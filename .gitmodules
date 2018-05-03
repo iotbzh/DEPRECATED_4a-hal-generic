@@ -4,3 +4,6 @@
 [submodule "app-controller"]
 	path = app-controller
 	url = https://gerrit.automotivelinux.org/gerrit/apps/app-controller-submodule
+[submodule "afb-helpers"]
+	path = afb-helpers
+	url = https://gerrit.automotivelinux.org/gerrit/apps/app-afb-helpers-submodule
