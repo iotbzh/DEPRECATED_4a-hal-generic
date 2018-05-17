@@ -1,0 +1,71 @@
+{
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
+    "metadata": {
+        "uid": "4a-hal-sample2",
+        "version": "0.9",
+        "api": "4a-hal-sample2",
+        "info": "Basic Audio Policy Control for Audio-4a"
+    },
+    "hal-metadata": {
+        "sndcard": "NOT_TESTED",
+        "author": "Jonathan Aillet",
+        "date": "2018-05-18"
+    },
+    "onload": [
+        {
+            "uid": "init-audio-hal",
+            "info": "Retrieve Active HAL",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ],
+    "controls":
+            [
+                {
+                    "uid": "Multimedia-Role",
+                    "info": "Request a multimedia stream",
+                    "privileges": "audio:multimedia",
+                    "action": "api://4a-hal-manager#ping",
+                    "args": {
+                        "ctl": "Multimedia_Playback_Volume",
+                        "val": 80
+                    }
+                },
+                {
+                    "uid": "Navigation-Role",
+                    "privileges": "audio:navigation",
+                    "action": "api://4a-hal-manager#ping",
+                    "args": {
+                        "ctl": "Multimedia_Playback_Volume",
+                        "val": 40
+                    }
+                },
+                {
+                    "uid": "Telephony-Role",
+                    "privileges": "audio:telephony",
+                    "action": "api://4a-hal-manager#ping",
+                    "args": {
+                        "ctl": "Navigation_Playback_Volume",
+                        "val": 0
+                    }
+                },
+                {
+                    "uid": "Release-Role",
+                    "privileges": "audio",
+                    "action": "api://4a-hal-manager#ping"
+                },
+                {
+                    "uid": "Signal-Timeout",
+                    "info": "Arm a timer and send event after timeout",
+                    "privileges": "audio:signal",
+                    "action": "api://4a-hal-manager#ping"
+                }
+            ],
+    "events":
+            [
+                {
+                    "uid": "api/status_changed",
+                    "action": "api://4a-hal-manager#ping"
+                }
+            ]
+}
+
