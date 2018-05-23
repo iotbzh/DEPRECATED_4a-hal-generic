@@ -25,14 +25,6 @@
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 
-// Api info definitions
-#define HAL_CTLS_API_NAME_MAX_SIZE 32
-#define HAL_CTLS_API_INFO_MAX_SIZE 64
-#define HAL_CTLS_API_SNDCARD_MAX_SIZE 128
-#define HAL_CTLS_API_AUTHOR_MAX_SIZE 32
-#define HAL_CTLS_API_VERSION_MAX_SIZE 16
-#define HAL_CTLS_API_DATE_MAX_SIZE 16
-
 // Verbs that can be use to create api
 int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMgrGlobalData);
 int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData);

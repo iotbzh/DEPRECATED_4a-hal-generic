@@ -68,10 +68,6 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 
 static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 {
-	int apiMetadataUnpackErr, apiHalmetadataUnpackErr;
-
-	json_object *apiMetadata, *apiHalmetadata;
-
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentCtlHalData;
 
@@ -94,27 +90,13 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	currentCtlHalData->internal = true;
 	currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 
-	if(! json_object_object_get_ex(ctrlConfig->configJ, "metadata", &apiMetadata))
-		return -4;
+	currentCtlHalData->name = (char *) ctrlConfig->api;
+	currentCtlHalData->sndCard = (char *) ctrlConfig->uid;
+	currentCtlHalData->info = (char *) ctrlConfig->info;
 
-	if(! json_object_object_get_ex(ctrlConfig->configJ, "hal-metadata", &apiHalmetadata))
-		return -5;
-
-	apiMetadataUnpackErr = wrap_json_unpack(apiMetadata, "{s:s s?:s s?:s s?:o s?:o !}",
-						"uid", NULL,
-						"version", &currentCtlHalData->version,
-						"api", &currentCtlHalData->name,
-						"info", NULL,
-						"require", NULL);
-	if(apiMetadataUnpackErr)
-		return -6;
-
-	apiHalmetadataUnpackErr = wrap_json_unpack(apiHalmetadata, "{s:s s:s s:s !}",
-						   "sndcard", &currentCtlHalData->sndCard,
-						   "author", &currentCtlHalData->author,
-						   "date", &currentCtlHalData->date);
-	if(apiHalmetadataUnpackErr)
-		return -7;
+	currentCtlHalData->author = (char *) ctrlConfig->author;
+	currentCtlHalData->version = (char *) ctrlConfig->version;
+	currentCtlHalData->date = (char *) ctrlConfig->date;
 
 	currentCtlHalData->apiHandle = apiHandle;
 	currentCtlHalData->ctrlConfig = ctrlConfig;

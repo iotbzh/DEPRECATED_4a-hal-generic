@@ -36,6 +36,7 @@ struct SpecificHalData {
 	char *name;
 	enum HalStatus status;
 	char *sndCard;
+	char *info;
 	uint8_t internal;
 
 	char *author;
