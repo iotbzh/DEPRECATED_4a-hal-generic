@@ -15,53 +15,29 @@
             "action": "api://4a-hal-manager#ping"
         }
     ],
-    "controls":
-            [
-                {
-                    "uid": "Multimedia-Role",
-                    "info": "Request a multimedia stream",
-                    "privileges": "audio:multimedia",
-                    "action": "api://4a-hal-manager#ping",
-                    "args": {
-                        "ctl": "Multimedia_Playback_Volume",
-                        "val": 80
-                    }
-                },
-                {
-                    "uid": "Navigation-Role",
-                    "privileges": "audio:navigation",
-                    "action": "api://4a-hal-manager#ping",
-                    "args": {
-                        "ctl": "Multimedia_Playback_Volume",
-                        "val": 40
-                    }
-                },
-                {
-                    "uid": "Telephony-Role",
-                    "privileges": "audio:telephony",
-                    "action": "api://4a-hal-manager#ping",
-                    "args": {
-                        "ctl": "Navigation_Playback_Volume",
-                        "val": 0
-                    }
-                },
-                {
-                    "uid": "Release-Role",
-                    "privileges": "audio",
-                    "action": "api://4a-hal-manager#ping"
-                },
-                {
-                    "uid": "Signal-Timeout",
-                    "info": "Arm a timer and send event after timeout",
-                    "privileges": "audio:signal",
-                    "action": "api://4a-hal-manager#ping"
-                }
-            ],
-    "events":
-            [
-                {
-                    "uid": "api/status_changed",
-                    "action": "api://4a-hal-manager#ping"
-                }
-            ]
+    "controls": [
+        {
+            "uid": "Master-Volume-Set",
+            "info": "Set Master Volume",
+            "privileges": "audio",
+            "action": "api://4a-hal-manager#ping"
+        },
+        {
+            "uid": "Master-Volume-Ramp",
+            "info": "Ramp master Volume",
+            "privileges": "audio",
+            "action": "api://4a-hal-manager#ping"
+        },
+        {
+            "uid": "ping2",
+            "info": "Ping hal",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ],
+    "events": [
+        {
+            "uid": "api/status_changed",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ]
 }
