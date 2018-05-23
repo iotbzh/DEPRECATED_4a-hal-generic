@@ -192,9 +192,9 @@ int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalDa
 	if(! dirList)
 		dirList = CONTROL_CONFIG_PATH;
 
-	configJ = CtlConfigScan(dirList, "4a");
+	configJ = CtlConfigScan(dirList, "hal");
 	if(! configJ) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s: No 4a*.json config file(s) found in %s ", __func__, dirList);
+		AFB_DYNAPI_ERROR(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s ", __func__, dirList);
 		return -2;
 	}
 
