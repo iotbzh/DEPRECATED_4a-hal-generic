@@ -65,9 +65,8 @@ void HalMgrPing(afb_request *request)
 
 void HalMgrLoaded(afb_request *request)
 {
-	int requestJsonErr;
+	int requestJsonErr, requestOptionValue;
 	uint64_t cpt, numberOfLoadedApi;
-	char *requestOption;
 
 	afb_dynapi *apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
@@ -76,8 +75,6 @@ void HalMgrLoaded(afb_request *request)
 	struct json_object *requestJson;
 	struct json_object *requestAnswer;
 	struct json_object *apiObject;
-
-	AFB_REQUEST_WARNING(request, "JAI :%s not completelly implemented yet", __func__);
 
 	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -112,20 +109,10 @@ void HalMgrLoaded(afb_request *request)
 	currentHalData = HalMgrGlobalData->first;
 
 	// Get request option
-	requestJsonErr = wrap_json_unpack(requestJson, "{s:s}", "option", &requestOption);
+	requestJsonErr = wrap_json_unpack(requestJson, "{s:i}", "verbose", &requestOptionValue);
 
-	if(! requestJsonErr && ! strcmp(requestOption, "status")) {		// Case if request option is 'status'
-		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
-			wrap_json_pack(&apiObject,
-				       "{s:i}",
-				       currentHalData->apiName,
-				       (unsigned int) currentHalData->status);
-			json_object_array_add(requestAnswer, apiObject);
-
-			currentHalData = currentHalData->next;
-		}
-	}
-	else if(! requestJsonErr && ! strcmp(requestOption, "metadata")) {	// Case if request option is 'metadata'
+	// Case if request key is 'verbose' and value is bigger than 0
+	if(! requestJsonErr && requestOptionValue > 0) {
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
 			wrap_json_pack(&apiObject,
 				       "{s:s s:i s:s s:i s:s s:s s:s}",
@@ -141,7 +128,8 @@ void HalMgrLoaded(afb_request *request)
 			currentHalData = currentHalData->next;
 		}
 	}
-	else {									// Case if request option is empty or not valid
+	// Case if request option is empty or not handled
+	else {
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
 			json_object_array_add(requestAnswer, json_object_new_string(currentHalData->apiName));
 
