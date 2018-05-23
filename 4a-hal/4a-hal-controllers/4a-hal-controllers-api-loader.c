@@ -27,7 +27,6 @@
 #include <ctl-config.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
-#include "../4a-hal-manager/4a-hal-manager-cb.h"
 
 #include "4a-hal-controllers-api-loader.h"
 #include "4a-hal-controllers-cb.h"
@@ -57,7 +56,6 @@ static CtlSectionT ctrlSections[] =
 static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL		SHORT DESCRIPTION */
-	{ .verb = "ping",		.callback = HalMgrPing,		.info = "Ping test for DynApi"},
 	{ .verb = "list",		.callback = HalCtlsListVerbs,	.info = "List available verbs for this api"},
 	{ .verb = NULL }		// Marker for end of the array
 };

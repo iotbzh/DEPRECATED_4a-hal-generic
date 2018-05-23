@@ -29,7 +29,7 @@
             "action": "api://4a-hal-manager#ping"
         },
         {
-            "uid": "ping2",
+            "uid": "ping",
             "info": "Ping hal",
             "action": "api://4a-hal-manager#ping"
         }
