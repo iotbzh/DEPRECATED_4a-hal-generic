@@ -33,7 +33,7 @@ enum HalStatus {
 
 // Structure to store specific hal (controller or external) data
 struct SpecificHalData {
-	char *name;
+	char *apiName;
 	enum HalStatus status;
 	char *sndCard;
 	char *info;
@@ -53,8 +53,8 @@ struct SpecificHalData {
 
 // Structure to store hal manager data
 struct HalMgrData {
-	char *name;
-	char *description;
+	char *apiName;
+	char *info;
 
 	afb_dynapi *apiHandle;
 
@@ -66,10 +66,10 @@ struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobal
 uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, struct SpecificHalData *ApiToRemove);
 uint64_t HalUtlRemoveAllHalFromList(struct HalMgrData *HalMgrGlobalData);
 uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData);
-struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *name);
+struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *apiName);
 
 // Exported verbs for 'struct HalMgrData' handling
-uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *name, char *description);
+uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info);
 void HalUtlRemoveHalMgrData(struct HalMgrData *HalMgrGlobalData);
 
 #endif /* _HAL_UTILITIES_DATA_INCLUDE_ */

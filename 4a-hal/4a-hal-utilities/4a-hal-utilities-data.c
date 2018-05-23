@@ -56,7 +56,7 @@ struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobal
 		currentApi = currentApi->next;
 	}
 
-	currentApi->name = NULL;
+	currentApi->apiName = NULL;
 	currentApi->sndCard = NULL;
 	currentApi->author = NULL;
 	currentApi->version = NULL;
@@ -93,8 +93,8 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 		}
 	}
 
-	if(matchingApi->name)
-		free(matchingApi->name);
+	if(matchingApi->apiName)
+		free(matchingApi->apiName);
 
 	if(matchingApi->sndCard)
 		free(matchingApi->sndCard);
@@ -147,17 +147,17 @@ uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData)
 	return numberOfCtlHal;
 }
 
-struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *name)
+struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *apiName)
 {
 	struct SpecificHalData *currentApi;
 
-	if(! HalMgrGlobalData || ! name)
+	if(! HalMgrGlobalData || ! apiName)
 		return NULL;
 
 	currentApi = HalMgrGlobalData->first;
 
 	while(currentApi) {
-		if(! strcmp(name, currentApi->name))
+		if(! strcmp(apiName, currentApi->apiName))
 			return currentApi;
 
 		currentApi = currentApi->next;
@@ -170,23 +170,19 @@ struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGl
  *		Hal Manager data handling functions			       *
  ******************************************************************************/
 
-uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *name, char *description)
+uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info)
 {
-	if(! apiHandle || ! HalMgrGlobalData || ! name || ! description)
+	if(! apiHandle || ! HalMgrGlobalData || ! apiName || ! info)
 		return -1;
 
-	// Allocate name and info strings
-	HalMgrGlobalData->name = (char *) calloc(strlen(name), sizeof(char));
-	if(! HalMgrGlobalData->name)
+	// Allocate and fill apiName and info strings
+	HalMgrGlobalData->apiName = strdup(apiName);
+	if(! HalMgrGlobalData->apiName)
 		return -2;
 
-	HalMgrGlobalData->description = (char *) calloc(strlen(description), sizeof(char));
-	if(! HalMgrGlobalData->name)
+	HalMgrGlobalData->info = strdup(info);
+	if(! HalMgrGlobalData->apiName)
 		return -3;
-
-	// Fill HalMgrGlobalData structure
-	strcpy(HalMgrGlobalData->name, name);
-	strcpy(HalMgrGlobalData->description, description);
 
 	HalMgrGlobalData->apiHandle = apiHandle;
 
@@ -201,11 +197,11 @@ void HalUtlRemoveHalMgrData(struct HalMgrData *HalMgrGlobalData)
 	if(HalMgrGlobalData->first)
 		HalUtlRemoveAllHalFromList(HalMgrGlobalData);
 
-	if(HalMgrGlobalData->name)
-		free(HalMgrGlobalData->name);
+	if(HalMgrGlobalData->apiName)
+		free(HalMgrGlobalData->apiName);
 
-	if(HalMgrGlobalData->description)
-		free(HalMgrGlobalData->description);
+	if(HalMgrGlobalData->info)
+		free(HalMgrGlobalData->info);
 
 	free(HalMgrGlobalData);
 }

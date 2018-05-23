@@ -90,7 +90,7 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	currentCtlHalData->internal = true;
 	currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 
-	currentCtlHalData->name = (char *) ctrlConfig->api;
+	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 	currentCtlHalData->sndCard = (char *) ctrlConfig->uid;
 	currentCtlHalData->info = (char *) ctrlConfig->info;
 

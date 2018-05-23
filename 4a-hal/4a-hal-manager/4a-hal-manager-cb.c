@@ -118,7 +118,7 @@ void HalMgrLoaded(afb_request *request)
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
 			wrap_json_pack(&apiObject,
 				       "{s:i}",
-				       currentHalData->name,
+				       currentHalData->apiName,
 				       (unsigned int) currentHalData->status);
 			json_object_array_add(requestAnswer, apiObject);
 
@@ -129,7 +129,7 @@ void HalMgrLoaded(afb_request *request)
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
 			wrap_json_pack(&apiObject,
 				       "{s:s s:i s:s s:i s:s s:s s:s}",
-				       "api", currentHalData->name,
+				       "api", currentHalData->apiName,
 				       "status", (int) currentHalData->status,
 				       "sndcard", currentHalData->sndCard,
 				       "internal", (int) currentHalData->internal,
@@ -143,7 +143,7 @@ void HalMgrLoaded(afb_request *request)
 	}
 	else {									// Case if request option is empty or not valid
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
-			json_object_array_add(requestAnswer, json_object_new_string(currentHalData->name));
+			json_object_array_add(requestAnswer, json_object_new_string(currentHalData->apiName));
 
 			currentHalData = currentHalData->next;
 		}
