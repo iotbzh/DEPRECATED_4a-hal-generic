@@ -1,13 +1,10 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "4a-hal-sample2",
+        "uid": "SND_CARD2",
         "version": "0.9",
         "api": "4a-hal-sample2",
-        "info": "Basic Audio Policy Control for Audio-4a"
-    },
-    "hal-metadata": {
-        "sndcard": "NOT_TESTED",
+        "info": "Basic Audio Policy Control for Audio-4a - Sample 2",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
     },
@@ -68,4 +65,3 @@
                 }
             ]
 }
-
