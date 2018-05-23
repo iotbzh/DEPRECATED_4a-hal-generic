@@ -41,12 +41,11 @@ afb_dynapi *AFB_default;
 // Config Section definition
 static CtlSectionT ctrlSections[] =
 {
-	[CTL_SECTION_PLUGIN]  = {.key="plugins" , .loadCB= PluginConfig},
-	[CTL_SECTION_ONLOAD]  = {.key="onload"  , .loadCB= OnloadConfig},
-	[CTL_SECTION_CONTROL] = {.key="controls", .loadCB= ControlConfig},
-	[CTL_SECTION_EVENT]   = {.key="events"  , .loadCB= EventConfig},
-
-	[CTL_SECTION_ENDTAG]  = {.key=NULL}
+	{.key="plugins" , .loadCB= PluginConfig},
+	{.key="onload"  , .loadCB= OnloadConfig},
+	{.key="controls", .loadCB= ControlConfig},
+	{.key="events"  , .loadCB= EventConfig},
+	{.key=NULL}
 };
 
 /*******************************************************************************
