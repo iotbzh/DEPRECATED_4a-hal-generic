@@ -93,21 +93,6 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 		}
 	}
 
-	if(matchingApi->apiName)
-		free(matchingApi->apiName);
-
-	if(matchingApi->sndCard)
-		free(matchingApi->sndCard);
-
-	if(matchingApi->author)
-		free(matchingApi->author);
-
-	if(matchingApi->version)
-		free(matchingApi->version);
-
-	if(matchingApi->date)
-		free(matchingApi->date);
-
 	free(matchingApi);
 
 	return 0;
@@ -197,11 +182,8 @@ void HalUtlRemoveHalMgrData(struct HalMgrData *HalMgrGlobalData)
 	if(HalMgrGlobalData->first)
 		HalUtlRemoveAllHalFromList(HalMgrGlobalData);
 
-	if(HalMgrGlobalData->apiName)
-		free(HalMgrGlobalData->apiName);
-
-	if(HalMgrGlobalData->info)
-		free(HalMgrGlobalData->info);
+	free(HalMgrGlobalData->apiName);
+	free(HalMgrGlobalData->info);
 
 	free(HalMgrGlobalData);
 }
