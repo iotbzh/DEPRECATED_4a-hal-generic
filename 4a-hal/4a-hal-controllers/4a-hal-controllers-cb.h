@@ -23,6 +23,13 @@
 #define AFB_BINDING_VERSION dyn
 #include <afb/afb-binding.h>
 
+#include <ctl-config.h>
+
+// HAL controllers sections parsing functions
+int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ);
+
+// HAL controllers verbs functions
+void HalCtlsActionOnStream(afb_request *request);
 void HalCtlsListVerbs(afb_request *request);
 
 #endif /* _HALMGR_CB_INCLUDE_ */

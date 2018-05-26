@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+#include <wrap-json.h>
+
 #define AFB_BINDING_VERSION dyn
 #include <afb/afb-binding.h>
 

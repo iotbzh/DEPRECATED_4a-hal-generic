@@ -45,6 +45,8 @@ static CtlSectionT ctrlSections[] =
 	{.key="onload"  , .loadCB= OnloadConfig},
 	{.key="controls", .loadCB= ControlConfig},
 	{.key="events"  , .loadCB= EventConfig},
+	// TODO JAI: create a new section parser to get 'halmap' and store them into hal structure
+	{.key="halmixer", .loadCB= HalCtlsHalMixerConfig},
 	{.key=NULL}
 };
 
