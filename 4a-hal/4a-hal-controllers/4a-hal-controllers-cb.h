@@ -30,6 +30,7 @@
 
 // HAL controllers sections parsing functions
 int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ);
+int HalCtlsHalMapConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *StreamControlsJ);
 
 // HAL controllers verbs functions
 void HalCtlsActionOnStream(afb_request *request);

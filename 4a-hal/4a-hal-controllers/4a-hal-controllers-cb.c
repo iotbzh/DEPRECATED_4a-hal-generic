@@ -110,13 +110,18 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 	return 0;
 }
 
-// TODO JAI: create a new section parser to get 'halmap' and store them into hal structure
+// TODO JAI : to implement
+int HalCtlsHalMapConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *StreamControlsJ)
+{
+	AFB_DYNAPI_WARNING(apiHandle, "JAI :%s not implemented yet", __func__);
+
+	return 0;
+}
 
 /*******************************************************************************
  *		HAL controllers verbs functions				       *
  ******************************************************************************/
 
-// TODO JAI : to implement
 void HalCtlsActionOnStream(afb_request *request)
 {
 	int verbToCallSize;
