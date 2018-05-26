@@ -25,11 +25,14 @@
 
 #include <ctl-config.h>
 
+#define ACTION_API_NAME "4a-softmixer"
+
 // HAL controllers sections parsing functions
 int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ);
 
 // HAL controllers verbs functions
 void HalCtlsActionOnStream(afb_request *request);
 void HalCtlsListVerbs(afb_request *request);
+void HalCtlsInitMixer(afb_request *request);
 
 #endif /* _HALMGR_CB_INCLUDE_ */

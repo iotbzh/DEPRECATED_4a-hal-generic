@@ -59,6 +59,7 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL		SHORT DESCRIPTION */
 	{ .verb = "list",		.callback = HalCtlsListVerbs,	.info = "List available verbs for this api"},
+	{ .verb = "init-mixer",		.callback = HalCtlsInitMixer,	.info = "Init Hal with 4a-softmixer"},
 	{ .verb = NULL }		// Marker for end of the array
 };
 
@@ -83,7 +84,7 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	if(! ctrlConfig)
 		return -2;
 
-	currentCtlHalData = ctrlConfig->external;
+	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData)
 		return -3;
 

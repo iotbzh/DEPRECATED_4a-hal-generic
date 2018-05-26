@@ -131,3 +131,62 @@ void HalCtlsListVerbs(afb_request *request)
 
 	afb_request_success(request, json_object_new_boolean(false), NULL);
 }
+
+void HalCtlsInitMixer(afb_request *request)
+{
+	char *apiToCall;
+
+	afb_dynapi *apiHandle;
+	CtlConfigT *ctrlConfig;
+
+	struct SpecificHalData *currentCtlHalData;
+
+	json_object *returnJ, *toReturnJ;
+
+	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	if(! apiHandle) {
+		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		return;
+	}
+
+	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
+	if(! ctrlConfig) {
+		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		return;
+	}
+
+	currentCtlHalData = ctrlConfig->external;
+	if(! currentCtlHalData) {
+		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		return;
+	}
+
+	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
+	if(! apiToCall) {
+		afb_request_fail(request, "mixer_api", "Can't get mixer api");
+		return;
+	}
+
+	// TODO JAI: test hal status (card is detected)
+
+	if(afb_dynapi_call_sync(apiHandle, apiToCall, "mixer_new", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
+		afb_request_fail_f(request,
+				   "mixer_new_call",
+				   "Seems that mix_new call to api %s didn't end well",
+				   apiToCall);
+	}
+	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
+		// TODO JAI : get streams cardId from mixer response
+
+		afb_request_success_f(request,
+				      toReturnJ,
+				      "Seems that mix_new call to api %s succeed",
+				      apiToCall);
+	}
+	else {
+		afb_request_fail_f(request,
+				   "invalid_response",
+				   "Seems that mix_new call to api %s succeed, but response is not valid",
+				   apiToCall);
+	}
+}
