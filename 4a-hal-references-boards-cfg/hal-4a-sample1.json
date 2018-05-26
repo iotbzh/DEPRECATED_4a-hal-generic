@@ -1,9 +1,10 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "SND_CARD",
+        "uid": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
         "version": "0.9",
         "api": "4a-hal-sample1",
+        "require": [ "4a-softmixer" ],
         "info": "Basic Audio Policy Control for Audio-4a - Sample 1",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
@@ -11,23 +12,11 @@
     "onload": [
         {
             "uid": "init-audio-hal",
-            "info": "Retrieve Active HAL",
+            "info": "Init current HAL",
             "action": "api://4a-hal-manager#ping"
         }
     ],
     "controls": [
-        {
-            "uid": "Master-Volume-Set",
-            "info": "Set Master Volume",
-            "privileges": "audio",
-            "action": "api://4a-hal-manager#ping"
-        },
-        {
-            "uid": "Master-Volume-Ramp",
-            "info": "Ramp master Volume",
-            "privileges": "audio",
-            "action": "api://4a-hal-manager#ping"
-        },
         {
             "uid": "ping",
             "info": "Ping hal",
@@ -39,5 +28,155 @@
             "uid": "api/status_changed",
             "action": "api://4a-hal-manager#ping"
         }
-    ]
+    ],
+    "halmap": [
+        {
+            "label": "Master_Playback_Volume",
+            "alsa": {
+                "name": "PCM Playback Volume",
+                "value": 12
+            }
+        },
+        {
+            "label": "Master_Playback_Ramp_70",
+            "info": "ramp volume linearly to 70 according to current ramp setting",
+            "alsa": {
+                "name": "Hal-VolRamp",
+                "numid": -1,
+                "type": "INTEGER",
+                "count": 1,
+                "minval": 0,
+                "maxval": 100,
+                "step": 1
+            },
+            "action": {
+                "label": "ramp-slow",
+                "callback": "api://4a-hal-sample1#master { ramp : 70 }"
+            }
+        }
+    ],
+    "halmixer": {
+        "uid": "hal-4a-sample1-test-mixer",
+        "mixerapi": "4a-softmixer",
+        "backend": {
+            "uid": "Jon-Office-HeadsetUSB-Audio",
+            "devpath": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
+            "sink": [
+                {
+                    "uid": "front-right",
+                    "port": 0
+                },
+                {
+                    "uid": "front-left",
+                    "port": 1
+                }
+            ]
+        },
+        "frontend" : {
+            "uid": "Alsa-Loop",
+            "devpath": "/dev/snd/by-path/platform-snd_aloop.0",
+            "params": {
+                "rate": 48000,
+            },
+            "ramps": [
+                {
+                    "uid": "ramp-fast",
+                    "delay": 050,
+                    "up": 10,
+                    "down": 3
+                },
+                {
+                    "uid": "ramp-slow",
+                    "delay": 250,
+                    "up": 03,
+                    "down": 1
+                },
+                {
+                    "uid": "ramp-normal",
+                    "delay": 100,
+                    "up": 06,
+                    "down": 2
+                }
+            ],
+            "devices": [
+                {
+                    "playback": 0,
+                    "capture": 1
+                }
+            ],
+            "subdevs": [
+                {
+                    "subdev": 0,
+                    "numid": 51
+                },
+                {
+                    "subdev": 1,
+                    "numid": 57
+                },
+                {
+                    "subdev": 2,
+                    "numid": 63
+                },
+                {
+                    "subdev": 3,
+                    "numid": 69
+                },
+                {
+                    "subdev": 4,
+                    "numid": 75
+                },
+                {
+                    "subdev": 5,
+                    "numid": 81
+                },
+                {
+                    "subdev": 6,
+                    "numid": 87
+                },
+                {
+                    "subdev": 7,
+                    "numid": 93
+                }
+            ]
+        },
+        "zones": [
+            {
+                "uid": "front-seats",
+                "type": "playback",
+                "mapping": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            }
+        ],
+        "streams": [
+            {
+                "uid": "multimedia",
+                "zone": "front-seats",
+                "ramp": "ramp-slow",
+                "volume": 60,
+                "mute": false
+            },
+            {
+                "uid": "navigation",
+                "zone": "front-seats",
+                "ramp": "ramp-normal",
+                "volume": 70,
+                "mute": false
+            },
+            {
+                "uid": "emergency",
+                "zone": "front-seats",
+                "ramp": "ramp-fast",
+                "volume": 80,
+                "mute": false
+            }
+        ]
+    }
 }
