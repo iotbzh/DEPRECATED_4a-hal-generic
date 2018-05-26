@@ -33,6 +33,6 @@ struct HalUtlApiVerb {
 };
 
 // Verb that allows to add verb to a dynamic api
-int HalUtlLoadStaticVerbs(afb_dynapi *apiHandle, struct HalUtlApiVerb *verbs);
+int HalUtlLoadVerbs(afb_dynapi *apiHandle, struct HalUtlApiVerb *verbs);
 
 #endif /* _HAL_UTILITIES_VERBS_LOADER_INCLUDE_ */

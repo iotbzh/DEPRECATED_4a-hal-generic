@@ -121,7 +121,7 @@ static int HalCtlsLoadOneApi(void *cbdata, afb_dynapi *apiHandle)
 	afb_dynapi_set_userdata(apiHandle, ctrlConfig);
 
 	// Add static controls verbs
-	if(HalUtlLoadStaticVerbs(apiHandle, CtlHalDynApiStaticVerbs)) {
+	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStaticVerbs)) {
 		AFB_DYNAPI_ERROR(apiHandle, "%s : load Section : fail to register static V2 verbs", __func__);
 		return 1;
 	}
