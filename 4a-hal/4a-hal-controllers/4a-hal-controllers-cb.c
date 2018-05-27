@@ -195,12 +195,67 @@ void HalCtlsActionOnStream(afb_request *request)
 	}
 }
 
-// TODO JAI : to implement
 void HalCtlsListVerbs(afb_request *request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	unsigned int idx;
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	afb_dynapi *apiHandle;
+	CtlConfigT *ctrlConfig;
+
+	struct SpecificHalData *currentCtlHalData;
+
+	json_object *requestJson, *requestAnswer, *streamsArray, *currentStream;
+
+	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	if(! apiHandle) {
+		afb_request_fail(request, "api_handle", "Can't get current hal controller api handle");
+		return;
+	}
+
+	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
+	if(! ctrlConfig) {
+		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		return;
+	}
+
+	currentCtlHalData = ctrlConfig->external;
+	if(! currentCtlHalData) {
+		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		return;
+	}
+
+	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
+		afb_request_fail(request, "no_data", "Won't be able to respond, no streams ofound");
+		return;
+	}
+
+	requestJson = afb_request_json(request);
+	if(! requestJson) {
+		afb_request_fail(request, "request_json", "Can't get request json");
+		return;
+	}
+
+	streamsArray = json_object_new_array();
+	if(! streamsArray) {
+		afb_request_fail(request, "json_answer", "Can't generate par of json answer");
+		return;
+	}
+
+	for(idx = 0; idx < currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count; idx++) {
+		wrap_json_pack(&currentStream,
+			       "{s:s s:s}",
+			       "name", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name,
+			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId ?
+					 currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId :
+					 "");
+		json_object_array_add(streamsArray, currentStream);
+	}
+
+	// TODO JAI : Check if there is some halmap config controls and add them to the reponse
+
+	wrap_json_pack(&requestAnswer, "{s:o}", "streams", streamsArray);
+
+	afb_request_success(request, requestAnswer, "Requested data");
 }
 
 void HalCtlsInitMixer(afb_request *request)
