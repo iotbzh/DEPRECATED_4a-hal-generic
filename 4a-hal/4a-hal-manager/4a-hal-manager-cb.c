@@ -72,25 +72,23 @@ void HalMgrLoaded(afb_request *request)
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *currentHalData;
 
-	struct json_object *requestJson;
-	struct json_object *requestAnswer;
-	struct json_object *apiObject;
+	struct json_object *requestJson, *requestAnswer, *apiObject;
 
 	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "ERROR", "Can't get HalManager Api handle");
+		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
 		return;
 	}
 
 	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
 	if(! HalMgrGlobalData) {
-		afb_request_fail(request, "ERROR", "Can't get HalManager data");
+		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
 		return;
 	}
 
 	requestJson = afb_request_json(request);
 	if(! requestJson) {
-		afb_request_fail(request, "ERROR", "Can't get request json");
+		afb_request_fail(request, "request_json", "Can't get request json");
 		return;
 	}
 
@@ -102,7 +100,7 @@ void HalMgrLoaded(afb_request *request)
 
 	requestAnswer = json_object_new_array();
 	if(! requestAnswer) {
-		afb_request_fail(request, "ERROR", "Can't generate json answer");
+		afb_request_fail(request, "json_answer", "Can't generate json answer");
 		return;
 	}
 
