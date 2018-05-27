@@ -56,13 +56,7 @@ struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobal
 		currentApi = currentApi->next;
 	}
 
-	currentApi->apiName = NULL;
-	currentApi->sndCard = NULL;
-	currentApi->author = NULL;
-	currentApi->version = NULL;
-	currentApi->date = NULL;
-
-	currentApi->next = NULL;
+	memset(currentApi, 0, sizeof(struct SpecificHalData));
 
 	return currentApi;
 }
@@ -92,6 +86,15 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 			return -2;
 		}
 	}
+
+	if(! matchingApi->internal) {
+		free(matchingApi->apiName);
+		free(matchingApi->sndCard);
+		free(matchingApi->info);
+		free(matchingApi->author);
+		free(matchingApi->version);
+		free(matchingApi->date);
+	};
 
 	free(matchingApi);
 
