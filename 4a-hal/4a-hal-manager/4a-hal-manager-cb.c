@@ -139,20 +139,130 @@ void HalMgrLoaded(afb_request *request)
 	afb_request_success(request, requestAnswer, "Requested data");
 }
 
-// TODO JAI : to implement
 void HalMgrLoad(afb_request *request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	char *apiName, *sndCard, *info = NULL, *author = NULL, *version = NULL, *date = NULL;
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	afb_dynapi *apiHandle;
+	struct HalMgrData *HalMgrGlobalData;
+	struct SpecificHalData *addedHal;
+
+	struct json_object *requestJson, *apiReceviedMetadata;
+
+	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	if(! apiHandle) {
+		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		return;
+	}
+
+	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
+	if(! HalMgrGlobalData) {
+		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
+		return;
+	}
+
+	requestJson = afb_request_json(request);
+	if(! requestJson) {
+		afb_request_fail(request, "request_json", "Can't get request json");
+		return;
+	}
+
+	if(! json_object_object_get_ex(requestJson, "metadata", &apiReceviedMetadata)) {
+		afb_request_fail(request, "api_metadata", "Can't get api to register metadata");
+		return;
+	}
+
+	if(wrap_json_unpack(apiReceviedMetadata,
+			    "{s:s s:s s?:s s?:s s?:s s?:s}",
+			    "api", &apiName,
+			    "uid", &sndCard,
+			    "info", &info,
+			    "author", &author,
+			    "version", &version,
+			    "date", &date)) {
+		afb_request_fail(request, "api_metadata", "Can't metadata of api to register");
+		return;
+	}
+
+	// TODO JAI: try connect to the api to test if it really exists
+
+	addedHal = HalUtlAddHalApiToHalList(HalMgrGlobalData);
+
+	addedHal->internal = false;
+	addedHal->status = HAL_STATUS_UNAVAILABLE;
+
+	addedHal->apiName = strdup(apiName);
+	addedHal->sndCard = strdup(sndCard);
+
+	if(info)
+		addedHal->info = strdup(info);
+
+	if(author)
+		addedHal->author = strdup(author);
+
+	if(version)
+		addedHal->version = strdup(version);
+
+	if(date)
+		addedHal->date = strdup(date);
+
+	// TODO JAI: add subscription to this api status events
+
+	afb_request_success(request, NULL, "Api successfully registered");
 }
 
-// TODO JAI : to implement
 void HalMgrUnload(afb_request *request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	char *apiName;
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	afb_dynapi *apiHandle;
+	struct HalMgrData *HalMgrGlobalData;
+	struct SpecificHalData *HalToRemove;
+
+	struct json_object *requestJson;
+
+	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	if(! apiHandle) {
+		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		return;
+	}
+
+	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
+	if(! HalMgrGlobalData) {
+		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
+		return;
+	}
+
+	requestJson = afb_request_json(request);
+	if(! requestJson) {
+		afb_request_fail(request, "request_json", "Can't get request json");
+		return;
+	}
+
+	if(wrap_json_unpack(requestJson, "{s:s}", "api", &apiName)) {
+		afb_request_fail(request, "requested_api", "Can't get api to remove");
+		return;
+	}
+
+	HalToRemove = HalUtlSearchHalDataByApiName(HalMgrGlobalData, apiName);
+	if(! HalToRemove) {
+		afb_request_fail(request, "requested_api", "Can't find api to remove");
+		return;
+	}
+
+	if(HalToRemove->internal) {
+		afb_request_fail(request, "requested_api", "Can't remove an internal controller api");
+		return;
+	}
+
+	if(HalUtlRemoveSelectedHalFromList(HalMgrGlobalData, HalToRemove)) {
+		afb_request_fail(request, "unregister_error", "Didn't succeed to remove specified api");
+		return;
+	}
+
+	// TODO JAI: remove subscription to this api status events
+
+	afb_request_success(request, NULL, "Api successfully unregistered");
 }
 
 // TODO JAI : to implement
