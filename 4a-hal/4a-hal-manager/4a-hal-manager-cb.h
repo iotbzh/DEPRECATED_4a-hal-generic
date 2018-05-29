@@ -24,7 +24,7 @@
 #include <afb/afb-binding.h>
 
 // Event handler
-void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, struct json_object *eventJ);
+void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ);
 
 // Exported verbs callbacks
 void HalMgrPing(afb_request *request);

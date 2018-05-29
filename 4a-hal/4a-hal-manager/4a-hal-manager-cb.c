@@ -33,7 +33,7 @@
  ******************************************************************************/
 
 // TODO JAI : to implement
-void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, struct json_object *eventJ)
+void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ)
 {
 	AFB_DYNAPI_WARNING(apiHandle, "JAI :%s not implemented yet", __func__);
 	// Use "4a-hal-manager-events.h" to handle events
@@ -72,7 +72,7 @@ void HalMgrLoaded(afb_request *request)
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *currentHalData;
 
-	struct json_object *requestJson, *requestAnswer, *apiObject;
+	json_object *requestJson, *requestAnswer, *apiObject;
 
 	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
 	if(! apiHandle) {
