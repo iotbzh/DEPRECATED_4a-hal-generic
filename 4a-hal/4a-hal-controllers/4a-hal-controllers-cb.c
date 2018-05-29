@@ -119,9 +119,75 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 // TODO JAI : to implement
 void HalCtlsActionOnStream(afb_request *request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	int verbToCallSize;
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	char *apiToCall, *verbToCall;
+
+	afb_dynapi *apiHandle;
+	CtlConfigT *ctrlConfig;
+
+	struct SpecificHalData *currentCtlHalData;
+
+	json_object *requestJson, *returnJ, *toReturnJ;
+
+	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	if(! apiHandle) {
+		afb_request_fail(request, "api_handle", "Can't get current hal controller api handle");
+		return;
+	}
+
+	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
+	if(! ctrlConfig) {
+		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		return;
+	}
+
+	currentCtlHalData = ctrlConfig->external;
+	if(! currentCtlHalData) {
+		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		return;
+	}
+
+	requestJson = afb_request_json(request);
+	if(! requestJson) {
+		afb_request_fail(request, "request_json", "Can't get request json");
+		return;
+	}
+
+	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
+	if(! apiToCall) {
+		afb_request_fail(request, "mixer_api", "Can't get mixer api");
+		return;
+	}
+
+	// TODO JAI: check status of hal before doing anything
+
+	// TODO JAI : remove action prefix, streams should be created as verb by mixer
+	verbToCallSize = (int) strlen(API_STREAM_PREFIX) + (int) strlen(request->verb) + 2;
+	verbToCall = (char *) alloca(verbToCallSize * sizeof(char));
+	verbToCall[0] = '\0';
+	verbToCall[verbToCallSize - 1] = '\0';
+
+	strcat(verbToCall, API_STREAM_PREFIX);
+	strcat(verbToCall, "/");
+	strcat(verbToCall, request->verb);
+
+	if(afb_dynapi_call_sync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
+		afb_request_fail_f(request, "action", "Action %s seemingly not correctly transfered to %s",
+							verbToCall,
+							apiToCall);
+
+	}
+	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
+		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s, and successfull",
+								verbToCall,
+								apiToCall);
+	}
+	else {
+		afb_request_fail_f(request, "invalid_response", "Action %s correctly transfered to %s, but response is not valid",
+							verbToCall,
+							apiToCall);
+	}
 }
 
 // TODO JAI : to implement
