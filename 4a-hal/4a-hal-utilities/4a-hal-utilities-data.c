@@ -26,6 +26,30 @@
 #include "4a-hal-utilities-data.h"
 
 /*******************************************************************************
+ *		Specfic Hal controller streams data handling functions	       *
+ ******************************************************************************/
+
+uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalStreamsDataT *ctlHalStreamsData)
+{
+	unsigned int cpt;
+
+	if(! ctlHalStreamsData)
+		return -1;
+
+	if(! ctlHalStreamsData->count)
+		return -2;
+
+	for(cpt = 0; cpt < ctlHalStreamsData->count; cpt++) {
+		free(ctlHalStreamsData->data[cpt].name);
+		free(ctlHalStreamsData->data[cpt].cardId);
+	}
+
+	free(ctlHalStreamsData->data);
+
+	return 0;
+}
+
+/*******************************************************************************
  *		Specfic Hal data handling functions			       *
  ******************************************************************************/
 
@@ -94,7 +118,12 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 		free(matchingApi->author);
 		free(matchingApi->version);
 		free(matchingApi->date);
-	};
+	}
+	else {
+		HalUtlRemoveAllCtlHalStreamsData(&matchingApi->ctlHalSpecificData->ctlHalStreamsData);
+
+		free(matchingApi->ctlHalSpecificData);
+	}
 
 	free(matchingApi);
 

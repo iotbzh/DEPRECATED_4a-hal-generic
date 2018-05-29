@@ -86,7 +86,7 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 		return -3;
 
 	// Fill SpecificHalDatadata structure
-	currentCtlHalData->internal = true;
+	currentCtlHalData->internal = (unsigned int) true;
 	currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 
 	currentCtlHalData->apiName = (char *) ctrlConfig->api;
@@ -97,8 +97,8 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	currentCtlHalData->version = (char *) ctrlConfig->version;
 	currentCtlHalData->date = (char *) ctrlConfig->date;
 
-	currentCtlHalData->apiHandle = apiHandle;
-	currentCtlHalData->ctrlConfig = ctrlConfig;
+	currentCtlHalData->ctlHalSpecificData->apiHandle = apiHandle;
+	currentCtlHalData->ctlHalSpecificData->ctrlConfig = ctrlConfig;
 
 	// TODO JAI: Search for hw sndCard
 	// TODO JAI: Update alsa command of HalCtl to use alsa-softmixer/alsa-core data
@@ -160,11 +160,16 @@ int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMg
 		return -3;
 	}
 
+	// Allocation of current hal controller data
 	currentCtlHalData = HalUtlAddHalApiToHalList(HalMgrGlobalData);
 	if(! currentCtlHalData)
 		return -4;
 
+	// Stores current hal controller data in controller config
 	ctrlConfig->external = (void *) currentCtlHalData;
+
+	// Allocation of the structure that will be used to store specific hal controller data
+	currentCtlHalData->ctlHalSpecificData = calloc(1, sizeof(struct CtlHalSpecificData));
 
 	// Create one API (Pre-V3 return code ToBeChanged)
 	return afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, HalCtlsLoadOneApi, ctrlConfig);

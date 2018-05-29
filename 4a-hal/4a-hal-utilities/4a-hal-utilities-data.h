@@ -31,22 +31,41 @@ enum HalStatus {
 	HAL_STATUS_AVAILABLE=1,
 };
 
+struct CtlHalStreamData {
+	char *name;
+	char *cardId;
+};
+
+struct CtlHalStreamsDataT {
+	struct CtlHalStreamData *data;
+	unsigned int count;
+};
+
+struct CtlHalSpecificData {
+	char *mixerApiName;
+	json_object *halMixerJ;
+
+	struct CtlHalStreamsDataT ctlHalStreamsData;
+	// TODO JAI : add structure to hold halmap section data
+
+	afb_dynapi *apiHandle;
+	CtlConfigT *ctrlConfig;
+};
+
 // Structure to store specific hal (controller or external) data
 struct SpecificHalData {
 	char *apiName;
 	enum HalStatus status;
 	char *sndCard;
 	char *info;
-	uint8_t internal;
+	unsigned int internal;
 
 	char *author;
 	char *version;
 	char *date;
-
 	// Can be beefed up if needed
 
-	afb_dynapi *apiHandle;			// Can be NULL if external api
-	CtlConfigT *ctrlConfig;			// Can be NULL if external api
+	struct CtlHalSpecificData *ctlHalSpecificData;		// Can be NULL if external api
 
 	struct SpecificHalData *next;
 };
