@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
+        "uid": "/dev/snd/by-id/usb-C-Media_Electronics_Inc._USB_Audio_Device-00",
         "version": "0.9",
-        "api": "4a-hal-sample1",
-        "require": [ "4a-softmixer" ],
-        "info": "Basic Audio Policy Control for Audio-4a - Sample 1",
+        "api": "4a-hal-jon-home-usb-card",
+        "require": [ "softmixer" ],
+        "info": "Basic Audio Policy Control for Audio-4a - Jon's Office USB Card Audio",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
     },
@@ -51,16 +51,16 @@
             },
             "action": {
                 "label": "ramp-slow",
-                "callback": "api://4a-hal-sample1#master { ramp : 70 }"
+                "callback": "api://4a-hal-jon-home-usb-card#master { ramp : 70 }"
             }
         }
     ],
     "halmixer": {
-        "uid": "hal-4a-sample1-test-mixer",
-        "mixerapi": "4a-softmixer",
+        "uid": "jon-home-usb-card-mixer",
+        "mixerapi": "softmixer",
         "backend": {
-            "uid": "Jon-Office-HeadsetUSB-Audio",
-            "devpath": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
+            "uid": "Jon-Home-USB-Card-Audio",
+            "devpath": "/dev/snd/by-id/usb-C-Media_Electronics_Inc._USB_Audio_Device-00",
             "sink": [
                 {
                     "uid": "front-right",
@@ -98,12 +98,10 @@
                     "down": 2
                 }
             ],
-            "devices": [
-                {
-                    "playback": 0,
-                    "capture": 1
-                }
-            ],
+            "devices": {
+                "playback": 0,
+                "capture": 1
+            },
             "subdevs": [
                 {
                     "subdev": 0,

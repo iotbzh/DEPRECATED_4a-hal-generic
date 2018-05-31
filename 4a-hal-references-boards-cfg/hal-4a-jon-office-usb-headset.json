@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-C-Media_Electronics_Inc._USB_Audio_Device-00",
+        "uid": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
         "version": "0.9",
-        "api": "4a-hal-sample2",
-        "require": [ "4a-softmixer" ],
-        "info": "Basic Audio Policy Control for Audio-4a - Sample 2",
+        "api": "4a-hal-jon-office-usb-headset",
+        "require": [ "softmixer" ],
+        "info": "Basic Audio Policy Control for Audio-4a - Jon's Office USB Headset Audio",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
     },
@@ -51,16 +51,16 @@
             },
             "action": {
                 "label": "ramp-slow",
-                "callback": "api://4a-hal-sample1#master { ramp : 70 }"
+                "callback": "api://4a-hal-jon-office-usb-headset#master { ramp : 70 }"
             }
         }
     ],
     "halmixer": {
-        "uid": "hal-4a-sample2-test-mixer",
-        "mixerapi": "4a-softmixer",
+        "uid": "jon-office-usb-headset-mixer",
+        "mixerapi": "softmixer",
         "backend": {
-            "uid": "Jon-Home-USB-Audio",
-            "devpath": "/dev/snd/by-id/usb-C-Media_Electronics_Inc._USB_Audio_Device-00",
+            "uid": "Jon-Office-USB-Headset-Audio",
+            "devpath": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
             "sink": [
                 {
                     "uid": "front-right",
