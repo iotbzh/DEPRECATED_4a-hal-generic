@@ -45,6 +45,7 @@ struct CtlHalStreamsDataT {
 
 struct CtlHalSpecificData {
 	char *mixerApiName;
+	char *halSoftMixerVerb;
 	json_object *halMixerJ;
 
 	struct CtlHalStreamsDataT ctlHalStreamsData;

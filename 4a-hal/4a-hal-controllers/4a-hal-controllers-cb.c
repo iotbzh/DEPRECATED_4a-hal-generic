@@ -64,8 +64,11 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 		if(wrap_json_unpack(MixerJ, "{s:s}", "mixerapi", &currentHalData->ctlHalSpecificData->mixerApiName))
 			return -5;
 
-		if(! json_object_object_get_ex(MixerJ, "streams", &streamsArray))
+		if(wrap_json_unpack(MixerJ, "{s:s}", "uid", &currentHalData->ctlHalSpecificData->halSoftMixerVerb))
 			return -6;
+
+		if(! json_object_object_get_ex(MixerJ, "streams", &streamsArray))
+			return -7;
 
 		switch(json_object_get_type(streamsArray)) {
 			case json_type_object:
@@ -75,7 +78,7 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 				streamCount = json_object_array_length(streamsArray);
 				break;
 			default:
-				return -7;
+				return -8;
 		}
 
 		currentHalData->ctlHalSpecificData->ctlHalStreamsData.count = streamCount;
@@ -93,7 +96,7 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 				currentStream = streamsArray;
 
 			if(wrap_json_unpack(currentStream, "{s:s}", "uid", &currentStreamName))
-				return -9-idx;
+				return -10-idx;
 
 			currentHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name = strdup(currentStreamName);
 			currentHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId = NULL;
@@ -104,7 +107,7 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 		}
 
 		if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStreamVerbs))
-			return -8;
+			return -9;
 	}
 
 	return 0;
@@ -126,7 +129,7 @@ void HalCtlsActionOnStream(afb_request *request)
 {
 	int verbToCallSize;
 
-	char *apiToCall, *verbToCall;
+	char *apiToCall, *halSoftMixerVerb, *verbToCall;
 
 	afb_dynapi *apiHandle;
 	CtlConfigT *ctrlConfig;
@@ -165,15 +168,21 @@ void HalCtlsActionOnStream(afb_request *request)
 		return;
 	}
 
+	halSoftMixerVerb = currentCtlHalData->ctlHalSpecificData->halSoftMixerVerb;
+	if(! halSoftMixerVerb) {
+		afb_request_fail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
+		return;
+	}
+
 	// TODO JAI: check status of hal before doing anything
 
-	// TODO JAI : remove action prefix, streams should be created as verb by mixer
-	verbToCallSize = (int) strlen(API_STREAM_PREFIX) + (int) strlen(request->verb) + 2;
+	// TODO JAI : remove verb to call prefix, each hal should have its own api in softmixer, and each streams should be created as verb by mixer
+	verbToCallSize = (int) strlen(halSoftMixerVerb) + (int) strlen(request->verb) + 2;
 	verbToCall = (char *) alloca(verbToCallSize * sizeof(char));
 	verbToCall[0] = '\0';
 	verbToCall[verbToCallSize - 1] = '\0';
 
-	strcat(verbToCall, API_STREAM_PREFIX);
+	strcat(verbToCall, halSoftMixerVerb);
 	strcat(verbToCall, "/");
 	strcat(verbToCall, request->verb);
 

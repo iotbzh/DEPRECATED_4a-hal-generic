@@ -25,9 +25,6 @@
 
 #include <ctl-config.h>
 
-// TODO JAI: remove this define
-#define API_STREAM_PREFIX "simple_mixer"
-
 // HAL controllers sections parsing functions
 int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ);
 int HalCtlsHalMapConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *StreamControlsJ);
