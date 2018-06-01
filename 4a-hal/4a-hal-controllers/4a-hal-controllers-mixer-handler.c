@@ -30,6 +30,72 @@
  *		HAL controllers hanlde mixer responses functions	       *
  ******************************************************************************/
 
+void HalCtlsHandleMixerCallError(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatus)
+{
+	char *returnedStatus, *returnedInfo;
+
+	json_object *returnedRequestJ, *returnedStatusJ, *returnedInfoJ;
+
+	if(! json_object_object_get_ex(callReturnJ, "request", &returnedRequestJ)) {
+		AFB_ReqFail(request, errorStatus, "Couldn't get response request object");
+		return;
+	}
+
+	if(! json_object_is_type(returnedRequestJ, json_type_object)) {
+		AFB_ReqFail(request, errorStatus, "Response request object is not valid");
+		return;
+	}
+
+	if(! json_object_object_get_ex(returnedRequestJ, "status", &returnedStatusJ)) {
+		AFB_ReqFail(request, errorStatus, "Couldn't get response status object");
+		return;
+	}
+
+	if(! json_object_is_type(returnedStatusJ, json_type_string)) {
+		AFB_ReqFail(request, errorStatus, "Response status object is not valid");
+		return;
+	}
+
+	returnedStatus = (char *) json_object_get_string(returnedStatusJ);
+
+	if(! strcmp(returnedStatus, "unknown-api")) {
+		AFB_ReqFailF(request,
+				   errorStatus,
+				   "Api %s not found",
+				   apiCalled);
+		return;
+	}
+
+	if(! strcmp(returnedStatus, "unknown-verb")) {
+		AFB_ReqFailF(request,
+				   errorStatus,
+				   "Verb %s of api %s not found",
+				   verbCalled,
+				   apiCalled);
+		return;
+	}
+
+	if(! json_object_object_get_ex(returnedRequestJ, "info", &returnedInfoJ)) {
+		AFB_ReqFail(request, errorStatus, "Couldn't get response info object");
+		return;
+	}
+
+	if(! json_object_is_type(returnedInfoJ, json_type_string)) {
+		AFB_ReqFail(request, errorStatus, "Response info object is not valid");
+		return;
+	}
+
+	returnedInfo = (char *) json_object_get_string(returnedInfoJ);
+
+	AFB_ReqFailF(request,
+			   errorStatus,
+			   "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
+			   apiCalled,
+			   verbCalled,
+			   returnedStatus,
+			   returnedInfo);
+}
+
 int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *mixerResponseJ)
 {
 	int err = 0;

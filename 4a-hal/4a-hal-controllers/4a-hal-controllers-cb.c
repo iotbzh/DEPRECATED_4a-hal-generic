@@ -81,7 +81,7 @@ void HalCtlsActionOnStream(afb_request *request)
 {
 	int verbToCallSize;
 
-	char *apiToCall, *halSoftMixerVerb, *verbToCall;
+	char *apiToCall, *mixerVerbName, *verbToCall;
 
 	afb_dynapi *apiHandle;
 	CtlConfigT *ctrlConfig;
@@ -120,8 +120,8 @@ void HalCtlsActionOnStream(afb_request *request)
 		return;
 	}
 
-	halSoftMixerVerb = currentCtlHalData->ctlHalSpecificData->mixerVerbName;
-	if(! halSoftMixerVerb) {
+	mixerVerbName = currentCtlHalData->ctlHalSpecificData->mixerVerbName;
+	if(! mixerVerbName) {
 		afb_request_fail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
 		return;
 	}
@@ -129,20 +129,17 @@ void HalCtlsActionOnStream(afb_request *request)
 	// TODO JAI: check status of hal before doing anything
 
 	// TODO JAI : remove verb to call prefix, each hal should have its own api in softmixer, and each streams should be created as verb by mixer
-	verbToCallSize = (int) strlen(halSoftMixerVerb) + (int) strlen(request->verb) + 2;
+	verbToCallSize = (int) strlen(mixerVerbName) + (int) strlen(request->verb) + 2;
 	verbToCall = (char *) alloca(verbToCallSize * sizeof(char));
 	verbToCall[0] = '\0';
 	verbToCall[verbToCallSize - 1] = '\0';
 
-	strcat(verbToCall, halSoftMixerVerb);
+	strcat(verbToCall, mixerVerbName);
 	strcat(verbToCall, "/");
 	strcat(verbToCall, request->verb);
 
 	if(afb_dynapi_call_sync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
-		afb_request_fail_f(request, "action", "Action %s seemingly not correctly transfered to %s",
-							verbToCall,
-							apiToCall);
-
+		HalCtlsHandleMixerCallError(request, apiToCall, verbToCall, returnJ, "stream_action");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
 		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s, and successfull",
@@ -256,11 +253,8 @@ void HalCtlsInitMixer(afb_request *request)
 
 	// TODO JAI: test hal status (card is detected)
 
-	if(afb_dynapi_call_sync(apiHandle, apiToCall, "mixer_new", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
-		afb_request_fail_f(request,
-				   "mixer_new_call",
-				   "Seems that mix_new call to api %s didn't end well",
-				   apiToCall);
+	if(afb_dynapi_call_sync(apiHandle, apiToCall, "create", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
+		HalCtlsHandleMixerCallError(request, apiToCall, "create", returnJ, "mixer_create");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
 		err = HalCtlsHandleMixerAttachResponse(request, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);
