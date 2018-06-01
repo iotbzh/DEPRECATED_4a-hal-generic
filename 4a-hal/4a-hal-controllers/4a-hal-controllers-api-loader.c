@@ -138,8 +138,6 @@ static int HalCtlsLoadOneApi(void *cbdata, afb_dynapi *apiHandle)
 	// Init Api function (does not receive user closure ???)
 	afb_dynapi_on_init(apiHandle, HalCtlsInitOneApi);
 
-	afb_dynapi_seal(apiHandle);
-
 	return err;
 }
 
