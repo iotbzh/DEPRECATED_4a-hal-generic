@@ -29,7 +29,7 @@
 #include "4a-hal-manager-cb.h"
 
 // Default api to print log when apihandle not available
-afb_dynapi *AFB_default;
+AFB_ApiT AFB_default;
 
 /*******************************************************************************
  *		HAL Manager verbs table					       *
@@ -53,7 +53,7 @@ struct HalUtlApiVerb HalManagerApiStaticVerbs[] =
  *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-static int HalMgrInitApi(afb_dynapi *apiHandle)
+static int HalMgrInitApi(AFB_ApiT apiHandle)
 {
 	struct HalMgrData *HalMgrGlobalData;
 
@@ -74,7 +74,7 @@ static int HalMgrInitApi(afb_dynapi *apiHandle)
 	return 0;
 }
 
-static int HalMgrLoadApi(void *cbdata, afb_dynapi *apiHandle)
+static int HalMgrLoadApi(void *cbdata, AFB_ApiT apiHandle)
 {
 	struct HalMgrData *HalMgrGlobalData;
 
@@ -88,7 +88,7 @@ static int HalMgrLoadApi(void *cbdata, afb_dynapi *apiHandle)
 
 	// Add static controls verbs
 	if(HalUtlLoadVerbs(apiHandle, HalManagerApiStaticVerbs)) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s : load section : fail to register static V2 verbs", __func__);
+		AFB_ApiError(apiHandle, "%s : load section : fail to register static V2 verbs", __func__);
 		return 1;
 	}
 
@@ -103,7 +103,7 @@ static int HalMgrLoadApi(void *cbdata, afb_dynapi *apiHandle)
 	return 0;
 }
 
-int HalMgrCreateApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData)
+int HalMgrCreateApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 {
 	if(! apiHandle || ! HalMgrGlobalData)
 		return -1;
@@ -117,7 +117,7 @@ int HalMgrCreateApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData)
  *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-int afbBindingVdyn(afb_dynapi *apiHandle)
+int afbBindingVdyn(AFB_ApiT apiHandle)
 {
 	int status = 0, rc;
 	struct HalMgrData *HalMgrGlobalData;
@@ -132,7 +132,7 @@ int afbBindingVdyn(afb_dynapi *apiHandle)
 	// Hugely hack to make all V2 AFB_DEBUG to work in fileutils
 	AFB_default = apiHandle;
 
-	AFB_DYNAPI_NOTICE(apiHandle, "In %s", __func__);
+	AFB_ApiNotice(apiHandle, "In %s", __func__);
 
 	// Load Hal-Manager using DynApi
 	rc = HalMgrCreateApi(apiHandle, HalMgrGlobalData);

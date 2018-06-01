@@ -22,8 +22,7 @@
 
 #include <wrap-json.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 #include <ctl-config.h>
 
@@ -54,7 +53,7 @@ struct CtlHalSpecificData {
 	struct CtlHalStreamsDataT ctlHalStreamsData;
 	// TODO JAI : add structure to hold halmap section data
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 };
 
@@ -84,7 +83,7 @@ struct HalMgrData {
 
 	struct SpecificHalData usedCardId[ALSA_MAX_CARD];
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 
 	struct SpecificHalData *first;
 };
@@ -97,7 +96,7 @@ uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData);
 struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *apiName);
 
 // Exported verbs for 'struct HalMgrData' handling
-uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info);
+uint8_t HalUtlInitializeHalMgrData(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info);
 void HalUtlRemoveHalMgrData(struct HalMgrData *HalMgrGlobalData);
 
 #endif /* _HAL_UTILITIES_DATA_INCLUDE_ */

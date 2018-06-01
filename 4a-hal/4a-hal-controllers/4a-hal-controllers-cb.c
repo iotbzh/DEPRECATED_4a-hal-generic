@@ -34,7 +34,7 @@
  *		HAL controllers sections parsing functions		       *
  ******************************************************************************/
 
-int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ)
+int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *MixerJ)
 {
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentHalData;
@@ -67,9 +67,9 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 }
 
 // TODO JAI : to implement
-int HalCtlsHalMapConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *StreamControlsJ)
+int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *StreamControlsJ)
 {
-	AFB_DYNAPI_WARNING(apiHandle, "JAI :%s not implemented yet", __func__);
+	AFB_ApiWarning(apiHandle, "JAI :%s not implemented yet", __func__);
 
 	return 0;
 }
@@ -78,57 +78,57 @@ int HalCtlsHalMapConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object
  *		HAL controllers verbs functions				       *
  ******************************************************************************/
 
-void HalCtlsActionOnStream(afb_request *request)
+void HalCtlsActionOnStream(AFB_ReqT request)
 {
 	int verbToCallSize;
 
 	char *apiToCall, *mixerVerbName, *verbToCall;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 
 	struct SpecificHalData *currentCtlHalData;
 
 	json_object *requestJson, *returnJ, *toReturnJ;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get current hal controller api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get current hal controller api handle");
 		return;
 	}
 
 	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
 	if(! ctrlConfig) {
-		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		AFB_ReqFail(request, "hal_controller_config", "Can't get current hal controller config");
 		return;
 	}
 
 	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
-		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		AFB_ReqFail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
 	}
 
-	requestJson = afb_request_json(request);
+	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		afb_request_fail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "request_json", "Can't get request json");
 		return;
 	}
 
 	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
 	if(! apiToCall) {
-		afb_request_fail(request, "mixer_api", "Can't get mixer api");
+		AFB_ReqFail(request, "mixer_api", "Can't get mixer api");
 		return;
 	}
 
 	mixerVerbName = currentCtlHalData->ctlHalSpecificData->mixerVerbName;
 	if(! mixerVerbName) {
-		afb_request_fail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
+		AFB_ReqFail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
 		return;
 	}
 
 	if(currentCtlHalData->status != HAL_STATUS_AVAILABLE) {
-		afb_request_fail(request, "hal_unavailable", "Seems that hal is not available");
+		AFB_ReqFail(request, "hal_unavailable", "Seems that hal is not available");
 		return;
 	}
 
@@ -142,64 +142,66 @@ void HalCtlsActionOnStream(afb_request *request)
 	strcat(verbToCall, "/");
 	strcat(verbToCall, request->verb);
 
-	if(afb_dynapi_call_sync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
+	if(AFB_ServiceSync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, verbToCall, returnJ, "stream_action");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
-		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s without any error raised",
-								verbToCall,
-								apiToCall);
+		AFB_ReqSucessF(request,
+			       toReturnJ,
+			       "Action %s correctly transfered to %s without any error raised",
+			       verbToCall,
+			       apiToCall);
 	}
 	else {
-		afb_request_fail_f(request, "invalid_response", "Action %s correctly transfered to %s, but response is not valid",
+		AFB_ReqFailF(request, "invalid_response", "Action %s correctly transfered to %s, but response is not valid",
 							verbToCall,
 							apiToCall);
 	}
 }
 
-void HalCtlsListVerbs(afb_request *request)
+void HalCtlsListVerbs(AFB_ReqT request)
 {
 	unsigned int idx;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 
 	struct SpecificHalData *currentCtlHalData;
 
 	json_object *requestJson, *requestAnswer, *streamsArray, *currentStream;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get current hal controller api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get current hal controller api handle");
 		return;
 	}
 
 	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
 	if(! ctrlConfig) {
-		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		AFB_ReqFail(request, "hal_controller_config", "Can't get current hal controller config");
 		return;
 	}
 
 	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
-		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		AFB_ReqFail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
 	}
 
 	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
-		afb_request_success(request, NULL, "No data to answer, no streams found");
+		AFB_ReqSucess(request, NULL, "No data to answer, no streams found");
 		return;
 	}
 
-	requestJson = afb_request_json(request);
+	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		afb_request_fail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "request_json", "Can't get request json");
 		return;
 	}
 
 	streamsArray = json_object_new_array();
 	if(! streamsArray) {
-		afb_request_fail(request, "json_answer", "Can't generate par of json answer");
+		AFB_ReqFail(request, "json_answer", "Can't generate par of json answer");
 		return;
 	}
 
@@ -215,82 +217,82 @@ void HalCtlsListVerbs(afb_request *request)
 
 	wrap_json_pack(&requestAnswer, "{s:o}", "streams", streamsArray);
 
-	afb_request_success(request, requestAnswer, "Requested data");
+	AFB_ReqSucess(request, requestAnswer, "Requested data");
 }
 
-void HalCtlsInitMixer(afb_request *request)
+void HalCtlsInitMixer(AFB_ReqT request)
 {
 	unsigned int err;
 
 	char *apiToCall;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 
 	struct SpecificHalData *currentCtlHalData;
 
 	json_object *returnJ, *toReturnJ;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT ) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get current hal api handle");
 		return;
 	}
 
 	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
 	if(! ctrlConfig) {
-		afb_request_fail(request, "hal_controller_config", "Can't get current hal controller config");
+		AFB_ReqFail(request, "hal_controller_config", "Can't get current hal controller config");
 		return;
 	}
 
 	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
-		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
+		AFB_ReqFail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
 	}
 
 	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
 	if(! apiToCall) {
-		afb_request_fail(request, "mixer_api", "Can't get mixer api");
+		AFB_ReqFail(request, "mixer_api", "Can't get mixer api");
 		return;
 	}
 
 	switch(currentCtlHalData->status) {
 		case HAL_STATUS_UNAVAILABLE:
-			afb_request_fail(request, "hal_unavailable", "Seems that the hal corresponding card was not found by alsacore at startup");
+			AFB_ReqFail(request, "hal_unavailable", "Seems that the hal corresponding card was not found by alsacore at startup");
 			return;
 
 		case HAL_STATUS_READY:
-			afb_request_success(request, NULL, "Seems that the hal mixer is already initialized");
+			AFB_ReqSucess(request, NULL, "Seems that the hal mixer is already initialized");
 			return;
 
 		case HAL_STATUS_AVAILABLE:
 			break;
 	}
 
-	if(afb_dynapi_call_sync(apiHandle, apiToCall, "create", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
+	if(AFB_ServiceSync(apiHandle, apiToCall, "create", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, "create", returnJ, "mixer_create");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
 		err = HalCtlsHandleMixerAttachResponse(request, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);
 		if(err != (int) MIXER_NO_ERROR) {
-			afb_request_success_f(request,
-					      toReturnJ,
-					      "Seems that create call to api %s succeed but this warning was risen by response decoder : %i",
-					      apiToCall,
-					      err);
+			AFB_ReqFailF(request,
+					   "handler_mixer_response",
+					   "Seems that create call to api %s succeed but this warning was risen by response decoder : %i",
+					   apiToCall,
+					   err);
 			return;
 		}
 
-		afb_request_success_f(request,
-				      toReturnJ,
-				      "Seems that create call to api %s succeed with no warning raised",
-				      apiToCall);
+		AFB_ReqSucessF(request,
+			       toReturnJ,
+			       "Seems that create call to api %s succeed with no warning raised",
+			       apiToCall);
 
 		currentCtlHalData->status = HAL_STATUS_READY;
 	}
 	else {
-		afb_request_fail_f(request,
+		AFB_ReqFailF(request,
 				   "invalid_response",
 				   "Seems that mix_new call to api %s succeed, but response is not valid",
 				   apiToCall);

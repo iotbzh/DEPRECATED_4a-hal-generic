@@ -25,6 +25,6 @@
 #define ALSACORE_GETINFO_VERB	"infoget"
 
 // HAL controllers alsacore calls funtions
-bool HalCtlsGetCardIdByCardPath(afb_dynapi *apiHandle, struct SpecificHalData *currentCtlHalData);
+bool HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, struct SpecificHalData *currentCtlHalData);
 
 #endif /* HAL_CTLS_ALSACORE_LINK_INCLUDE_ */

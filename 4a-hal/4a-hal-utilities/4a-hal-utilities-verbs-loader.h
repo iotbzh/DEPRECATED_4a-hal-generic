@@ -20,19 +20,18 @@
 
 #include <stdio.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 // Structure to store data necessary to add a verb to a dynamic api
 struct HalUtlApiVerb {
 	const char *verb;			/* name of the verb, NULL only at end of the array */
-	void (*callback)(afb_request *req);	/* callback function implementing the verb */
+	void (*callback)(AFB_ReqT req);	/* callback function implementing the verb */
 	const struct afb_auth *auth;		/* required authorisation, can be NULL */
 	const char *info;			/* some info about the verb, can be NULL */
 	uint32_t session;
 };
 
 // Verb that allows to add verb to a dynamic api
-int HalUtlLoadVerbs(afb_dynapi *apiHandle, struct HalUtlApiVerb *verbs);
+int HalUtlLoadVerbs(AFB_ApiT apiHandle, struct HalUtlApiVerb *verbs);
 
 #endif /* _HAL_UTILITIES_VERBS_LOADER_INCLUDE_ */

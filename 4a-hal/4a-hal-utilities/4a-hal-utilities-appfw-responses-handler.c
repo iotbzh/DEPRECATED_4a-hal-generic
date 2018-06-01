@@ -27,7 +27,7 @@
  *		Handle application framework response function		       *
  ******************************************************************************/
 
-enum CallError HalUtlHandleAppFwCallError(afb_dynapi *apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo)
+enum CallError HalUtlHandleAppFwCallError(AFB_ApiT apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo)
 {
 	json_object *returnedRequestJ, *returnedStatusJ, *returnedInfoJ;
 
@@ -35,50 +35,50 @@ enum CallError HalUtlHandleAppFwCallError(afb_dynapi *apiHandle, char *apiCalled
 		return CALL_ERROR_INVALID_ARGS;
 
 	if(! json_object_object_get_ex(callReturnJ, "request", &returnedRequestJ)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Couldn't get response request object");
+		AFB_ApiWarning(apiHandle, "Couldn't get response request object");
 		return CALL_ERROR_REQUEST_UNAVAILABLE;
 	}
 
 	if(! json_object_is_type(returnedRequestJ, json_type_object)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Response request object is not valid");
+		AFB_ApiWarning(apiHandle, "Response request object is not valid");
 		return CALL_ERROR_REQUEST_NOT_VALID;
 	}
 
 	if(! json_object_object_get_ex(returnedRequestJ, "status", &returnedStatusJ)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Couldn't get response status object");
+		AFB_ApiWarning(apiHandle, "Couldn't get response status object");
 		return CALL_ERROR_REQUEST_STATUS_UNAVAILABLE;
 	}
 
 	if(! json_object_is_type(returnedStatusJ, json_type_string)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Response status object is not valid");
+		AFB_ApiWarning(apiHandle, "Response status object is not valid");
 		return CALL_ERROR_REQUEST_STATUS_NOT_VALID;
 	}
 
 	*returnedStatus = (char *) json_object_get_string(returnedStatusJ);
 
 	if(! strcmp(*returnedStatus, "unknown-api")) {
-		AFB_DYNAPI_WARNING(apiHandle, "Api %s not found", apiCalled);
+		AFB_ApiWarning(apiHandle, "Api %s not found", apiCalled);
 		return CALL_ERROR_API_UNAVAILABLE;
 	}
 
 	if(! strcmp(*returnedStatus, "unknown-verb")) {
-		AFB_DYNAPI_WARNING(apiHandle, "Verb %s of api %s not found", verbCalled, apiCalled);
+		AFB_ApiWarning(apiHandle, "Verb %s of api %s not found", verbCalled, apiCalled);
 		return CALL_ERROR_VERB_UNAVAILABLE;
 	}
 
 	if(! json_object_object_get_ex(returnedRequestJ, "info", &returnedInfoJ)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Couldn't get response info object");
+		AFB_ApiWarning(apiHandle, "Couldn't get response info object");
 		return CALL_ERROR_REQUEST_INFO_UNAVAILABLE;
 	}
 
 	if(! json_object_is_type(returnedInfoJ, json_type_string)) {
-		AFB_DYNAPI_WARNING(apiHandle, "Response info object is not valid");
+		AFB_ApiWarning(apiHandle, "Response info object is not valid");
 		return CALL_ERROR_REQUEST_INFO_NOT_VALID;
 	}
 
 	*returnedInfo = (char *) json_object_get_string(returnedInfoJ);
 
-	AFB_DYNAPI_WARNING(apiHandle,
+	AFB_ApiWarning(apiHandle,
 			   "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
 			   apiCalled,
 			   verbCalled,
@@ -88,20 +88,20 @@ enum CallError HalUtlHandleAppFwCallError(afb_dynapi *apiHandle, char *apiCalled
 	return CALL_ERROR_RETURNED;
 }
 
-void HalUtlHandleAppFwCallErrorInRequest(afb_request *request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend)
+void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend)
 {
 	char **returnedStatus, **returnedInfo;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 
 	if(! request || ! apiCalled || ! verbCalled || ! callReturnJ) {
-		afb_request_fail_f(request, "invalid_args", "%s: invalid arguments", __func__);
+		AFB_ReqFailF(request, "invalid_args", "%s: invalid arguments", __func__);
 		return;
 	}
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail_f(request, "api_handle", "%s: Can't get hal manager api handle", __func__);
+		AFB_ReqFailF(request, "api_handle", "%s: Can't get hal manager api handle", __func__);
 		return;
 	}
 
@@ -115,25 +115,25 @@ void HalUtlHandleAppFwCallErrorInRequest(afb_request *request, char *apiCalled, 
 		case CALL_ERROR_REQUEST_STATUS_NOT_VALID:
 		case CALL_ERROR_REQUEST_INFO_UNAVAILABLE:
 		case CALL_ERROR_REQUEST_INFO_NOT_VALID:
-			afb_request_fail(request, errorStatusToSend, "Error with response object");
+			AFB_ReqFail(request, errorStatusToSend, "Error with response object");
 			return;
 
 		case CALL_ERROR_API_UNAVAILABLE:
-			afb_request_fail_f(request, errorStatusToSend, "Api %s not found", apiCalled);
+			AFB_ReqFailF(request, errorStatusToSend, "Api %s not found", apiCalled);
 			return;
 
 		case CALL_ERROR_VERB_UNAVAILABLE:
-			afb_request_fail_f(request, errorStatusToSend, "Verb %s of api %s not found", verbCalled, apiCalled);
+			AFB_ReqFailF(request, errorStatusToSend, "Verb %s of api %s not found", verbCalled, apiCalled);
 			return;
 
 		case CALL_ERROR_RETURNED:
-			afb_request_fail_f(request,
-					   errorStatusToSend,
-					   "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
-					   apiCalled,
-					   verbCalled,
-					   *returnedStatus,
-					   *returnedInfo);
+			AFB_ReqFailF(request,
+				     errorStatusToSend,
+				     "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
+				     apiCalled,
+				     verbCalled,
+				     *returnedStatus,
+				     *returnedInfo);
 			return;
 
 		case CALL_ERROR_INVALID_ARGS:

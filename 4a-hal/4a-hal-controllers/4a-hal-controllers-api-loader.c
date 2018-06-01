@@ -33,7 +33,7 @@
 #include "4a-hal-controllers-cb.h"
 
 // Default api to print log when apihandle not available
-afb_dynapi *AFB_default;
+AFB_ApiT AFB_default;
 
 /*******************************************************************************
  *		Json parsing functions using app controller		       *
@@ -69,7 +69,7 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
  *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
+static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 {
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentCtlHalData;
@@ -115,7 +115,7 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	return CtlConfigExec(apiHandle, ctrlConfig);
 }
 
-static int HalCtlsLoadOneApi(void *cbdata, afb_dynapi *apiHandle)
+static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 {
 	int err;
 	CtlConfigT *ctrlConfig;
@@ -130,7 +130,7 @@ static int HalCtlsLoadOneApi(void *cbdata, afb_dynapi *apiHandle)
 
 	// Add static controls verbs
 	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStaticVerbs)) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s : load Section : fail to register static V2 verbs", __func__);
+		AFB_ApiError(apiHandle, "%s : load Section : fail to register static V2 verbs", __func__);
 		return 1;
 	}
 
@@ -146,7 +146,7 @@ static int HalCtlsLoadOneApi(void *cbdata, afb_dynapi *apiHandle)
 	return err;
 }
 
-int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMgrGlobalData)
+int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGlobalData)
 {
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentCtlHalData;
@@ -157,12 +157,12 @@ int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMg
 	// Create one Api per file
 	ctrlConfig = CtlLoadMetaData(apiHandle, path);
 	if(! ctrlConfig) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s: No valid control config file in:\n-- %s", __func__, path);
+		AFB_ApiError(apiHandle, "%s: No valid control config file in:\n-- %s", __func__, path);
 		return -2;
 	}
 
 	if(! ctrlConfig->api) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s: API Missing from metadata in:\n-- %s", __func__, path);
+		AFB_ApiError(apiHandle, "%s: API Missing from metadata in:\n-- %s", __func__, path);
 		return -3;
 	}
 
@@ -181,7 +181,7 @@ int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMg
 	return afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, HalCtlsLoadOneApi, ctrlConfig);
 }
 
-int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData)
+int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 {
 	int index, err, status = 0;
 	char *dirList, *fileName, *fullPath;
@@ -197,7 +197,7 @@ int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalDa
 	// Hugely hack to make all V2 AFB_DEBUG to work in fileutils
 	AFB_default = apiHandle;
 
-	AFB_DYNAPI_NOTICE(apiHandle, "In %s", __func__);
+	AFB_ApiNotice(apiHandle, "In %s", __func__);
 
 	dirList = getenv("CONTROL_CONFIG_PATH");
 	if(! dirList)
@@ -205,7 +205,7 @@ int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalDa
 
 	configJ = CtlConfigScan(dirList, "hal");
 	if(! configJ) {
-		AFB_DYNAPI_ERROR(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s ", __func__, dirList);
+		AFB_ApiError(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s ", __func__, dirList);
 		return -2;
 	}
 
@@ -215,7 +215,7 @@ int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalDa
 
 		err = wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName);
 		if(err) {
-			AFB_DYNAPI_ERROR(apiHandle, "%s: HOOPs invalid JSON entry = %s", __func__, json_object_get_string(entryJ));
+			AFB_ApiError(apiHandle, "%s: HOOPs invalid JSON entry = %s", __func__, json_object_get_string(entryJ));
 			return -1;
 		}
 

@@ -30,7 +30,7 @@
  *		HAL controllers alsacore calls funtions			       *
  ******************************************************************************/
 
-bool HalCtlsGetCardIdByCardPath(afb_dynapi *apiHandle, struct SpecificHalData *currentCtlHalData)
+bool HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, struct SpecificHalData *currentCtlHalData)
 {
 	int *cardId;
 
@@ -46,12 +46,12 @@ bool HalCtlsGetCardIdByCardPath(afb_dynapi *apiHandle, struct SpecificHalData *c
 
 	wrap_json_pack(&toSendJ, "{s:s}", "devpath", currentCtlHalData->sndCard);
 
-	if(afb_dynapi_call_sync(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, toSendJ, &returnJ)) {
+	if(AFB_ServiceSync(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, toSendJ, &returnJ)) {
 		returnedStatus = alloca(sizeof(char *));
 		returnedInfo = alloca(sizeof(char *));
 
 		returnedError = HalUtlHandleAppFwCallError(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, returnJ, returnedStatus, returnedInfo);
-		AFB_DYNAPI_WARNING(apiHandle,
+		AFB_ApiWarning(apiHandle,
 				   "Error %i during call to verb %s of %s api",
 				   (int) returnedError,
 				   ALSACORE_GETINFO_VERB,
@@ -61,10 +61,10 @@ bool HalCtlsGetCardIdByCardPath(afb_dynapi *apiHandle, struct SpecificHalData *c
 		if(json_object_object_get_ex(responsJ, "devid", &devidJ) && json_object_is_type(devidJ, json_type_string)) {
 			cardIdString = (char *) json_object_get_string(devidJ);
 			if(sscanf(cardIdString, "hw:%i", cardId) <= 0)
-				AFB_DYNAPI_WARNING(apiHandle, "Couldn't get valid devid from string: '%s'", cardIdString);
+				AFB_ApiWarning(apiHandle, "Couldn't get valid devid from string: '%s'", cardIdString);
 		}
 		else {
-			AFB_DYNAPI_WARNING(apiHandle, "Response devid is not present/valid");
+			AFB_ApiWarning(apiHandle, "Response devid is not present/valid");
 		}
 
 		currentCtlHalData->sndCardId = *cardId;

@@ -28,7 +28,7 @@
  *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-int HalUtlLoadVerbs(afb_dynapi *apiHandle, struct HalUtlApiVerb *verbs)
+int HalUtlLoadVerbs(AFB_ApiT apiHandle, struct HalUtlApiVerb *verbs)
 {
 	int idx, errCount = 0;
 

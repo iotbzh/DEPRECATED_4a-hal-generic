@@ -20,8 +20,7 @@
 
 #include <stdio.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 // TODO JAI: declare events handlers functions
 

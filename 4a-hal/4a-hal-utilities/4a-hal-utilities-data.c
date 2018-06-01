@@ -187,7 +187,7 @@ struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGl
  *		Hal Manager data handling functions			       *
  ******************************************************************************/
 
-uint8_t HalUtlInitializeHalMgrData(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info)
+uint8_t HalUtlInitializeHalMgrData(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info)
 {
 	if(! apiHandle || ! HalMgrGlobalData || ! apiName || ! info)
 		return -1;

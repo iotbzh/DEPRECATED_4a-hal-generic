@@ -20,13 +20,12 @@
 
 #include <stdio.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 
 // Verbs that can be use to create api
-int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMgrGlobalData);
-int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData);
+int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGlobalData);
+int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData);
 
 #endif /* _HALMGR_HALCTL_DYNAPI_INCLUDE_ */

@@ -20,19 +20,18 @@
 
 #include <stdio.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 // Event handler
-void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ);
+void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_object *eventJ);
 
 // Exported verbs callbacks
-void HalMgrPing(afb_request *request);
+void HalMgrPing(AFB_ReqT request);
 
-void HalMgrLoaded(afb_request *request);
-void HalMgrLoad(afb_request *request);
-void HalMgrUnload(afb_request *request);
-void HalMgrSubscribeEvent(afb_request *request);
-void HalMgrUnsubscribeEvent(afb_request *request);
+void HalMgrLoaded(AFB_ReqT request);
+void HalMgrLoad(AFB_ReqT request);
+void HalMgrUnload(AFB_ReqT request);
+void HalMgrSubscribeEvent(AFB_ReqT request);
+void HalMgrUnsubscribeEvent(AFB_ReqT request);
 
 #endif /* _HALMGR_CB_INCLUDE_ */

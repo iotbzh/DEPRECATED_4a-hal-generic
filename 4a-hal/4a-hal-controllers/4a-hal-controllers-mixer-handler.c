@@ -37,15 +37,15 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 
 	char *currentStreamName, *currentStreamCardId;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 
 	struct HalUtlApiVerb *CtlHalDynApiStreamVerbs;
 
 	json_object *currentStreamJ;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		AFB_REQUEST_WARNING(request, "%s: Can't get current hal api handle", __func__);
+		AFB_ReqWarning(request, "%s: Can't get current hal api handle", __func__);
 		return (int) MIXER_ERROR_API_UNAVAILABLE;
 	}
 
@@ -58,7 +58,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 			break;
 		default:
 			currentHalStreamsData->count = 0;
-			AFB_REQUEST_WARNING(request, "%s: no streams returned", __func__);
+			AFB_ReqWarning(request, "%s: no streams returned", __func__);
 			return (int) MIXER_ERROR_NO_STREAMS;
 	}
 
@@ -75,11 +75,11 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 			currentStreamJ = mixerResponseJ;
 
 		if(wrap_json_unpack(currentStreamJ, "{s:s}", "uid", &currentStreamName)) {
-			AFB_REQUEST_WARNING(request, "%s: can't find name in current stream object", __func__);
+			AFB_ReqWarning(request, "%s: can't find name in current stream object", __func__);
 			err += (int) MIXER_ERROR_STREAM_NAME_UNAVAILABLE;
 		}
 		else if(wrap_json_unpack(currentStreamJ, "{s:s}", "alsa", &currentStreamCardId)) {
-			AFB_REQUEST_WARNING(request, "%s: can't find card id in current stream object", __func__);
+			AFB_ReqWarning(request, "%s: can't find card id in current stream object", __func__);
 			err += (int) MIXER_ERROR_STREAM_CARDID_UNAVAILABLE;
 		}
 		else {
@@ -93,7 +93,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 	}
 
 	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStreamVerbs)) {
-		AFB_REQUEST_WARNING(request, "%s: error while creating verbs for streams", __func__);
+		AFB_ReqWarning(request, "%s: error while creating verbs for streams", __func__);
 		err += (int) MIXER_ERROR_COULDNT_ADD_STREAMS_AS_VERB;
 	}
 

@@ -22,8 +22,7 @@
 
 #include <wrap-json.h>
 
-#define AFB_BINDING_VERSION dyn
-#include <afb/afb-binding.h>
+#include <afb-definitions.h>
 
 // Enum for the type of error detected
 enum CallError {
@@ -40,7 +39,7 @@ enum CallError {
 };
 
 // Handle application framework response function
-enum CallError HalUtlHandleAppFwCallError(afb_dynapi *apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo);
-void HalUtlHandleAppFwCallErrorInRequest(afb_request *request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend);
+enum CallError HalUtlHandleAppFwCallError(AFB_ApiT apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo);
+void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend);
 
 #endif /* _HAL_UTILITIES_APPFW_RESP_HANDLER_INCLUDE_ */

@@ -35,6 +35,6 @@ enum MixerStatus {
 };
 
 // HAL controllers handle mixer response function
-int HalCtlsHandleMixerAttachResponse(afb_request *request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *MixerResponseJ);
+int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *MixerResponseJ);
 
 #endif /* _HAL_CTLS_SOFTMIXER_LINK_INCLUDE_ */

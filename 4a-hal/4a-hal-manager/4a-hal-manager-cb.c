@@ -33,9 +33,9 @@
  ******************************************************************************/
 
 // TODO JAI : to implement
-void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ)
+void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_object *eventJ)
 {
-	AFB_DYNAPI_WARNING(apiHandle, "JAI :%s not implemented yet", __func__);
+	AFB_ApiWarning(apiHandle, "JAI :%s not implemented yet", __func__);
 	// Use "4a-hal-manager-events.h" to handle events
 }
 
@@ -43,18 +43,18 @@ void HalMgrDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_ob
  *	TODO JAI : Present for test, delete this function when validated       *
  ******************************************************************************/
 
-void HalMgrPing(afb_request *request)
+void HalMgrPing(AFB_ReqT request)
 {
 	static int count = 0;
 
 	count++;
 
 	if(request->dynapi)
-		AFB_REQUEST_NOTICE(request, "JAI :%s (%s): ping count = %d", request->api, request->dynapi->apiname, count);
+		AFB_ReqNotice(request, "JAI :%s (%s): ping count = %d", request->api, request->dynapi->apiname, count);
 	else
-		AFB_REQUEST_NOTICE(request, "JAI: %s: ping count = %d", request->api, count);
+		AFB_ReqNotice(request, "JAI: %s: ping count = %d", request->api, count);
 
-	afb_request_success(request, json_object_new_int(count), NULL);
+	AFB_ReqSucess(request, json_object_new_int(count), NULL);
 
 	return;
 }
@@ -63,44 +63,44 @@ void HalMgrPing(afb_request *request)
  *		HAL Manager verbs functions				       *
  ******************************************************************************/
 
-void HalMgrLoaded(afb_request *request)
+void HalMgrLoaded(AFB_ReqT request)
 {
 	int requestJsonErr, requestOptionValue;
 	uint64_t cpt, numberOfLoadedApi;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *currentHalData;
 
 	json_object *requestJson, *requestAnswer, *apiObject;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT ) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get hal manager api handle");
 		return;
 	}
 
 	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
 	if(! HalMgrGlobalData) {
-		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
+		AFB_ReqFail(request, "hal_manager_data", "Can't get hal manager data");
 		return;
 	}
 
-	requestJson = afb_request_json(request);
+	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		afb_request_fail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "request_json", "Can't get request json");
 		return;
 	}
 
 	numberOfLoadedApi = HalUtlGetNumberOfHalInList(HalMgrGlobalData);
 	if(! numberOfLoadedApi) {
-		afb_request_success(request, NULL, "No Hal Api loaded");
+		AFB_ReqSucess(request, NULL, "No Hal Api loaded");
 		return;
 	}
 
 	requestAnswer = json_object_new_array();
 	if(! requestAnswer) {
-		afb_request_fail(request, "json_answer", "Can't generate json answer");
+		AFB_ReqFail(request, "json_answer", "Can't generate json answer");
 		return;
 	}
 
@@ -136,39 +136,39 @@ void HalMgrLoaded(afb_request *request)
 		}
 	}
 
-	afb_request_success(request, requestAnswer, "Requested data");
+	AFB_ReqSucess(request, requestAnswer, "Requested data");
 }
 
-void HalMgrLoad(afb_request *request)
+void HalMgrLoad(AFB_ReqT request)
 {
 	char *apiName, *sndCard, *info = NULL, *author = NULL, *version = NULL, *date = NULL;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *addedHal;
 
 	struct json_object *requestJson, *apiReceviedMetadata;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get hal manager api handle");
 		return;
 	}
 
 	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
 	if(! HalMgrGlobalData) {
-		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
+		AFB_ReqFail(request, "hal_manager_data", "Can't get hal manager data");
 		return;
 	}
 
-	requestJson = afb_request_json(request);
+	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		afb_request_fail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "request_json", "Can't get request json");
 		return;
 	}
 
 	if(! json_object_object_get_ex(requestJson, "metadata", &apiReceviedMetadata)) {
-		afb_request_fail(request, "api_metadata", "Can't get api to register metadata");
+		AFB_ReqFail(request, "api_metadata", "Can't get api to register metadata");
 		return;
 	}
 
@@ -180,7 +180,7 @@ void HalMgrLoad(afb_request *request)
 			    "author", &author,
 			    "version", &version,
 			    "date", &date)) {
-		afb_request_fail(request, "api_metadata", "Can't metadata of api to register");
+		AFB_ReqFail(request, "api_metadata", "Can't metadata of api to register");
 		return;
 	}
 
@@ -208,75 +208,75 @@ void HalMgrLoad(afb_request *request)
 
 	// TODO JAI: add subscription to this api status events
 
-	afb_request_success(request, NULL, "Api successfully registered");
+	AFB_ReqSucess(request, NULL, "Api successfully registered");
 }
 
-void HalMgrUnload(afb_request *request)
+void HalMgrUnload(AFB_ReqT request)
 {
 	char *apiName;
 
-	afb_dynapi *apiHandle;
+	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *HalToRemove;
 
 	struct json_object *requestJson;
 
-	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
+	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		afb_request_fail(request, "api_handle", "Can't get hal manager api handle");
+		AFB_ReqFail(request, "api_handle", "Can't get hal manager api handle");
 		return;
 	}
 
 	HalMgrGlobalData = (struct HalMgrData *) afb_dynapi_get_userdata(apiHandle);
 	if(! HalMgrGlobalData) {
-		afb_request_fail(request, "hal_manager_data", "Can't get hal manager data");
+		AFB_ReqFail(request, "hal_manager_data", "Can't get hal manager data");
 		return;
 	}
 
-	requestJson = afb_request_json(request);
+	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		afb_request_fail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "request_json", "Can't get request json");
 		return;
 	}
 
 	if(wrap_json_unpack(requestJson, "{s:s}", "api", &apiName)) {
-		afb_request_fail(request, "requested_api", "Can't get api to remove");
+		AFB_ReqFail(request, "requested_api", "Can't get api to remove");
 		return;
 	}
 
 	HalToRemove = HalUtlSearchHalDataByApiName(HalMgrGlobalData, apiName);
 	if(! HalToRemove) {
-		afb_request_fail(request, "requested_api", "Can't find api to remove");
+		AFB_ReqFail(request, "requested_api", "Can't find api to remove");
 		return;
 	}
 
 	if(HalToRemove->internal) {
-		afb_request_fail(request, "requested_api", "Can't remove an internal controller api");
+		AFB_ReqFail(request, "requested_api", "Can't remove an internal controller api");
 		return;
 	}
 
 	if(HalUtlRemoveSelectedHalFromList(HalMgrGlobalData, HalToRemove)) {
-		afb_request_fail(request, "unregister_error", "Didn't succeed to remove specified api");
+		AFB_ReqFail(request, "unregister_error", "Didn't succeed to remove specified api");
 		return;
 	}
 
 	// TODO JAI: remove subscription to this api status events
 
-	afb_request_success(request, NULL, "Api successfully unregistered");
+	AFB_ReqSucess(request, NULL, "Api successfully unregistered");
 }
 
 // TODO JAI : to implement
-void HalMgrSubscribeEvent(afb_request *request)
+void HalMgrSubscribeEvent(AFB_ReqT request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "JAI :%s not implemented yet", __func__);
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
 }
 
 // TODO JAI : to implement
-void HalMgrUnsubscribeEvent(afb_request *request)
+void HalMgrUnsubscribeEvent(AFB_ReqT request)
 {
-	AFB_REQUEST_WARNING(request, "JAI :%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "JAI :%s not implemented yet", __func__);
 
-	afb_request_success(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
 }
