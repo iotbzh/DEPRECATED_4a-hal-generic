@@ -46,4 +46,4 @@ int HalUtlLoadVerbs(afb_dynapi *apiHandle, struct HalUtlApiVerb *verbs)
 	}
 
 	return errCount;
-};
+}
