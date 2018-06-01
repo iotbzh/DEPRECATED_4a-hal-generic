@@ -27,6 +27,7 @@
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
 
 #include "4a-hal-controllers-cb.h"
+#include "4a-hal-controllers-mixer-handler.h"
 
 /*******************************************************************************
  *		HAL controllers sections parsing functions		       *
@@ -34,15 +35,8 @@
 
 int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_object *MixerJ)
 {
-	unsigned int streamCount, idx;
-	char *currentStreamName;
-
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentHalData;
-
-	json_object *streamsArray, *currentStream;
-
-	struct HalUtlApiVerb *CtlHalDynApiStreamVerbs;
 
 	if(! apiHandle || ! section)
 		return -1;
@@ -64,50 +58,8 @@ int HalCtlsHalMixerConfig(afb_dynapi *apiHandle, CtlSectionT *section, json_obje
 		if(wrap_json_unpack(MixerJ, "{s:s}", "mixerapi", &currentHalData->ctlHalSpecificData->mixerApiName))
 			return -5;
 
-		if(wrap_json_unpack(MixerJ, "{s:s}", "uid", &currentHalData->ctlHalSpecificData->halSoftMixerVerb))
+		if(wrap_json_unpack(MixerJ, "{s:s}", "uid", &currentHalData->ctlHalSpecificData->mixerVerbName))
 			return -6;
-
-		if(! json_object_object_get_ex(MixerJ, "streams", &streamsArray))
-			return -7;
-
-		switch(json_object_get_type(streamsArray)) {
-			case json_type_object:
-				streamCount = 1;
-				break;
-			case json_type_array:
-				streamCount = json_object_array_length(streamsArray);
-				break;
-			default:
-				return -8;
-		}
-
-		currentHalData->ctlHalSpecificData->ctlHalStreamsData.count = streamCount;
-		currentHalData->ctlHalSpecificData->ctlHalStreamsData.data =
-			(struct CtlHalStreamData *) calloc(streamCount, sizeof (struct CtlHalStreamData *));
-
-		CtlHalDynApiStreamVerbs = alloca((streamCount + 1) * sizeof(struct HalUtlApiVerb));
-		memset(CtlHalDynApiStreamVerbs, '\0', (streamCount + 1) * sizeof(struct HalUtlApiVerb));
-		CtlHalDynApiStreamVerbs[streamCount + 1].verb = NULL;
-
-		for(idx = 0; idx < streamCount; idx++) {
-			if(streamCount > 1)
-				currentStream = json_object_array_get_idx(streamsArray, (int) idx);
-			else
-				currentStream = streamsArray;
-
-			if(wrap_json_unpack(currentStream, "{s:s}", "uid", &currentStreamName))
-				return -10-idx;
-
-			currentHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name = strdup(currentStreamName);
-			currentHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId = NULL;
-
-			CtlHalDynApiStreamVerbs[idx].verb = currentStreamName;
-			CtlHalDynApiStreamVerbs[idx].callback = HalCtlsActionOnStream;
-			CtlHalDynApiStreamVerbs[idx].info = "Peform action on this stream";
-		}
-
-		if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStreamVerbs))
-			return -9;
 	}
 
 	return 0;
@@ -168,7 +120,7 @@ void HalCtlsActionOnStream(afb_request *request)
 		return;
 	}
 
-	halSoftMixerVerb = currentCtlHalData->ctlHalSpecificData->halSoftMixerVerb;
+	halSoftMixerVerb = currentCtlHalData->ctlHalSpecificData->mixerVerbName;
 	if(! halSoftMixerVerb) {
 		afb_request_fail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
 		return;
@@ -254,9 +206,7 @@ void HalCtlsListVerbs(afb_request *request)
 		wrap_json_pack(&currentStream,
 			       "{s:s s:s}",
 			       "name", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name,
-			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId ?
-					 currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId :
-					 "");
+			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId);
 		json_object_array_add(streamsArray, currentStream);
 	}
 
@@ -269,6 +219,8 @@ void HalCtlsListVerbs(afb_request *request)
 
 void HalCtlsInitMixer(afb_request *request)
 {
+	unsigned int err;
+
 	char *apiToCall;
 
 	afb_dynapi *apiHandle;
@@ -311,11 +263,19 @@ void HalCtlsInitMixer(afb_request *request)
 				   apiToCall);
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
-		// TODO JAI : get streams cardId from mixer response
+		err = HalCtlsHandleMixerAttachResponse(request, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);
+		if(err) {
+			afb_request_success_f(request,
+					      toReturnJ,
+					      "Seems that create call to api %s succeed but this warning was rised by response decoder : %i",
+					      apiToCall,
+					      err);
+			return;
+		}
 
 		afb_request_success_f(request,
 				      toReturnJ,
-				      "Seems that mix_new call to api %s succeed",
+				      "Seems that create call to api %s succeed with no warning raised",
 				      apiToCall);
 	}
 	else {

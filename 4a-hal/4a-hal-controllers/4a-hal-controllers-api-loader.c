@@ -103,6 +103,8 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 	currentCtlHalData->ctlHalSpecificData->apiHandle = apiHandle;
 	currentCtlHalData->ctlHalSpecificData->ctrlConfig = ctrlConfig;
 
+	currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count = 0;
+
 	// TODO JAI: Search for hw sndCard
 	// TODO JAI: Update alsa command of HalCtl to use alsa-softmixer/alsa-core data
 	// TODO JAI: handle refresh of hal status using /dev/snd/byId (or /dev/snd/byId)
