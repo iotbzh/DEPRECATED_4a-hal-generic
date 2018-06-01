@@ -70,13 +70,16 @@
                     "uid": "front-left",
                     "port": 1
                 }
-            ]
+            ],
+            "params": {
+                "rate": 44100
+            }
         },
         "frontend" : {
             "uid": "Alsa-Loop",
             "devpath": "/dev/snd/by-path/platform-snd_aloop.0",
             "params": {
-                "rate": 48000,
+                "rate": 44100
             },
             "ramps": [
                 {
@@ -98,12 +101,10 @@
                     "down": 2
                 }
             ],
-            "devices": [
-                {
-                    "playback": 0,
-                    "capture": 1
-                }
-            ],
+            "devices": {
+                "playback": 0,
+                "capture": 1
+            },
             "subdevs": [
                 {
                     "subdev": 0,
@@ -161,21 +162,30 @@
                 "zone": "front-seats",
                 "ramp": "ramp-slow",
                 "volume": 60,
-                "mute": false
+                "mute": false,
+                "params": {
+                    "rate": 44100
+                }
             },
             {
                 "uid": "navigation",
                 "zone": "front-seats",
                 "ramp": "ramp-normal",
                 "volume": 70,
-                "mute": false
+                "mute": false,
+                "params": {
+                    "rate": 44100
+                }
             },
             {
                 "uid": "emergency",
                 "zone": "front-seats",
                 "ramp": "ramp-fast",
                 "volume": 80,
-                "mute": false
+                "mute": false,
+                "params": {
+                    "rate": 44100
+                }
             }
         ]
     }
