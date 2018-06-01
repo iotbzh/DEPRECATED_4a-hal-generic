@@ -183,7 +183,7 @@ void HalCtlsListVerbs(afb_request *request)
 	}
 
 	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
-		afb_request_fail(request, "no_data", "Won't be able to respond, no streams found");
+		afb_request_success(request, NULL, "No data to answer, no streams found");
 		return;
 	}
 
