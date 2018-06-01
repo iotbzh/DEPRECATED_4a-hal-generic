@@ -142,7 +142,7 @@ void HalCtlsActionOnStream(afb_request *request)
 		HalCtlsHandleMixerCallError(request, apiToCall, verbToCall, returnJ, "stream_action");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
-		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s, and successfull",
+		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s without any error raised",
 								verbToCall,
 								apiToCall);
 	}
@@ -183,7 +183,7 @@ void HalCtlsListVerbs(afb_request *request)
 	}
 
 	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
-		afb_request_fail(request, "no_data", "Won't be able to respond, no streams ofound");
+		afb_request_fail(request, "no_data", "Won't be able to respond, no streams found");
 		return;
 	}
 
