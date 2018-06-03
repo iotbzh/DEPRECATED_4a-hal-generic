@@ -258,12 +258,12 @@ void HalCtlsInitMixer(afb_request *request)
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
 		err = HalCtlsHandleMixerAttachResponse(request, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);
-		if(err) {
-			afb_request_success_f(request,
-					      toReturnJ,
-					      "Seems that create call to api %s succeed but this warning was rised by response decoder : %i",
-					      apiToCall,
-					      err);
+		if(err != (int) MIXER_NO_ERROR) {
+			afb_request_fail_f(request,
+					   "handler_mixer_response",
+					   "Seems that create call to api %s succeed but this warning was rised by response decoder : %i",
+					   apiToCall,
+					   err);
 			return;
 		}
 
