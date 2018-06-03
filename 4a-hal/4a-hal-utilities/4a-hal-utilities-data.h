@@ -33,6 +33,7 @@
 enum HalStatus {
 	HAL_STATUS_UNAVAILABLE=0,
 	HAL_STATUS_AVAILABLE=1,
+	HAL_STATUS_READY=2,
 };
 
 struct CtlHalStreamData {
@@ -62,6 +63,7 @@ struct SpecificHalData {
 	char *apiName;
 	enum HalStatus status;
 	char *sndCard;
+	int sndCardId;
 	char *info;
 	unsigned int internal;
 

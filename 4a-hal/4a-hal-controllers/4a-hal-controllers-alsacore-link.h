@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 "IoT.bzh"
+ * Copyright (C) 2018 "IoT.bzh"
  * Author Jonathan Aillet <jonathan.aillet@iot.bzh>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-#ifndef _HAL_UTILITIES_ALSA_LINK_INCLUDE_
-#define _HAL_UTILITIES_ALSA_LINK_INCLUDE_
+#ifndef HAL_CTLS_ALSACORE_LINK_INCLUDE_
+#define HAL_CTLS_ALSACORE_LINK_INCLUDE_
 
 #include <stdio.h>
+#include <stdbool.h>
 
-// TODO JAI: implement alsa link functions
+#define ALSACORE_API		"alsacore"
+#define ALSACORE_GETINFO_VERB	"infoget"
 
-#endif /* _HAL_UTILITIES_DATA_INCLUDE_ */
+// HAL controllers alsacore calls funtions
+bool HalCtlsGetCardIdByCardPath(afb_dynapi *apiHandle, struct SpecificHalData *currentCtlHalData);
+
+#endif /* HAL_CTLS_ALSACORE_LINK_INCLUDE_ */

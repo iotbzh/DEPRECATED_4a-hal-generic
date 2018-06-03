@@ -28,6 +28,7 @@
 
 #include "4a-hal-controllers-cb.h"
 #include "4a-hal-controllers-mixer-handler.h"
+#include "4a-hal-controllers-alsacore-link.h"
 
 /*******************************************************************************
  *		HAL controllers sections parsing functions		       *
@@ -126,7 +127,10 @@ void HalCtlsActionOnStream(afb_request *request)
 		return;
 	}
 
-	// TODO JAI: check status of hal before doing anything
+	if(currentCtlHalData->status != HAL_STATUS_AVAILABLE) {
+		afb_request_fail(request, "hal_unavailable", "Seems that hal is not available");
+		return;
+	}
 
 	// TODO JAI : remove verb to call prefix, each hal should have its own api in softmixer, and each streams should be created as verb by mixer
 	verbToCallSize = (int) strlen(mixerVerbName) + (int) strlen(request->verb) + 2;
@@ -251,7 +255,18 @@ void HalCtlsInitMixer(afb_request *request)
 		return;
 	}
 
-	// TODO JAI: test hal status (card is detected)
+	switch(currentCtlHalData->status) {
+		case HAL_STATUS_UNAVAILABLE:
+			afb_request_fail(request, "hal_unavailable", "Seems that the hal corresponding card was not found by alsacore at startup");
+			return;
+
+		case HAL_STATUS_READY:
+			afb_request_success(request, NULL, "Seems that the hal mixer is already initialized");
+			return;
+
+		case HAL_STATUS_AVAILABLE:
+			break;
+	}
 
 	if(afb_dynapi_call_sync(apiHandle, apiToCall, "create", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, "create", returnJ, "mixer_create");
@@ -271,6 +286,8 @@ void HalCtlsInitMixer(afb_request *request)
 				      toReturnJ,
 				      "Seems that create call to api %s succeed with no warning raised",
 				      apiToCall);
+
+		currentCtlHalData->status = HAL_STATUS_READY;
 	}
 	else {
 		afb_request_fail_f(request,

@@ -24,12 +24,12 @@ PROJECT_TARGET_ADD(4a-hal)
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-appfw-responses-handler.c
-		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-alsa-link.c
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-data.c
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-verbs-loader.c
 		    ${TARGET_NAME}-manager/${TARGET_NAME}-manager.c
 		    ${TARGET_NAME}-manager/${TARGET_NAME}-manager-cb.c
 		    ${TARGET_NAME}-manager/${TARGET_NAME}-manager-events.c
+		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-alsacore-link.c
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-api-loader.c
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-cb.c
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-mixer-handler.c

@@ -29,6 +29,7 @@
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
 
 #include "4a-hal-controllers-api-loader.h"
+#include "4a-hal-controllers-alsacore-link.h"
 #include "4a-hal-controllers-cb.h"
 
 // Default api to print log when apihandle not available
@@ -90,7 +91,6 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 
 	// Fill SpecificHalDatadata structure
 	currentCtlHalData->internal = (unsigned int) true;
-	currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 
 	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 	currentCtlHalData->sndCard = (char *) ctrlConfig->uid;
@@ -105,8 +105,11 @@ static int HalCtlsInitOneApi(afb_dynapi *apiHandle)
 
 	currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count = 0;
 
-	// TODO JAI: Search for hw sndCard
-	// TODO JAI: Update alsa command of HalCtl to use alsa-softmixer/alsa-core data
+	if(HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData))
+		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
+	else
+		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
+
 	// TODO JAI: handle refresh of hal status using /dev/snd/byId (or /dev/snd/byId)
 
 	return CtlConfigExec(apiHandle, ctrlConfig);
