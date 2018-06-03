@@ -32,7 +32,7 @@
 
 int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *mixerResponseJ)
 {
-	int err = 0;
+	int err = (int) MIXER_NO_ERROR;
 	unsigned int idx;
 
 	char *currentStreamName, *currentStreamCardId;
@@ -46,7 +46,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 	apiHandle = (afb_dynapi *) afb_request_get_dynapi(request);
 	if(! apiHandle) {
 		AFB_REQUEST_WARNING(request, "%s: Can't get current hal api handle", __func__);
-		return -1;
+		return (int) MIXER_ERROR_API_UNAVAILABLE;
 	}
 
 	switch(json_object_get_type(mixerResponseJ)) {
@@ -59,7 +59,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 		default:
 			currentHalStreamsData->count = 0;
 			AFB_REQUEST_WARNING(request, "%s: no streams returned", __func__);
-			return -2;
+			return (int) MIXER_ERROR_NO_STREAMS;
 	}
 
 	currentHalStreamsData->data = (struct CtlHalStreamData *) calloc(currentHalStreamsData->count, sizeof(struct CtlHalStreamData));
@@ -76,11 +76,11 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 
 		if(wrap_json_unpack(currentStreamJ, "{s:s}", "uid", &currentStreamName)) {
 			AFB_REQUEST_WARNING(request, "%s: can't find name in current stream object", __func__);
-			err -= 10;
+			err += (int) MIXER_ERROR_STREAM_NAME_UNAVAILABLE;
 		}
 		else if(wrap_json_unpack(currentStreamJ, "{s:s}", "alsa", &currentStreamCardId)) {
 			AFB_REQUEST_WARNING(request, "%s: can't find card id in current stream object", __func__);
-			err -= 1000;
+			err += (int) MIXER_ERROR_STREAM_CARDID_UNAVAILABLE;
 		}
 		else {
 			currentHalStreamsData->data[idx].name = strdup(currentStreamName);
@@ -94,7 +94,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 
 	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStreamVerbs)) {
 		AFB_REQUEST_WARNING(request, "%s: error while creating verbs for streams", __func__);
-		err -= 100000;
+		err += (int) MIXER_ERROR_COULDNT_ADD_STREAMS_AS_VERB;
 	}
 
 	return err;

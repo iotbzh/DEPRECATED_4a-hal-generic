@@ -24,6 +24,16 @@
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 
+// Enum for the type of error detected
+enum MixerStatus {
+	MIXER_NO_ERROR=0,
+	MIXER_ERROR_API_UNAVAILABLE=-1,
+	MIXER_ERROR_NO_STREAMS=-2,
+	MIXER_ERROR_STREAM_NAME_UNAVAILABLE=-10,
+	MIXER_ERROR_STREAM_CARDID_UNAVAILABLE=-1000,
+	MIXER_ERROR_COULDNT_ADD_STREAMS_AS_VERB =-100000,
+};
+
 // HAL controllers handle mixer response function
 int HalCtlsHandleMixerAttachResponse(afb_request *request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *MixerResponseJ);
 
