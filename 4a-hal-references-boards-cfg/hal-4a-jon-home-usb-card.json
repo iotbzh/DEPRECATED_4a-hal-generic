@@ -4,8 +4,8 @@
         "uid": "/dev/snd/by-id/usb-C-Media_Electronics_Inc._USB_Audio_Device-00",
         "version": "0.9",
         "api": "4a-hal-jon-home-usb-card",
-        "require": [ "softmixer" ],
-        "info": "Basic Audio Policy Control for Audio-4a - Jon's Office USB Card Audio",
+        "require": [ "alsacore", "softmixer" ],
+        "info": "4a hal for Jon's Home USB Card Audio",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
     },

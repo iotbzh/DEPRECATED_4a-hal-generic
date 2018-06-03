@@ -4,8 +4,8 @@
         "uid": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
         "version": "0.9",
         "api": "4a-hal-jon-office-usb-headset",
-        "require": [ "softmixer" ],
-        "info": "Basic Audio Policy Control for Audio-4a - Jon's Office USB Headset Audio",
+        "require": [ "alsacore", "softmixer" ],
+        "info": "4a hal for Jon's Office USB Headset Audio",
         "author": "Jonathan Aillet",
         "date": "2018-05-18"
     },
