@@ -102,7 +102,7 @@ void HalCtlsActionOnStream(afb_request *request)
 		return;
 	}
 
-	currentCtlHalData = ctrlConfig->external;
+	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
 		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
@@ -176,7 +176,7 @@ void HalCtlsListVerbs(afb_request *request)
 		return;
 	}
 
-	currentCtlHalData = ctrlConfig->external;
+	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
 		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
@@ -239,7 +239,7 @@ void HalCtlsInitMixer(afb_request *request)
 		return;
 	}
 
-	currentCtlHalData = ctrlConfig->external;
+	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentCtlHalData) {
 		afb_request_fail(request, "hal_controller_data", "Can't get current hal controller data");
 		return;
