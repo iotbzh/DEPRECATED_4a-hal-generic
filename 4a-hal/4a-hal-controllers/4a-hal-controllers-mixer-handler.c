@@ -150,7 +150,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 		}
 		else {
 			currentHalStreamsData->data[idx].name = strdup(currentStreamName);
-			currentHalStreamsData->data[idx].cardId = strdup(currentStreamCardId);
+			currentHalStreamsData->data[idx].streamCardId = strdup(currentStreamCardId);
 
 			CtlHalDynApiStreamVerbs[idx].verb = currentStreamName;
 			CtlHalDynApiStreamVerbs[idx].callback = HalCtlsActionOnStream;

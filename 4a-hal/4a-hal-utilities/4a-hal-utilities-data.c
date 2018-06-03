@@ -41,7 +41,7 @@ uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalStreamsDataT *ctlHalStream
 
 	for(cpt = 0; cpt < ctlHalStreamsData->count; cpt++) {
 		free(ctlHalStreamsData->data[cpt].name);
-		free(ctlHalStreamsData->data[cpt].cardId);
+		free(ctlHalStreamsData->data[cpt].streamCardId);
 	}
 
 	free(ctlHalStreamsData->data);

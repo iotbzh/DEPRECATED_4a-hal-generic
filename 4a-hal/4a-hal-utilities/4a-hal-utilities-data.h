@@ -37,7 +37,7 @@ enum HalStatus {
 
 struct CtlHalStreamData {
 	char *name;
-	char *cardId;
+	char *streamCardId;
 };
 
 struct CtlHalStreamsDataT {

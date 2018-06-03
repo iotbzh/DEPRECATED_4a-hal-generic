@@ -203,7 +203,7 @@ void HalCtlsListVerbs(afb_request *request)
 		wrap_json_pack(&currentStream,
 			       "{s:s s:s}",
 			       "name", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name,
-			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].cardId);
+			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].streamCardId);
 		json_object_array_add(streamsArray, currentStream);
 	}
 
