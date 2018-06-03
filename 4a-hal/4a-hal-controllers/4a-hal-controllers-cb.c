@@ -24,7 +24,7 @@
 #include <wrap-json.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
-#include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
+#include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"
 
 #include "4a-hal-controllers-cb.h"
 #include "4a-hal-controllers-mixer-handler.h"
@@ -139,7 +139,7 @@ void HalCtlsActionOnStream(afb_request *request)
 	strcat(verbToCall, request->verb);
 
 	if(afb_dynapi_call_sync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
-		HalCtlsHandleMixerCallError(request, apiToCall, verbToCall, returnJ, "stream_action");
+		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, verbToCall, returnJ, "stream_action");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
 		afb_request_success_f(request, toReturnJ, "Action %s correctly transfered to %s without any error raised",
@@ -254,7 +254,7 @@ void HalCtlsInitMixer(afb_request *request)
 	// TODO JAI: test hal status (card is detected)
 
 	if(afb_dynapi_call_sync(apiHandle, apiToCall, "create", json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
-		HalCtlsHandleMixerCallError(request, apiToCall, "create", returnJ, "mixer_create");
+		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, "create", returnJ, "mixer_create");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
 		err = HalCtlsHandleMixerAttachResponse(request, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);

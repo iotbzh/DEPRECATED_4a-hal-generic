@@ -24,7 +24,6 @@
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 
-void HalCtlsHandleMixerCallError(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatus);
 int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *MixerResponseJ);
 
 #endif /* _HAL_CTLS_SOFTMIXER_LINK_INCLUDE_ */

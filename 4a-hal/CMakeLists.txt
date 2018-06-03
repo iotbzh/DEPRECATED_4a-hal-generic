@@ -23,6 +23,7 @@ PROJECT_TARGET_ADD(4a-hal)
 
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE
+		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-appfw-responses-handler.c
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-alsa-link.c
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-data.c
 		    ${TARGET_NAME}-utilities/${TARGET_NAME}-utilities-verbs-loader.c
