@@ -20,9 +20,6 @@
 
 #include <stdio.h>
 
-// TODO JAI: use it
-// #include <alsa/asoundlib.h>
-
 #define HAL_MANAGER_API_NAME "4a-hal-manager"
 #define HAL_MANAGER_API_INFO "Manager for 4A HAL APIs"
 
