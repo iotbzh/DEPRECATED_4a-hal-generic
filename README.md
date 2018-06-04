@@ -140,7 +140,7 @@ Now, you can obtain streams information of your initialized internal hal:
 
 All the streams listed are available as a verb of the hal api using `name` field.
 You can also get the corresponding card id of the stream in `cardId` field.
-The card id format of a stream is `hw:X,X,X` and can be used to play music.
+The card id stream format is `hw:X,X,X` and can be used to play music.
 
 #### Play some music into a stream
 
