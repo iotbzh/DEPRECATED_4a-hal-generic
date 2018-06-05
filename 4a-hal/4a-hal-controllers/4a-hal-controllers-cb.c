@@ -261,7 +261,7 @@ void HalCtlsInitMixer(afb_request *request)
 		if(err) {
 			afb_request_success_f(request,
 					      toReturnJ,
-					      "Seems that create call to api %s succeed but this warning was rised by response decoder : %i",
+					      "Seems that create call to api %s succeed but this warning was risen by response decoder : %i",
 					      apiToCall,
 					      err);
 			return;
