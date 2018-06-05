@@ -180,7 +180,7 @@ int HalCtlsCreateApi(afb_dynapi *apiHandle, char *path, struct HalMgrData *HalMg
 
 int HalCtlsCreateAllApi(afb_dynapi *apiHandle, struct HalMgrData *HalMgrGlobalData)
 {
-	int index, err, status;
+	int index, err, status = 0;
 	char *dirList, *fileName, *fullPath;
 	char filePath[CONTROL_MAXPATH_LEN];
 
