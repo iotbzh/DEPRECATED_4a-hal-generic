@@ -50,7 +50,7 @@ struct HalUtlApiVerb HalManagerApiStaticVerbs[] =
 
 /*******************************************************************************
  *		Dynamic API functions for hal manager			       *
- *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
+ *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
 static int HalMgrInitApi(AFB_ApiT apiHandle)
@@ -114,7 +114,7 @@ int HalMgrCreateApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 
 /*******************************************************************************
  *		Startup function					       *
- *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
+ *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
 int afbBindingVdyn(AFB_ApiT apiHandle)

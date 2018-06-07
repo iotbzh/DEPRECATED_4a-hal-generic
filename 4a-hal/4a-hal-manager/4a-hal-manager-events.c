@@ -26,4 +26,4 @@
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 #include "4a-hal-manager-events.h"
 
-// TODO JAI: implement events handlers functions
+// TBD JAI: implement events handlers functions

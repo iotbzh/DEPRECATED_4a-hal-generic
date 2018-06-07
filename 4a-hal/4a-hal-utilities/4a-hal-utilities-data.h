@@ -35,16 +35,19 @@ enum HalStatus {
 	HAL_STATUS_READY=2,
 };
 
+// Structure to store stream data
 struct CtlHalStreamData {
 	char *name;
 	char *streamCardId;
 };
 
+// Structure to store stream data table
 struct CtlHalStreamsDataT {
 	struct CtlHalStreamData *data;
 	unsigned int count;
 };
 
+// Structure to store specific controller hal  data
 struct CtlHalSpecificData {
 	char *mixerApiName;
 	char *mixerVerbName;

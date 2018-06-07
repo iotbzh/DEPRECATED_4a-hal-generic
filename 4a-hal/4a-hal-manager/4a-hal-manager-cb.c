@@ -32,15 +32,15 @@
  *		HAL Manager event handler function			       *
  ******************************************************************************/
 
-// TODO JAI : to implement
+// TBD JAI : to implement
 void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_object *eventJ)
 {
-	AFB_ApiWarning(apiHandle, "JAI :%s not implemented yet", __func__);
+	AFB_ApiWarning(apiHandle, "%s not implemented yet", __func__);
 	// Use "4a-hal-manager-events.h" to handle events
 }
 
 /*******************************************************************************
- *	TODO JAI : Present for test, delete this function when validated       *
+ *	TBD JAI : Present for test, delete this function when validated        *
  ******************************************************************************/
 
 void HalMgrPing(AFB_ReqT request)
@@ -50,9 +50,9 @@ void HalMgrPing(AFB_ReqT request)
 	count++;
 
 	if(request->dynapi)
-		AFB_ReqNotice(request, "JAI :%s (%s): ping count = %d", request->api, request->dynapi->apiname, count);
+		AFB_ReqNotice(request, "%s (%s): ping count = %d", request->api, request->dynapi->apiname, count);
 	else
-		AFB_ReqNotice(request, "JAI: %s: ping count = %d", request->api, count);
+		AFB_ReqNotice(request, "%s: ping count = %d", request->api, count);
 
 	AFB_ReqSucess(request, json_object_new_int(count), NULL);
 
@@ -184,7 +184,7 @@ void HalMgrLoad(AFB_ReqT request)
 		return;
 	}
 
-	// TODO JAI: try connect to the api to test if it really exists
+	// TBD JAI: try connect to the api to test if it really exists
 
 	addedHal = HalUtlAddHalApiToHalList(HalMgrGlobalData);
 
@@ -206,7 +206,7 @@ void HalMgrLoad(AFB_ReqT request)
 	if(date)
 		addedHal->date = strdup(date);
 
-	// TODO JAI: add subscription to this api status events
+	// TBD JAI: add subscription to this api status events
 
 	AFB_ReqSucess(request, NULL, "Api successfully registered");
 }
@@ -260,23 +260,23 @@ void HalMgrUnload(AFB_ReqT request)
 		return;
 	}
 
-	// TODO JAI: remove subscription to this api status events
+	// TBD JAI: remove subscription to this api status events
 
 	AFB_ReqSucess(request, NULL, "Api successfully unregistered");
 }
 
-// TODO JAI : to implement
+// TBD JAI : to implement
 void HalMgrSubscribeEvent(AFB_ReqT request)
 {
-	AFB_ReqWarning(request, "JAI :%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
 	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
 }
 
-// TODO JAI : to implement
+// TBD JAI : to implement
 void HalMgrUnsubscribeEvent(AFB_ReqT request)
 {
-	AFB_ReqWarning(request, "JAI :%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
 	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
 }

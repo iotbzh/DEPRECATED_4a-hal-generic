@@ -22,6 +22,6 @@
 
 #include <afb-definitions.h>
 
-// TODO JAI: declare events handlers functions
+// TBD JAI: declare events handlers functions
 
 #endif /* _HALMGR_EVENTS_INCLUDE_ */

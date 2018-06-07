@@ -66,7 +66,7 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 
 /*******************************************************************************
  *		Dynamic API functions for app controller		       *
- *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
+ *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
 static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
@@ -110,7 +110,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 	else
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 
-	// TODO JAI: handle refresh of hal status using /dev/snd/byId (or /dev/snd/byId)
+	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
 
 	return CtlConfigExec(apiHandle, ctrlConfig);
 }

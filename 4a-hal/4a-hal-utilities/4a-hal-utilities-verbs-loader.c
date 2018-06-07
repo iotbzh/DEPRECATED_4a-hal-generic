@@ -25,7 +25,7 @@
 
 /*******************************************************************************
  *		Dynamic API common functions				       *
- *		TODO JAI : Use API-V3 instead of API-PRE-V3		       *
+ *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
 int HalUtlLoadVerbs(AFB_ApiT apiHandle, struct HalUtlApiVerb *verbs)
