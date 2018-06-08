@@ -54,7 +54,7 @@ void HalMgrPing(AFB_ReqT request)
 	else
 		AFB_ReqNotice(request, "%s: ping count = %d", request->api, count);
 
-	AFB_ReqSucess(request, json_object_new_int(count), NULL);
+	AFB_ReqSuccess(request, json_object_new_int(count), NULL);
 
 	return;
 }
@@ -94,7 +94,7 @@ void HalMgrLoaded(AFB_ReqT request)
 
 	numberOfLoadedApi = HalUtlGetNumberOfHalInList(HalMgrGlobalData);
 	if(! numberOfLoadedApi) {
-		AFB_ReqSucess(request, NULL, "No Hal Api loaded");
+		AFB_ReqSuccess(request, NULL, "No Hal Api loaded");
 		return;
 	}
 
@@ -136,7 +136,7 @@ void HalMgrLoaded(AFB_ReqT request)
 		}
 	}
 
-	AFB_ReqSucess(request, requestAnswer, "Requested data");
+	AFB_ReqSuccess(request, requestAnswer, "Requested data");
 }
 
 void HalMgrLoad(AFB_ReqT request)
@@ -209,7 +209,7 @@ void HalMgrLoad(AFB_ReqT request)
 
 	// TBD JAI: add subscription to this api status events
 
-	AFB_ReqSucess(request, NULL, "Api successfully registered");
+	AFB_ReqSuccess(request, NULL, "Api successfully registered");
 }
 
 void HalMgrUnload(AFB_ReqT request)
@@ -263,7 +263,7 @@ void HalMgrUnload(AFB_ReqT request)
 
 	// TBD JAI: remove subscription to this api status events
 
-	AFB_ReqSucess(request, NULL, "Api successfully unregistered");
+	AFB_ReqSuccess(request, NULL, "Api successfully unregistered");
 }
 
 // TBD JAI : to implement
@@ -271,7 +271,7 @@ void HalMgrSubscribeEvent(AFB_ReqT request)
 {
 	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
-	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSuccess(request, json_object_new_boolean(false), NULL);
 }
 
 // TBD JAI : to implement
@@ -279,5 +279,5 @@ void HalMgrUnsubscribeEvent(AFB_ReqT request)
 {
 	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
-	AFB_ReqSucess(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSuccess(request, json_object_new_boolean(false), NULL);
 }

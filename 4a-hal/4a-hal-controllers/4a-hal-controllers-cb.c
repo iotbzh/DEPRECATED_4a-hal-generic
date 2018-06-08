@@ -447,7 +447,7 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, verbToCall, returnJ, "stream_action");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
-		AFB_ReqSucessF(request,
+		AFB_ReqSuccessF(request,
 			       toReturnJ,
 			       "Action %s correctly transferred to %s without any error raised",
 			       verbToCall,
@@ -490,7 +490,7 @@ void HalCtlsListVerbs(AFB_ReqT request)
 	}
 
 	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
-		AFB_ReqSucess(request, NULL, "No data to answer, no streams found");
+		AFB_ReqSuccess(request, NULL, "No data to answer, no streams found");
 		return;
 	}
 
@@ -518,5 +518,5 @@ void HalCtlsListVerbs(AFB_ReqT request)
 
 	wrap_json_pack(&requestAnswer, "{s:o}", "streams", streamsArray);
 
-	AFB_ReqSucess(request, requestAnswer, "Requested data");
+	AFB_ReqSuccess(request, requestAnswer, "Requested data");
 }

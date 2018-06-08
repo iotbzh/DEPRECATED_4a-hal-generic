@@ -465,5 +465,5 @@ void HalCtlsActionOnAlsaCtl(AFB_ReqT request)
 
 	json_object_put(convertedJ);
 
-	AFB_ReqSucess(request, NULL, "Action on alsa control correclty done");
+	AFB_ReqSuccess(request, NULL, "Action on alsa control correclty done");
 }
