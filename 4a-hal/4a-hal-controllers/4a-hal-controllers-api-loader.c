@@ -90,7 +90,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 		return -3;
 
 	// Fill SpecificHalDatadata structure
-	currentCtlHalData->internal = (unsigned int) true;
+	currentCtlHalData->internal = true;
 
 	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 	currentCtlHalData->sndCard = (char *) ctrlConfig->uid;

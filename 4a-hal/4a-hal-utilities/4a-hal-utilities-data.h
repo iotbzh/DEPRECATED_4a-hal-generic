@@ -19,6 +19,7 @@
 #define _HAL_UTILITIES_DATA_INCLUDE_
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include <wrap-json.h>
 
@@ -67,7 +68,7 @@ struct SpecificHalData {
 	char *sndCard;
 	int sndCardId;
 	char *info;
-	unsigned int internal;
+	bool internal;
 
 	char *author;
 	char *version;
