@@ -49,7 +49,7 @@ struct CtlHalAlsaCtlProperties {
 	int step;
 	// TBD JAI : use them
 	const char **enums;
-	struct CtlHalAlsaDBScale *dbscale;
+	struct CtlHalAlsaDBScale dbscale;
 };
 
 struct CtlHalAlsaCtl {

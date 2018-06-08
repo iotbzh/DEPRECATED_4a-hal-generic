@@ -185,10 +185,10 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 		return -4;
 	}
 	else if(currentAlsaCtl->name) {
-		wrap_json_pack(&queryJ, "{s:s s:s}", "devid", cardId, "ctl", currentAlsaCtl->name);
+		wrap_json_pack(&queryJ, "{s:s s:s s:i}", "devid", cardId, "ctl", currentAlsaCtl->name, "mode", 3);
 	}
 	else if(currentAlsaCtl->numid > 0) {
-		wrap_json_pack(&queryJ, "{s:s s:i}", "devid", cardId, "ctl", currentAlsaCtl->numid);
+		wrap_json_pack(&queryJ, "{s:s s:i s:i}", "devid", cardId, "ctl", currentAlsaCtl->numid, "mode", 3);
 	}
 	else {
 		AFB_ApiError(apiHandle, "%s: Need at least a control name or a control uid", __func__);
@@ -214,6 +214,23 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 	else if(! json_object_object_get_ex(returnedJ, "response", NULL)) {
 		AFB_ApiError(apiHandle, "Can't find alsa control 'id': %i on device '%s'", currentAlsaCtl->numid, cardId);
 		return -8;
+	}
+
+	// TBD JAI : get dblinear/dbminmax/... values
+	if(wrap_json_unpack(returnedJ, "{s:{s:{s?:i s?:i s?:i s?:i s?:i}}}",
+					"response",
+					"ctl",
+					"type", (snd_ctl_elem_type_t) &currentAlsaCtl->alsaCtlProperties.type,
+					"count", &currentAlsaCtl->alsaCtlProperties.count,
+					"min", &currentAlsaCtl->alsaCtlProperties.minval,
+					"max", &currentAlsaCtl->alsaCtlProperties.maxval,
+					"step", &currentAlsaCtl->alsaCtlProperties.step)) {
+		AFB_ApiError(apiHandle,
+			     "Didn't succeed to get control %i properties on device '%s' : '%s'",
+			     currentAlsaCtl->numid,
+			     cardId,
+			     json_object_get_string(returnedJ));
+		return -9;
 	}
 
 	return 0;
@@ -301,16 +318,16 @@ int HalCtlsCreateAlsaCtl(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl 
 		return -4;
 	}
 
-	wrap_json_pack(&queryJ, "{s:s s:{s:i s:s s:i s:i s:i s:i s:i s:i} s:i}",
+	wrap_json_pack(&queryJ, "{s:s s:{s:i s:s s:i s:i s:i s:i s:i}}",
 				"devid", cardId,
 				"ctl",
-				       "ctl", -1,
-				       "name", alsaCtlToCreate->name,
-				       "min", alsaCtlToCreate->alsaCtlCreation->minval,
-				       "max", alsaCtlToCreate->alsaCtlCreation->maxval,
-				       "step", alsaCtlToCreate->alsaCtlCreation->step,
-				       "type", (int) alsaCtlToCreate->alsaCtlCreation->type,
-				       "count", alsaCtlToCreate->alsaCtlCreation->count);
+				"ctl", -1,
+				"name", alsaCtlToCreate->name,
+				"min", alsaCtlToCreate->alsaCtlCreation->minval,
+				"max", alsaCtlToCreate->alsaCtlCreation->maxval,
+				"step", alsaCtlToCreate->alsaCtlCreation->step,
+				"type", (int) alsaCtlToCreate->alsaCtlCreation->type,
+				"count", alsaCtlToCreate->alsaCtlCreation->count);
 
 	if(AFB_ServiceSync(apiHandle, ALSACORE_API, ALSACORE_ADDCTL_VERB, queryJ, &returnedJ)) {
 		returnedError = HalUtlHandleAppFwCallError(apiHandle, ALSACORE_API, ALSACORE_ADDCTL_VERB, returnedJ, &returnedStatus, &returnedInfo);
