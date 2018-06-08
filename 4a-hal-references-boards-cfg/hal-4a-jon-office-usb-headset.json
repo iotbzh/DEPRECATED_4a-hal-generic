@@ -55,7 +55,7 @@
                     "type": "INTEGER",
                     "count": 1,
                     "minval": 0,
-                    "maxval": 100,
+                    "maxval": 20,
                     "step": 1
                 }
             },
