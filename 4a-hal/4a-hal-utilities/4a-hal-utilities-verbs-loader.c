@@ -40,7 +40,7 @@ int HalUtlLoadVerbs(AFB_ApiT apiHandle, struct HalUtlApiVerb *verbs)
 					       verbs[idx].verb,
 					       NULL,
 					       verbs[idx].callback,
-					       (void*) &verbs[idx],
+					       (void *) &verbs[idx],
 					       verbs[idx].auth,
 					       0);
 	}
