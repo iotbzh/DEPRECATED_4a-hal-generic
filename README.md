@@ -3,19 +3,23 @@
 ------------------------------------------------------------
 
 * Object: Use a new api to centralize call to hals, automatically create hal api from configuration files
-* Status: In Progress (RC1)
+* Status: In Progress (master)
 * Author: Jonathan Aillet jonathan.aillet@iot.bzh
 * Date  : June-2018
 
-## Cloning repositories for RC1 version
+## Cloning repositories for current version
 
-### Cloning 4a-hal-generic rc1 version with its submodules
+### Cloning 4a-hal-generic with its submodules
 
-git clone --recurse-submodules -b rc1 https://github.com/iotbzh/4a-hal-generic.git
+git clone --recurse-submodules https://github.com/iotbzh/4a-hal-generic.git
 
 ### Cloning 4a-softmixer hal-rc1 version (needed to make work '4a-hal-generic') with its submodules
 
 git clone --recurse-submodules -b hal-rc1-sandbox https://github.com/iotbzh/4a-softmixer.git
+
+### Cloning 4a-alsacore with its submodules
+
+git clone --recurse-submodules https://gerrit.automotivelinux.org/gerrit/src/4a-alsa-core
 
 ## Quick introduction to how hal are handled with 4a-hal-generic
 
@@ -103,7 +107,7 @@ make
 ### Run your binder from shell
 
 ```bash
-afb-daemon --name=afb-4a --workdir=$PATH_TO_4a-softmixer/build   --binding=$$PATH_TO_4a-softmixer/build/package/lib/softmixer-binding.so --binding=$PATH_TO_4a-hal-generic/build/4a-hal/4a-hal.so  --roothttp=$PATH_TO_4a-softmixer/build/package/htdocs --no-ldpaths --port=1234 --token= -vvv
+afb-daemon --name=afb-4a --workdir=$PATH_TO_4a-softmixer/build --binding=$PATH_TO_4a-alsa-core/build/alsa-binding/afb-alsa-4a.so --binding=$$PATH_TO_4a-softmixer/build/package/lib/softmixer-binding.so --binding=$PATH_TO_4a-hal-generic/build/4a-hal/4a-hal.so  --roothttp=$PATH_TO_4a-softmixer/build/package/htdocs --no-ldpaths --port=1234 --token= -vvv
 ```
 
 ### Connect your binder
@@ -125,12 +129,6 @@ And now with more information:
 ```4a-hal-manager loaded { "verbose" : 1 }```
 
 ### Play with an 'internal' hal (described in a json configuration file)
-
-#### Initialize an internal hal
-
-Use an api name obtain in the previous command to initialize mixer of the wanted hal:
-
-```4a-hal-*halapiname* init-mixer```
 
 #### Get streams information
 
@@ -197,13 +195,11 @@ Your hal must also have a 'subscribe' verb available and event name 'hal_status'
 At external hal loading, the '4a-hal-manager' will subscribe to this event.
 Within your hal, you must generate an event each time the status of your hal changes.
 
-## What is missing in RC1 version
+## What is missing in this version
 
 * Check that external hal really exist at loading
 * Handling external hal status events.
-* Handling 'halcontrol' section in configuration files.
 * Generation of an '4a-hal-manager' event when a hal status change.
-* Checking that the specified device in configuration file is present ('4a-alsa-core' binding will be needed).
-* Update internal hal status after mixer initialization.
 * At mixer initialization, check that the specified device is not already used by another hal.
 * Dynamic handling of USB devices.
+* Update to the latest version of the softmixer.
