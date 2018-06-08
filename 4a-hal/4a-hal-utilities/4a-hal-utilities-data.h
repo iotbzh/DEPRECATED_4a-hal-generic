@@ -33,7 +33,7 @@
 enum HalStatus {
 	HAL_STATUS_UNAVAILABLE=0,
 	HAL_STATUS_AVAILABLE=1,
-	HAL_STATUS_READY=2,
+	HAL_STATUS_READY=2
 };
 
 // Structure to store stream data

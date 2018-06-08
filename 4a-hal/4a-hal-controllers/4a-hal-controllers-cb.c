@@ -127,8 +127,8 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 		return;
 	}
 
-	if(currentCtlHalData->status != HAL_STATUS_AVAILABLE) {
-		AFB_ReqFail(request, "hal_unavailable", "Seems that hal is not available");
+	if(currentCtlHalData->status != HAL_STATUS_READY) {
+		AFB_ReqFail(request, "hal_not_ready", "Seems that hal is not ready");
 		return;
 	}
 
