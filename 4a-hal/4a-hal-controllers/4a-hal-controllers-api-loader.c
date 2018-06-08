@@ -185,7 +185,7 @@ int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGl
 
 int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 {
-	int index, err, status = 0;
+	int index, status = 0;
 	char *dirList, *fileName, *fullPath;
 	char filePath[CONTROL_MAXPATH_LEN];
 
@@ -215,8 +215,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 	for(index = 0; index < json_object_array_length(configJ); index++) {
 		entryJ = json_object_array_get_idx(configJ, index);
 
-		err = wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName);
-		if(err) {
+		if(wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName)) {
 			AFB_ApiError(apiHandle, "%s: HOOPs invalid JSON entry = %s", __func__, json_object_get_string(entryJ));
 			return -1;
 		}
