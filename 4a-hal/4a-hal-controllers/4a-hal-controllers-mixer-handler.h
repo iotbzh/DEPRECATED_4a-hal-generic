@@ -22,7 +22,11 @@
 
 #include <wrap-json.h>
 
+#include "afb-helpers-utils.h"
+
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
+
+#define MIXER_ATTACH_VERB	"create"
 
 // Enum for the type of error detected
 enum MixerStatus {
@@ -34,7 +38,7 @@ enum MixerStatus {
 	MIXER_ERROR_COULDNT_ADD_STREAMS_AS_VERB =-100000,
 };
 
-// HAL controllers handle mixer response function
-int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *MixerResponseJ);
+// HAL controllers handle mixer calls functions
+int HalCtlsAttachToMixer(AFB_ApiT apiHandle);
 
 #endif /* _HAL_CTLS_SOFTMIXER_LINK_INCLUDE_ */

@@ -21,31 +21,29 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
 
 #include "4a-hal-controllers-mixer-handler.h"
 #include "4a-hal-controllers-cb.h"
 
 /*******************************************************************************
- *		HAL controllers handle mixer response function		       *
+ *		HAL controllers handle mixer calls functions		       *
  ******************************************************************************/
 
-int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *mixerResponseJ)
+int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *mixerResponseJ)
 {
 	int err = (int) MIXER_NO_ERROR;
 	unsigned int idx;
 
 	char *currentStreamName, *currentStreamCardId;
 
-	AFB_ApiT apiHandle;
-
 	struct HalUtlApiVerb *CtlHalDynApiStreamVerbs;
 
 	json_object *currentStreamJ;
 
-	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		AFB_ReqWarning(request, "%s: Can't get current hal api handle", __func__);
+		AFB_ApiError(apiHandle, "%s: Can't get current hal api handle", __func__);
 		return (int) MIXER_ERROR_API_UNAVAILABLE;
 	}
 
@@ -58,7 +56,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 			break;
 		default:
 			currentHalStreamsData->count = 0;
-			AFB_ReqWarning(request, "%s: no streams returned", __func__);
+			AFB_ApiWarning(apiHandle, "%s: no streams returned", __func__);
 			return (int) MIXER_ERROR_NO_STREAMS;
 	}
 
@@ -75,11 +73,11 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 			currentStreamJ = mixerResponseJ;
 
 		if(wrap_json_unpack(currentStreamJ, "{s:s}", "uid", &currentStreamName)) {
-			AFB_ReqWarning(request, "%s: can't find name in current stream object", __func__);
+			AFB_ApiError(apiHandle, "%s: can't find name in current stream object", __func__);
 			err += (int) MIXER_ERROR_STREAM_NAME_UNAVAILABLE;
 		}
 		else if(wrap_json_unpack(currentStreamJ, "{s:s}", "alsa", &currentStreamCardId)) {
-			AFB_ReqWarning(request, "%s: can't find card id in current stream object", __func__);
+			AFB_ApiError(apiHandle, "%s: can't find card id in current stream object", __func__);
 			err += (int) MIXER_ERROR_STREAM_CARDID_UNAVAILABLE;
 		}
 		else {
@@ -93,9 +91,100 @@ int HalCtlsHandleMixerAttachResponse(AFB_ReqT request, struct CtlHalStreamsDataT
 	}
 
 	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStreamVerbs)) {
-		AFB_ReqWarning(request, "%s: error while creating verbs for streams", __func__);
+		AFB_ApiError(apiHandle, "%s: error while creating verbs for streams", __func__);
 		err += (int) MIXER_ERROR_COULDNT_ADD_STREAMS_AS_VERB;
 	}
 
 	return err;
+}
+
+int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
+{
+	unsigned int err;
+
+	char *apiToCall, *returnedStatus = NULL, *returnedInfo = NULL;
+
+	enum CallError returnedError;
+
+	CtlConfigT *ctrlConfig;
+
+	struct SpecificHalData *currentCtlHalData;
+
+	json_object *returnJ, *toReturnJ;
+
+	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
+	if(! ctrlConfig) {
+		AFB_ApiError(apiHandle, "%s: Can't get current hal controller config", __func__);
+		return -1;
+	}
+
+	currentCtlHalData = (struct SpecificHalData *) ctrlConfig->external;
+	if(! currentCtlHalData) {
+		AFB_ApiError(apiHandle, "%s: Can't get current hal controller data", __func__);
+		return -2;
+	}
+
+	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
+	if(! apiToCall) {
+		AFB_ApiError(apiHandle, "%s: Can't get mixer api", __func__);
+		return -3;
+	}
+
+	switch(currentCtlHalData->status) {
+		case HAL_STATUS_UNAVAILABLE:
+			AFB_ApiError(apiHandle, "%s: Seems that the hal corresponding card was not found by alsacore at startup", __func__);
+			return -4;
+
+		case HAL_STATUS_READY:
+			AFB_ApiNotice(apiHandle, "%s: Seems that the hal mixer is already initialized", __func__);
+			return 1;
+
+		case HAL_STATUS_AVAILABLE:
+			break;
+	}
+
+	if(AFB_ServiceSync(apiHandle, apiToCall, MIXER_ATTACH_VERB, json_object_get(currentCtlHalData->ctlHalSpecificData->halMixerJ), &returnJ)) {
+		returnedError = HalUtlHandleAppFwCallError(apiHandle, apiToCall, MIXER_ATTACH_VERB, returnJ, &returnedStatus, &returnedInfo);
+		AFB_ApiWarning(apiHandle,
+			       "Error %i during call to verb %s of %s api with status '%s' and info '%s'",
+			       (int) returnedError,
+			       apiToCall,
+			       MIXER_ATTACH_VERB,
+			       returnedStatus ? returnedStatus : "not returned",
+			       returnedInfo ? returnedInfo : "not returned");
+		return -6;
+	}
+	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
+		err = HalCtlsHandleMixerAttachResponse(apiHandle, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, toReturnJ);
+		if(err != (int) MIXER_NO_ERROR) {
+			AFB_ApiError(apiHandle,
+				     "%s: Seems that %s call to api %s succeed but this warning was risen by response decoder : %i '%s'",
+				     __func__,
+				     MIXER_ATTACH_VERB,
+				     apiToCall,
+				     err,
+				     json_object_get_string(toReturnJ));
+			return -7;
+		}
+
+		AFB_ApiNotice(apiHandle,
+			      "%s: Seems that %s call to api %s succeed with no warning raised : '%s'",
+			      __func__,
+			      MIXER_ATTACH_VERB,
+			      apiToCall,
+			      json_object_get_string(toReturnJ));
+
+		currentCtlHalData->status = HAL_STATUS_READY;
+	}
+	else {
+		AFB_ApiError(apiHandle,
+			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
+			     __func__,
+			     MIXER_ATTACH_VERB,
+			     apiToCall,
+			     json_object_get_string(returnJ));
+		return -8;
+	}
+
+	return 0;
 }

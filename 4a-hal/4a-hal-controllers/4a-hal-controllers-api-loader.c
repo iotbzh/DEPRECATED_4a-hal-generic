@@ -31,6 +31,7 @@
 #include "4a-hal-controllers-api-loader.h"
 #include "4a-hal-controllers-alsacore-link.h"
 #include "4a-hal-controllers-cb.h"
+#include "4a-hal-controllers-mixer-handler.h"
 
 // Default api to print log when apihandle not available
 AFB_ApiT AFB_default;
@@ -60,7 +61,6 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL		SHORT DESCRIPTION */
 	{ .verb = "list",		.callback = HalCtlsListVerbs,	.info = "List available verbs for this api"},
-	{ .verb = "init-mixer",		.callback = HalCtlsInitMixer,	.info = "Init Hal with 4a-softmixer"},
 	{ .verb = NULL }		// Marker for end of the array
 };
 
@@ -71,6 +71,8 @@ static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
 
 static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 {
+	int err;
+
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentCtlHalData;
 
@@ -109,8 +111,11 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	if(currentCtlHalData->sndCardId < 0)
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
-	else
+	else {
 		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
+		if((err = HalCtlsAttachToMixer(apiHandle)))
+			AFB_ApiError(apiHandle, "%s: Error %i while attaching to mixer", __func__, err);
+	}
 
 	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
 
