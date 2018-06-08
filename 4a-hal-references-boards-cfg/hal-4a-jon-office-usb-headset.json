@@ -31,28 +31,35 @@
     ],
     "halmap": [
         {
-            "label": "Master_Playback_Volume",
+            "uid": "agl-speaker-playback-switch",
             "alsa": {
-                "name": "PCM Playback Volume",
+                "name": "Speaker Playback Switch",
                 "value": 12
             }
         },
         {
-            "label": "Master_Playback_Ramp_70",
-            "info": "ramp volume linearly to 70 according to current ramp setting",
+            "uid": "agl-speaker-playback-volume",
             "alsa": {
-                "name": "Hal-VolRamp",
-                "numid": -1,
-                "type": "INTEGER",
-                "count": 1,
-                "minval": 0,
-                "maxval": 100,
-                "step": 1
-            },
-            "action": {
-                "label": "ramp-slow",
-                "callback": "api://4a-hal-jon-office-usb-headset#master { ramp : 70 }"
+                "numid": 7,
+                "value": 34
             }
+        },
+        {
+            "uid": "hal-ping",
+            "info": "ping this hal through alsa",
+            "alsa": {
+                "name": "Hal-Ping",
+                "value": 20,
+                "create":
+                {
+                    "type": "INTEGER",
+                    "count": 1,
+                    "minval": 0,
+                    "maxval": 100,
+                    "step": 1
+                }
+            },
+            "action": "api://4a-hal-jon-home-usb-card#ping"
         }
     ],
     "halmixer": {
@@ -84,20 +91,20 @@
             "ramps": [
                 {
                     "uid": "ramp-fast",
-                    "delay": 050,
+                    "delay": 50,
                     "up": 10,
                     "down": 3
                 },
                 {
                     "uid": "ramp-slow",
                     "delay": 250,
-                    "up": 03,
+                    "up": 3,
                     "down": 1
                 },
                 {
                     "uid": "ramp-normal",
                     "delay": 100,
-                    "up": 06,
+                    "up": 6,
                     "down": 2
                 }
             ],
