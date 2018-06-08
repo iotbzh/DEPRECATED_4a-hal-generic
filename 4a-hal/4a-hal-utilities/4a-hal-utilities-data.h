@@ -27,6 +27,8 @@
 
 #include <ctl-config.h>
 
+#include "../4a-hal-controllers/4a-hal-controllers-alsacore-link.h"
+
 #define ALSA_MAX_CARD 32
 
 // Enum for sharing hal (controller or external) status
@@ -55,7 +57,7 @@ struct CtlHalSpecificData {
 	json_object *halMixerJ;
 
 	struct CtlHalStreamsDataT ctlHalStreamsData;
-	// TODO JAI : add structure to hold halmap section data
+	struct CtlHalAlsaMapT *ctlHalAlsaMapT;
 
 	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;

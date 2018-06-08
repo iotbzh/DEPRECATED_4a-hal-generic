@@ -140,7 +140,7 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 	err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
 
 	// Declare an event manager for this Api
-	afb_dynapi_on_event(apiHandle, CtrlDispatchApiEvent);
+	afb_dynapi_on_event(apiHandle, HalCtlsDispatchApiEvent);
 
 	// Init Api function (does not receive user closure ???)
 	afb_dynapi_on_init(apiHandle, HalCtlsInitOneApi);

@@ -24,6 +24,9 @@
 
 #include <ctl-config.h>
 
+// HAL controller event handler function
+void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ);
+
 // HAL controllers sections parsing functions
 int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *MixerJ);
 int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *StreamControlsJ);
