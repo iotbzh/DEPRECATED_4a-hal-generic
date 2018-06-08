@@ -189,7 +189,8 @@ void HalMgrLoad(AFB_ReqT request)
 	addedHal = HalUtlAddHalApiToHalList(HalMgrGlobalData);
 
 	addedHal->internal = false;
-	addedHal->status = HAL_STATUS_UNAVAILABLE;
+	// TBD JAI : initialize external to unavailable once event from external hal will be handled
+	addedHal->status = HAL_STATUS_READY;
 
 	addedHal->apiName = strdup(apiName);
 	addedHal->sndCardPath = strdup(sndCardPath);
