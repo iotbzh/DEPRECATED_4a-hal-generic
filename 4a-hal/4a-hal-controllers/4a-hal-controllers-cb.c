@@ -213,7 +213,7 @@ void HalCtlsListVerbs(AFB_ReqT request)
 		json_object_array_add(streamsArray, currentStream);
 	}
 
-	// TODO JAI : Check if there is some halmap config controls and add them to the reponse
+	// TODO JAI : Add playback and capture with their card id to the response
 
 	wrap_json_pack(&requestAnswer, "{s:o}", "streams", streamsArray);
 
