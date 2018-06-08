@@ -27,8 +27,9 @@
 #include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"
 
 #include "4a-hal-controllers-cb.h"
-#include "4a-hal-controllers-mixer-handler.h"
 #include "4a-hal-controllers-alsacore-link.h"
+#include "4a-hal-controllers-mixer-handler.h"
+#include "4a-hal-controllers-value-handler.h"
 
 /*******************************************************************************
  *		HAL controller event handler function			       *
@@ -81,9 +82,13 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 					source.api = currentHalAlsaCtlsT->ctls[idx].action->api;
 					source.request = NULL;
 
-					// TODO JAI: add weighting passing values (new valueJ object)
-
 					(void) ActionExecOne(&source, currentHalAlsaCtlsT->ctls[idx].action, valuesJ);
+				}
+				else {
+					AFB_ApiNotice(apiHandle,
+						      "%s: The alsa control id '%i' is corresponding to a known control but without any action registered",
+						      __func__,
+						      numid);
 				}
 
 				return;
@@ -219,7 +224,7 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 
 int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaMap *alsaMap)
 {
-	json_object *valueJ;
+	json_object *valueJ, *convertedValueJ;
 
 	if(alsaMap->ctl.alsaCtlCreation) {
 		if(HalCtlsCreateAlsaCtl(apiHandle, cardId, &alsaMap->ctl)) {
@@ -237,16 +242,21 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 	}
 
 	if(alsaMap->ctl.value) {
-		// TODO JAI: add weighting passing values on currentAlsaCtl->value (and put them into valueJ json)
-
+		// TBD JAI : handle alsa controls type
 		valueJ = json_object_new_int(alsaMap->ctl.value);
-		if(HalCtlsSetAlsaCtlValue(apiHandle, cardId, alsaMap->ctl.numid, valueJ)) {
+
+		if(HalCtlsNormalizeJsonValues(apiHandle, &alsaMap->ctl.alsaCtlProperties, valueJ, &convertedValueJ)) {
+			AFB_ApiError(apiHandle, "Error when trying to convert initiate value json '%s'", json_object_get_string(valueJ));
+			return -3;
+		}
+
+		if(HalCtlsSetAlsaCtlValue(apiHandle, cardId, alsaMap->ctl.numid, convertedValueJ)) {
 			AFB_ApiError(apiHandle,
 				     "Error while trying to set initial value on alsa control %i, device '%s', value '%s'",
 				     alsaMap->ctl.numid,
 				     cardId,
 				     json_object_get_string(valueJ));
-			return -3;
+			return -4;
 		}
 	}
 
@@ -257,7 +267,7 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 				     "%s: Didn't succeed to load action using alsa object:\n-- %s",
 				     __func__,
 				     json_object_get_string(alsaMap->actionJ));
-			return -4;
+			return -5;
 		}
 	}
 
@@ -266,7 +276,7 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 			     "%s: Didn't to create verb for current alsa control to load action using alsa object:\n-- %s",
 			     __func__,
 			     json_object_get_string(alsaMap->actionJ));
-		return -5;
+		return -6;
 	}
 
 	return 0;
@@ -291,7 +301,7 @@ int HalCtlsProcessAllHalMap(AFB_ApiT apiHandle, json_object *AlsaMapJ, struct Ct
 			currentCtlHalAlsaMapT->ctlsCount = 0;
 			currentCtlHalAlsaMapT->ctls = NULL;
 			AFB_ApiWarning(apiHandle, "%s: couldn't get content of 'halmap' section in:\n-- %s", __func__, json_object_get_string(AlsaMapJ));
-			return -3;
+			return -1;
 	}
 
 	ctlMaps = calloc(currentCtlHalAlsaMapT->ctlsCount, sizeof(struct CtlHalAlsaMap));

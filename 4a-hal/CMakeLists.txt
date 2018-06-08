@@ -33,6 +33,7 @@ PROJECT_TARGET_ADD(4a-hal)
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-api-loader.c
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-cb.c
 		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-mixer-handler.c
+		    ${TARGET_NAME}-controllers/${TARGET_NAME}-controllers-value-handler.c
 		    )
 
 	# Binder exposes a unique public entry point

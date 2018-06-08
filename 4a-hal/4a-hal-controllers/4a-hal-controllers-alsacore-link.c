@@ -31,6 +31,7 @@
 #include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"
 
 #include "4a-hal-controllers-alsacore-link.h"
+#include "4a-hal-controllers-value-handler.h"
 
 /*******************************************************************************
  *		Map to alsa control types				       *
@@ -264,7 +265,7 @@ int HalCtlsSetAlsaCtlValue(AFB_ApiT apiHandle, char *cardId, int ctlId, json_obj
 		return -4;
 	}
 
-	wrap_json_pack(&queryJ, "{s:s s:{s:i s:o}}", "devid", cardId, "ctl", "id", ctlId, "val", valuesJ);
+	wrap_json_pack(&queryJ, "{s:s s:{s:i s:o}}", "devid", cardId, "ctl", "id", ctlId, "val", json_object_get(valuesJ));
 
 	if(AFB_ServiceSync(apiHandle, ALSACORE_API, ALSACORE_CTLSET_VERB, queryJ, &returnedJ)) {
 		returnedError = HalUtlHandleAppFwCallError(apiHandle, ALSACORE_API, ALSACORE_CTLSET_VERB, returnedJ, &returnedStatus, &returnedInfo);
@@ -386,7 +387,7 @@ void HalCtlsActionOnAlsaCtl(AFB_ReqT request)
 	struct SpecificHalData *currentCtlHalData;
 	struct CtlHalAlsaMap *currentAlsaCtl;
 
-	json_object *requestJson;
+	json_object *requestJson, *valueJ, *convertedJ;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -440,17 +441,29 @@ void HalCtlsActionOnAlsaCtl(AFB_ReqT request)
 
 	snprintf(cardIdString, 6, "hw:%i", currentCtlHalData->sndCardId);
 
-	// TODO JAI: add weighting passing values on currentAlsaCtl->value (and put them into valueJ json)
-
-	// TODO JAI : test it
-	if(HalCtlsSetAlsaCtlValue(apiHandle, cardIdString, currentAlsaCtl->ctl.numid, requestJson)) {
+	if(wrap_json_unpack(requestJson, "{s:o}", "val", &valueJ)) {
 		AFB_ReqFailF(request,
-			     "alsa_control_call_error",
-			     "Error while trying to set value on alsa control %i, device '%s'",
-			     currentAlsaCtl->ctl.numid,
-			     cardIdString);
+			     "request_json", "Error when trying to get request value object inside request '%s'",
+			     json_object_get_string(requestJson));
 		return;
 	}
+
+	if(HalCtlsNormalizeJsonValues(apiHandle, &currentAlsaCtl->ctl.alsaCtlProperties, valueJ, &convertedJ)) {
+		AFB_ReqFailF(request, "request_json", "Error when trying to convert request json '%s'", json_object_get_string(requestJson));
+		return;
+	}
+
+	if(HalCtlsSetAlsaCtlValue(apiHandle, cardIdString, currentAlsaCtl->ctl.numid, convertedJ)) {
+		AFB_ReqFailF(request,
+			     "alsa_control_call_error",
+			     "Error while trying to set value on alsa control %i, device '%s', message '%s'",
+			     currentAlsaCtl->ctl.numid,
+			     cardIdString,
+			     json_object_get_string(requestJson));
+		return;
+	}
+
+	json_object_put(convertedJ);
 
 	AFB_ReqSucess(request, NULL, "Action on alsa control correclty done");
 }
