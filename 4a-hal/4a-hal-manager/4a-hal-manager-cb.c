@@ -116,7 +116,7 @@ void HalMgrLoaded(AFB_ReqT request)
 				       "{s:s s:i s:s s:i s:s s:s s:s s:s}",
 				       "api", currentHalData->apiName,
 				       "status", (int) currentHalData->status,
-				       "sndcard", currentHalData->sndCard,
+				       "sndcard", currentHalData->sndCardPath,
 				       "internal", (int) currentHalData->internal,
 				       "info", currentHalData->info ? currentHalData->info : "",
 				       "author", currentHalData->author ? currentHalData->author : "",
@@ -141,7 +141,7 @@ void HalMgrLoaded(AFB_ReqT request)
 
 void HalMgrLoad(AFB_ReqT request)
 {
-	char *apiName, *sndCard, *info = NULL, *author = NULL, *version = NULL, *date = NULL;
+	char *apiName, *sndCardPath, *info = NULL, *author = NULL, *version = NULL, *date = NULL;
 
 	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
@@ -175,7 +175,7 @@ void HalMgrLoad(AFB_ReqT request)
 	if(wrap_json_unpack(apiReceviedMetadata,
 			    "{s:s s:s s?:s s?:s s?:s s?:s}",
 			    "api", &apiName,
-			    "uid", &sndCard,
+			    "uid", &sndCardPath,
 			    "info", &info,
 			    "author", &author,
 			    "version", &version,
@@ -192,7 +192,7 @@ void HalMgrLoad(AFB_ReqT request)
 	addedHal->status = HAL_STATUS_UNAVAILABLE;
 
 	addedHal->apiName = strdup(apiName);
-	addedHal->sndCard = strdup(sndCard);
+	addedHal->sndCardPath = strdup(sndCardPath);
 
 	if(info)
 		addedHal->info = strdup(info);

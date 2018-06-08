@@ -93,7 +93,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 	currentCtlHalData->internal = true;
 
 	currentCtlHalData->apiName = (char *) ctrlConfig->api;
-	currentCtlHalData->sndCard = (char *) ctrlConfig->uid;
+	currentCtlHalData->sndCardPath = (char *) ctrlConfig->uid;
 	currentCtlHalData->info = (char *) ctrlConfig->info;
 
 	currentCtlHalData->author = (char *) ctrlConfig->author;
@@ -105,7 +105,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count = 0;
 
-	currentCtlHalData->sndCardId = HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData->sndCard);
+	currentCtlHalData->sndCardId = HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData->sndCardPath);
 
 	if(currentCtlHalData->sndCardId < 0)
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;

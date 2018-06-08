@@ -65,7 +65,7 @@ struct CtlHalSpecificData {
 struct SpecificHalData {
 	char *apiName;
 	enum HalStatus status;
-	char *sndCard;
+	char *sndCardPath;
 	int sndCardId;
 	char *info;
 	bool internal;

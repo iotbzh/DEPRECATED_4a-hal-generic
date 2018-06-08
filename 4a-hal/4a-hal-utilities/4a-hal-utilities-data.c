@@ -113,7 +113,7 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 
 	if(! matchingApi->internal) {
 		free(matchingApi->apiName);
-		free(matchingApi->sndCard);
+		free(matchingApi->sndCardPath);
 		free(matchingApi->info);
 		free(matchingApi->author);
 		free(matchingApi->version);
