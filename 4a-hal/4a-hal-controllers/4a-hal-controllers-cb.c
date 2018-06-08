@@ -148,12 +148,12 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
 		AFB_ReqSucessF(request,
 			       toReturnJ,
-			       "Action %s correctly transfered to %s without any error raised",
+			       "Action %s correctly transferred to %s without any error raised",
 			       verbToCall,
 			       apiToCall);
 	}
 	else {
-		AFB_ReqFailF(request, "invalid_response", "Action %s correctly transfered to %s, but response is not valid",
+		AFB_ReqFailF(request, "invalid_response", "Action %s correctly transferred to %s, but response is not valid",
 							verbToCall,
 							apiToCall);
 	}
