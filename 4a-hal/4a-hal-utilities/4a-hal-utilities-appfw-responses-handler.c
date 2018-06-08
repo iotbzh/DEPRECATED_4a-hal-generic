@@ -79,18 +79,18 @@ enum CallError HalUtlHandleAppFwCallError(AFB_ApiT apiHandle, char *apiCalled, c
 	*returnedInfo = (char *) json_object_get_string(returnedInfoJ);
 
 	AFB_ApiWarning(apiHandle,
-			   "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
-			   apiCalled,
-			   verbCalled,
-			   *returnedStatus,
-			   *returnedInfo);
+		       "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
+		       apiCalled,
+		       verbCalled,
+		       *returnedStatus,
+		       *returnedInfo);
 
 	return CALL_ERROR_RETURNED;
 }
 
 void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend)
 {
-	char **returnedStatus, **returnedInfo;
+	char *returnedStatus = NULL, *returnedInfo = NULL;
 
 	AFB_ApiT apiHandle;
 
@@ -105,10 +105,7 @@ void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char
 		return;
 	}
 
-	returnedStatus = alloca(sizeof(char *));
-	returnedInfo = alloca(sizeof(char *));
-
-	switch (HalUtlHandleAppFwCallError(apiHandle, apiCalled, verbCalled, callReturnJ, returnedStatus, returnedInfo)) {
+	switch(HalUtlHandleAppFwCallError(apiHandle, apiCalled, verbCalled, callReturnJ, &returnedStatus, &returnedInfo)) {
 		case CALL_ERROR_REQUEST_UNAVAILABLE:
 		case CALL_ERROR_REQUEST_NOT_VALID:
 		case CALL_ERROR_REQUEST_STATUS_UNAVAILABLE:
@@ -132,8 +129,8 @@ void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char
 				     "Api %s and verb %s found, but this error was raised : '%s' with this info : '%s'",
 				     apiCalled,
 				     verbCalled,
-				     *returnedStatus,
-				     *returnedInfo);
+				     returnedStatus ? returnedStatus : "not returned",
+				     returnedInfo ? returnedInfo : "not returned");
 			return;
 
 		case CALL_ERROR_INVALID_ARGS:
