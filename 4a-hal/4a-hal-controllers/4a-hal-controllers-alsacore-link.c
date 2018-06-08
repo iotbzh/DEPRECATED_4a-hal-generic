@@ -30,50 +30,50 @@
  *		HAL controllers alsacore calls funtions			       *
  ******************************************************************************/
 
-bool HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, struct SpecificHalData *currentCtlHalData)
+int HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, char *devPath)
 {
-	int *cardId;
+	int cardId = -1;
 
-	char *cardIdString = NULL;
-	char **returnedStatus, **returnedInfo;
+	char *returnedStatus = NULL, *returnedInfo = NULL, *cardIdString = NULL;
 
 	enum CallError returnedError;
 
 	json_object *toSendJ, *returnJ, *responsJ, *devidJ;
 
-	cardId = alloca(sizeof(int));
-	*cardId = -1;
+	if(! apiHandle) {
+		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
+		return -1;
+	}
 
-	wrap_json_pack(&toSendJ, "{s:s}", "devpath", currentCtlHalData->sndCard);
+	if(! devPath) {
+		AFB_ApiError(apiHandle, "%s: dev path is not available", __func__);
+		return -2;
+	}
+
+	wrap_json_pack(&toSendJ, "{s:s}", "devpath", devPath);
 
 	if(AFB_ServiceSync(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, toSendJ, &returnJ)) {
-		returnedStatus = alloca(sizeof(char *));
-		returnedInfo = alloca(sizeof(char *));
-
-		returnedError = HalUtlHandleAppFwCallError(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, returnJ, returnedStatus, returnedInfo);
+		returnedError = HalUtlHandleAppFwCallError(apiHandle, ALSACORE_API, ALSACORE_GETINFO_VERB, returnJ, &returnedStatus, &returnedInfo);
 		AFB_ApiWarning(apiHandle,
-				   "Error %i during call to verb %s of %s api",
-				   (int) returnedError,
-				   ALSACORE_GETINFO_VERB,
-				   ALSACORE_API);
+			       "Error %i during call to verb %s of %s api with status '%s' and info '%s'",
+			       (int) returnedError,
+			       ALSACORE_GETINFO_VERB,
+			       ALSACORE_API,
+			       returnedStatus ? returnedStatus : "not returned",
+			       returnedInfo ? returnedInfo : "not returned");
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &responsJ)) {
 		if(json_object_object_get_ex(responsJ, "devid", &devidJ) && json_object_is_type(devidJ, json_type_string)) {
 			cardIdString = (char *) json_object_get_string(devidJ);
-			if(sscanf(cardIdString, "hw:%i", cardId) <= 0)
+			if(sscanf(cardIdString, "hw:%i", &cardId) <= 0) {
 				AFB_ApiWarning(apiHandle, "Couldn't get valid devid from string: '%s'", cardIdString);
+				cardId = -2;
+			}
 		}
 		else {
 			AFB_ApiWarning(apiHandle, "Response devid is not present/valid");
 		}
-
-		currentCtlHalData->sndCardId = *cardId;
-
-		return true;
 	}
 
-	currentCtlHalData->sndCardId = *cardId;
-
-	return false;
+	return cardId;
 }
-

@@ -105,10 +105,12 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count = 0;
 
-	if(HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData))
-		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
-	else
+	currentCtlHalData->sndCardId = HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData->sndCard);
+
+	if(currentCtlHalData->sndCardId < 0)
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
+	else
+		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
 
 	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
 
