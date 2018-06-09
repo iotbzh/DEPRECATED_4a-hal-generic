@@ -29,8 +29,6 @@
 
 #include "../4a-hal-controllers/4a-hal-controllers-alsacore-link.h"
 
-#define ALSA_MAX_CARD 32
-
 // Enum for sharing hal (controller or external) status
 enum HalStatus {
 	HAL_STATUS_UNAVAILABLE=0,
@@ -86,8 +84,6 @@ struct SpecificHalData {
 struct HalMgrData {
 	char *apiName;
 	char *info;
-
-	struct SpecificHalData usedCardId[ALSA_MAX_CARD];
 
 	AFB_ApiT apiHandle;
 
