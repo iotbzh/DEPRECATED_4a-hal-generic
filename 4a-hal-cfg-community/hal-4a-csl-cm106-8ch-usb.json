@@ -1,13 +1,13 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
+        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
         "version": "0.9",
-        "api": "4a-hal-jon-office-usb-headset",
+        "api": "4a-hal-csl-cm106-8ch-usb",
         "require": [ "alsacore", "softmixer" ],
-        "info": "4a hal for Jon's Office USB Headset Audio",
+        "info": "4a hal for Jon's CSL CM106 8ch USB device",
         "author": "Jonathan Aillet",
-        "date": "2018-05-18"
+        "date": "2018-06-09"
     },
     "onload": [
         {
@@ -31,17 +31,17 @@
     ],
     "halmap": [
         {
-            "uid": "agl-speaker-playback-switch",
+            "uid": "agl-mic-capture-volume",
             "alsa": {
-                "name": "Speaker Playback Switch",
-                "value": 12
+                "name": "Mic Capture Volume",
+                "value": 60
             }
         },
         {
             "uid": "agl-speaker-playback-volume",
             "alsa": {
-                "numid": 7,
-                "value": 34
+                "numid": 8,
+                "value": 80
             }
         },
         {
@@ -55,19 +55,19 @@
                     "type": "INTEGER",
                     "count": 1,
                     "minval": 0,
-                    "maxval": 20,
+                    "maxval": 100,
                     "step": 1
                 }
             },
-            "action": "api://4a-hal-jon-home-usb-card#ping"
+            "action": "api://4a-hal-csl-cm106-8ch-usb#ping"
         }
     ],
     "halmixer": {
-        "uid": "jon-office-usb-headset-mixer",
+        "uid": "csl-cm106-8ch-usb",
         "mixerapi": "softmixer",
         "backend": {
-            "uid": "Jon-Office-USB-Headset-Audio",
-            "devpath": "/dev/snd/by-id/usb-Plantronics_Plantronics_.Audio_655_DSP-00",
+            "uid": "CSL-CM106-8CH-USB",
+            "devpath": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
             "sink": [
                 {
                     "uid": "front-right",
@@ -77,16 +77,13 @@
                     "uid": "front-left",
                     "port": 1
                 }
-            ],
-            "params": {
-                "rate": 44100
-            }
+            ]
         },
         "frontend" : {
             "uid": "Alsa-Loop",
             "devpath": "/dev/snd/by-path/platform-snd_aloop.0",
             "params": {
-                "rate": 44100
+                "rate": 48000
             },
             "ramps": [
                 {
@@ -149,6 +146,20 @@
         },
         "zones": [
             {
+                "uid": "full-stereo",
+                "type": "playback",
+                "mapping": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
                 "uid": "front-seats",
                 "type": "playback",
                 "mapping": [
@@ -166,33 +177,24 @@
         "streams": [
             {
                 "uid": "multimedia",
-                "zone": "front-seats",
+                "zone": "full-stereo",
                 "ramp": "ramp-slow",
                 "volume": 60,
-                "mute": false,
-                "params": {
-                    "rate": 44100
-                }
+                "mute": false
             },
             {
                 "uid": "navigation",
                 "zone": "front-seats",
                 "ramp": "ramp-normal",
                 "volume": 70,
-                "mute": false,
-                "params": {
-                    "rate": 44100
-                }
+                "mute": false
             },
             {
                 "uid": "emergency",
                 "zone": "front-seats",
                 "ramp": "ramp-fast",
                 "volume": 80,
-                "mute": false,
-                "params": {
-                    "rate": 44100
-                }
+                "mute": false
             }
         ]
     }

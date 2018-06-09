@@ -130,7 +130,7 @@ set(CONTROL_SUPPORT_LUA 1 CACHE BOOL "Active or not LUA Support")
 # CACHE STRING "Compilation flags for RELEASE build type.")
 
 add_definitions(-DCTL_PLUGIN_MAGIC=7053042648)
-add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/4a-hal-references-boards-cfg:${CMAKE_BINARY_DIR}/package/etc")
+add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/4a-hal-cfg-community:${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/4a-hal-cfg-reference:${CMAKE_BINARY_DIR}/package/etc")
 add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/plugins/lib:${CMAKE_BINARY_DIR}/package/lib/plugins")
 add_definitions(-DCONTROL_LUA_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/plugins/lua:${CMAKE_BINARY_DIR}/package/data")
 

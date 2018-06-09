@@ -19,7 +19,7 @@
 ##################################################
 # Control Policy Config file
 ##################################################
-PROJECT_TARGET_ADD(4a-hal-references-boards-cfg)
+PROJECT_TARGET_ADD(4a-hal-cfg-community)
 
 	file(GLOB CONF_FILES "*.json")
 

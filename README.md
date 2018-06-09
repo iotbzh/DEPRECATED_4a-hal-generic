@@ -56,7 +56,7 @@ sudo modprobe snd-aloop
 #### Information about audio json configuration files
 
 * All audio hardware configuration files are a json description of your audio devices.
-* They all must be in ./4a-hal-references-boards-cfg/ and must begin with 'hal-4a'.
+* They all must be in ./4a-hal-cfg-reference or ./4a-hal-cfg-community and must begin with 'hal-4a'.
 * You can found some examples of these configurations in this directory.
 * Each configuration file found at startup will create a new hal with its own api.
 * At 'init-mixer' hal command, your mixer configuration will be sent.
