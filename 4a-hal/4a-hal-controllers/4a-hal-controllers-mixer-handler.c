@@ -22,7 +22,10 @@
 #include <stdbool.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"
+#include "../4a-hal-utilities/4a-hal-utilities-data.h"
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
+
+#include "../4a-hal-manager/4a-hal-manager.h"
 
 #include "4a-hal-controllers-mixer-handler.h"
 #include "4a-hal-controllers-cb.h"
@@ -108,7 +111,8 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 
 	CtlConfigT *ctrlConfig;
 
-	struct SpecificHalData *currentCtlHalData;
+	struct SpecificHalData *currentCtlHalData, *concurentHalData = NULL;
+	struct SpecificHalData **firstHalData;
 
 	json_object *returnJ, *toReturnJ;
 
@@ -124,16 +128,28 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 		return -2;
 	}
 
+	// TODO JAI : add a test to see if the hal card id is already used
+	firstHalData = HalMngGetFirstHalData();
+	if((concurentHalData = HalUtlSearchReadyHalDataByCarId(firstHalData, currentCtlHalData->sndCardId))) {
+		AFB_ApiError(apiHandle,
+			     "%s: trying to attach mixer for hal '%s' but the alsa device %i is already in use with mixer by hal '%s'",
+			     __func__,
+			     currentCtlHalData->apiName,
+			     currentCtlHalData->sndCardId,
+			     concurentHalData->apiName);
+		return -3;
+	}
+
 	apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
 	if(! apiToCall) {
 		AFB_ApiError(apiHandle, "%s: Can't get mixer api", __func__);
-		return -3;
+		return -4;
 	}
 
 	switch(currentCtlHalData->status) {
 		case HAL_STATUS_UNAVAILABLE:
 			AFB_ApiError(apiHandle, "%s: Seems that the hal corresponding card was not found by alsacore at startup", __func__);
-			return -4;
+			return -5;
 
 		case HAL_STATUS_READY:
 			AFB_ApiNotice(apiHandle, "%s: Seems that the hal mixer is already initialized", __func__);
