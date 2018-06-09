@@ -64,6 +64,8 @@ void HalMgrLoaded(AFB_ReqT request)
 	int requestJsonErr, requestOptionValue;
 	uint64_t cpt, numberOfLoadedApi;
 
+	char cardIdString[10];
+
 	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *currentHalData;
@@ -108,8 +110,13 @@ void HalMgrLoaded(AFB_ReqT request)
 	// Case if request key is 'verbose' and value is bigger than 0
 	if(! requestJsonErr && requestOptionValue > 0) {
 		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
+			if(currentHalData->sndCardId >= 0)
+				snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
+			else
+				snprintf(cardIdString, 10, "not-found");
+
 			wrap_json_pack(&apiObject,
-				       "{s:s s:i s:s s:i s:s s:s s:s s:s}",
+				       "{s:s s:i s:s s:i s:s s:s s:s s:s s:s}",
 				       "api", currentHalData->apiName,
 				       "status", (int) currentHalData->status,
 				       "sndcard", currentHalData->sndCardPath,
@@ -117,7 +124,8 @@ void HalMgrLoaded(AFB_ReqT request)
 				       "info", currentHalData->info ? currentHalData->info : "",
 				       "author", currentHalData->author ? currentHalData->author : "",
 				       "version", currentHalData->version ? currentHalData->version : "",
-				       "date", currentHalData->date ? currentHalData->date : "");
+				       "date", currentHalData->date ? currentHalData->date : "",
+				       "snd-dev-id", cardIdString);
 			json_object_array_add(requestAnswer, apiObject);
 
 			currentHalData = currentHalData->next;
@@ -137,6 +145,8 @@ void HalMgrLoaded(AFB_ReqT request)
 
 void HalMgrLoad(AFB_ReqT request)
 {
+	int cardId = -1;
+
 	char *apiName, *sndCardPath, *info = NULL, *author = NULL, *version = NULL, *date = NULL;
 
 	AFB_ApiT apiHandle;
@@ -169,18 +179,17 @@ void HalMgrLoad(AFB_ReqT request)
 	}
 
 	if(wrap_json_unpack(apiReceviedMetadata,
-			    "{s:s s:s s?:s s?:s s?:s s?:s}",
+			    "{s:s s:s s?:s s?:s s?:s s?:s s?:i}",
 			    "api", &apiName,
 			    "uid", &sndCardPath,
 			    "info", &info,
 			    "author", &author,
 			    "version", &version,
-			    "date", &date)) {
+			    "date", &date,
+			    "snd-dev-id", &cardId)) {
 		AFB_ReqFail(request, "api_metadata", "Can't metadata of api to register");
 		return;
 	}
-
-	// TBD JAI: try connect to the api to test if it really exists
 
 	addedHal = HalUtlAddHalApiToHalList(HalMgrGlobalData);
 
@@ -203,7 +212,9 @@ void HalMgrLoad(AFB_ReqT request)
 	if(date)
 		addedHal->date = strdup(date);
 
-	// TBD JAI: add subscription to this api status events
+	addedHal->sndCardId = cardId;
+
+	// TBD JAI: add subscription to this api status events, if subscription fails, remove hal from list
 
 	AFB_ReqSuccess(request, NULL, "Api successfully registered");
 }
