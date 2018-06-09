@@ -23,4 +23,7 @@
 #define HAL_MANAGER_API_NAME "4a-hal-manager"
 #define HAL_MANAGER_API_INFO "Manager for 4A HAL APIs"
 
+// HAL Manager get first 'SpecificHalData' structure from HAL list function
+struct SpecificHalData **HalMngGetFirstHalData(void);
+
 #endif /* _HALMGR_BINDING_INCLUDE_ */

@@ -31,6 +31,9 @@
 // Default api to print log when apihandle not available
 AFB_ApiT AFB_default;
 
+// Local (static) Hal manager data structure
+static struct HalMgrData localHalMgrGlobalData;
+
 /*******************************************************************************
  *		HAL Manager verbs table					       *
  ******************************************************************************/
@@ -47,6 +50,16 @@ struct HalUtlApiVerb HalManagerApiStaticVerbs[] =
 	{ .verb = "unsuscribe",		.callback = HalMgrUnsubscribeEvent,	.info = "Unsubscribe to an event"},
 	{ .verb = NULL }		// Marker for end of the array
 };
+
+/*******************************************************************************
+ *		HAL Manager get first 'SpecificHalData' structure	       *
+		from HAL list function					       *
+ ******************************************************************************/
+
+struct SpecificHalData **HalMngGetFirstHalData(void)
+{
+	return &localHalMgrGlobalData.first;
+}
 
 /*******************************************************************************
  *		Dynamic API functions for hal manager			       *
@@ -120,14 +133,9 @@ int HalMgrCreateApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 int afbBindingVdyn(AFB_ApiT apiHandle)
 {
 	int status = 0, rc;
-	struct HalMgrData *HalMgrGlobalData;
 
 	if(! apiHandle)
 		return -1;
-
-	HalMgrGlobalData = (struct HalMgrData *) calloc(1, sizeof(struct HalMgrData));
-	if(! HalMgrGlobalData)
-		return -2;
 
 	// Hugely hack to make all V2 AFB_DEBUG to work in fileutils
 	AFB_default = apiHandle;
@@ -135,12 +143,12 @@ int afbBindingVdyn(AFB_ApiT apiHandle)
 	AFB_ApiNotice(apiHandle, "In %s", __func__);
 
 	// Load Hal-Manager using DynApi
-	rc = HalMgrCreateApi(apiHandle, HalMgrGlobalData);
+	rc = HalMgrCreateApi(apiHandle, &localHalMgrGlobalData);
 	if(rc < 0)
 		status--;
 
 	// Load Hal-Ctls using DynApi
-	rc = HalCtlsCreateAllApi(apiHandle, HalMgrGlobalData);
+	rc = HalCtlsCreateAllApi(apiHandle, &localHalMgrGlobalData);
 	if(rc < 0)
 		status -= rc;
 
