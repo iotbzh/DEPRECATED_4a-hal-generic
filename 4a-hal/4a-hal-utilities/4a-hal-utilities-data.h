@@ -96,6 +96,7 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, s
 uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData);
 uint64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData);
 struct SpecificHalData *HalUtlSearchHalDataByApiName(struct SpecificHalData **firstHalData, char *apiName);
+struct SpecificHalData *HalUtlSearchReadyHalDataByCarId(struct SpecificHalData **firstHalData, int cardId);
 
 // Exported verbs for 'struct HalMgrData' handling
 uint8_t HalUtlInitializeHalMgrData(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info);

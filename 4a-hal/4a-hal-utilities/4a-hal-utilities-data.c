@@ -187,6 +187,25 @@ struct SpecificHalData *HalUtlSearchHalDataByApiName(struct SpecificHalData **fi
 	return NULL;
 }
 
+
+struct SpecificHalData *HalUtlSearchReadyHalDataByCarId(struct SpecificHalData **firstHalData, int cardId)
+{
+	struct SpecificHalData *currentApi;
+
+	if(! firstHalData)
+		return NULL;
+
+	currentApi = *firstHalData;
+	while(currentApi) {
+		if(currentApi->status == HAL_STATUS_READY && currentApi->sndCardId == cardId)
+			return currentApi;
+
+		currentApi = currentApi->next;
+	}
+
+	return NULL;
+}
+
 /*******************************************************************************
  *		Hal Manager data handling functions			       *
  ******************************************************************************/
