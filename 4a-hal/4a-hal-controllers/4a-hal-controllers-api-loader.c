@@ -121,12 +121,12 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
 
-	return CtlConfigExec(apiHandle, ctrlConfig);
+	return 0;
 }
 
 static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 {
-	int err;
+	int err = 0;
 	CtlConfigT *ctrlConfig;
 
 	if(! cbdata || ! apiHandle )
@@ -144,13 +144,17 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 	}
 
 	// Load section for corresponding Api
-	err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
+	err += CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
 
 	// Declare an event manager for this Api
 	afb_dynapi_on_event(apiHandle, HalCtlsDispatchApiEvent);
 
 	// Init Api function (does not receive user closure ???)
-	afb_dynapi_on_init(apiHandle, HalCtlsInitOneApi);
+	afb_dynapi_on_init(apiHandle, NULL);
+
+	err += HalCtlsInitOneApi(apiHandle);
+
+	err += CtlConfigExec(apiHandle, ctrlConfig);
 
 	return err;
 }
