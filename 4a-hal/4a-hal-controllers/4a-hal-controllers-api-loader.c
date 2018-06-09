@@ -113,8 +113,10 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
 	else {
 		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
-		if((err = HalCtlsAttachToMixer(apiHandle)))
+		if((err = HalCtlsAttachToMixer(apiHandle))) {
 			AFB_ApiError(apiHandle, "%s: Error %i while attaching to mixer", __func__, err);
+			return -4;
+		}
 	}
 
 	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
