@@ -40,7 +40,7 @@ void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_objec
 }
 
 /*******************************************************************************
- *	TBD JAI : Present for test, delete this function when validated        *
+ *		HAL Manager verbs functions				       *
  ******************************************************************************/
 
 void HalMgrPing(AFB_ReqT request)
@@ -58,10 +58,6 @@ void HalMgrPing(AFB_ReqT request)
 
 	return;
 }
-
-/*******************************************************************************
- *		HAL Manager verbs functions				       *
- ******************************************************************************/
 
 void HalMgrLoaded(AFB_ReqT request)
 {

@@ -27,7 +27,6 @@ void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_objec
 
 // Exported verbs callbacks
 void HalMgrPing(AFB_ReqT request);
-
 void HalMgrLoaded(AFB_ReqT request);
 void HalMgrLoad(AFB_ReqT request);
 void HalMgrUnload(AFB_ReqT request);
