@@ -90,7 +90,7 @@ void HalMgrLoaded(AFB_ReqT request)
 		return;
 	}
 
-	numberOfLoadedApi = HalUtlGetNumberOfHalInList(HalMgrGlobalData);
+	numberOfLoadedApi = HalUtlGetNumberOfHalInList(&HalMgrGlobalData->first);
 	if(! numberOfLoadedApi) {
 		AFB_ReqSuccess(request, NULL, "No Hal Api loaded");
 		return;
@@ -191,7 +191,7 @@ void HalMgrLoad(AFB_ReqT request)
 		return;
 	}
 
-	addedHal = HalUtlAddHalApiToHalList(HalMgrGlobalData);
+	addedHal = HalUtlAddHalApiToHalList(&HalMgrGlobalData->first);
 
 	addedHal->internal = false;
 	// TBD JAI : initialize external to unavailable once event from external hal will be handled
@@ -252,7 +252,7 @@ void HalMgrUnload(AFB_ReqT request)
 		return;
 	}
 
-	HalToRemove = HalUtlSearchHalDataByApiName(HalMgrGlobalData, apiName);
+	HalToRemove = HalUtlSearchHalDataByApiName(&HalMgrGlobalData->first, apiName);
 	if(! HalToRemove) {
 		AFB_ReqFail(request, "requested_api", "Can't find api to remove");
 		return;
@@ -263,7 +263,7 @@ void HalMgrUnload(AFB_ReqT request)
 		return;
 	}
 
-	if(HalUtlRemoveSelectedHalFromList(HalMgrGlobalData, HalToRemove)) {
+	if(HalUtlRemoveSelectedHalFromList(&HalMgrGlobalData->first, HalToRemove)) {
 		AFB_ReqFail(request, "unregister_error", "Didn't succeed to remove specified api");
 		return;
 	}

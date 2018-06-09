@@ -25,6 +25,8 @@
 
 #include "4a-hal-utilities-data.h"
 
+#include "../4a-hal-controllers/4a-hal-controllers-alsacore-link.h"
+
 /*******************************************************************************
  *		Specfic Hal controller streams data handling functions	       *
  ******************************************************************************/
@@ -53,21 +55,21 @@ uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalStreamsDataT *ctlHalStream
  *		Specfic Hal data handling functions			       *
  ******************************************************************************/
 
-struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobalData)
+struct SpecificHalData *HalUtlAddHalApiToHalList(struct SpecificHalData **firstHalData)
 {
 	struct SpecificHalData *currentApi;
 
-	if(! HalMgrGlobalData)
+	if(! firstHalData)
 		return NULL;
 
-	currentApi = HalMgrGlobalData->first;
+	currentApi = *firstHalData;
 
 	if(! currentApi) {
 		currentApi = (struct SpecificHalData *) calloc(1, sizeof(struct SpecificHalData));
 		if(! currentApi)
 			return NULL;
 
-		HalMgrGlobalData->first = currentApi;
+		*firstHalData = currentApi;
 	}
 	else {
 		while(currentApi->next)
@@ -85,17 +87,17 @@ struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobal
 	return currentApi;
 }
 
-uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, struct SpecificHalData *apiToRemove)
+uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *apiToRemove)
 {
 	struct SpecificHalData *currentApi, *matchingApi;
 
-	if(! HalMgrGlobalData || ! apiToRemove)
+	if(! firstHalData || ! apiToRemove)
 		return -1;
 
-	currentApi = HalMgrGlobalData->first;
+	currentApi = *firstHalData;
 
 	if(currentApi == apiToRemove) {
-		HalMgrGlobalData->first = currentApi->next;
+		*firstHalData = currentApi->next;
 		matchingApi = currentApi;
 	}
 	else {
@@ -132,13 +134,13 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 	return 0;
 }
 
-uint64_t HalUtlRemoveAllHalFromList(struct HalMgrData *HalMgrGlobalData)
+uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData)
 {
 	uint8_t ret;
 	uint64_t CtlHalApiRemoved = 0;
 
-	while(HalMgrGlobalData->first) {
-		ret = HalUtlRemoveSelectedHalFromList(HalMgrGlobalData, HalMgrGlobalData->first);
+	while(*firstHalData) {
+		ret = HalUtlRemoveSelectedHalFromList(firstHalData, *firstHalData);
 		if(ret)
 			return (uint64_t) ret;
 
@@ -148,15 +150,15 @@ uint64_t HalUtlRemoveAllHalFromList(struct HalMgrData *HalMgrGlobalData)
 	return CtlHalApiRemoved;
 }
 
-uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData)
+uint64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData)
 {
 	uint64_t numberOfCtlHal = 0;
 	struct SpecificHalData *currentApi;
 
-	if(! HalMgrGlobalData)
+	if(! firstHalData)
 		return -1;
 
-	currentApi = HalMgrGlobalData->first;
+	currentApi = *firstHalData;
 
 	while(currentApi) {
 		currentApi = currentApi->next;
@@ -166,14 +168,14 @@ uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData)
 	return numberOfCtlHal;
 }
 
-struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *apiName)
+struct SpecificHalData *HalUtlSearchHalDataByApiName(struct SpecificHalData **firstHalData, char *apiName)
 {
 	struct SpecificHalData *currentApi;
 
-	if(! HalMgrGlobalData || ! apiName)
+	if(! firstHalData || ! apiName)
 		return NULL;
 
-	currentApi = HalMgrGlobalData->first;
+	currentApi = *firstHalData;
 
 	while(currentApi) {
 		if(! strcmp(apiName, currentApi->apiName))
@@ -214,7 +216,7 @@ void HalUtlRemoveHalMgrData(struct HalMgrData *HalMgrGlobalData)
 		return;
 
 	if(HalMgrGlobalData->first)
-		HalUtlRemoveAllHalFromList(HalMgrGlobalData);
+		HalUtlRemoveAllHalFromList(&HalMgrGlobalData->first);
 
 	free(HalMgrGlobalData->apiName);
 	free(HalMgrGlobalData->info);

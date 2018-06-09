@@ -91,11 +91,11 @@ struct HalMgrData {
 };
 
 // Exported verbs for 'struct SpecificHalData' handling
-struct SpecificHalData *HalUtlAddHalApiToHalList(struct HalMgrData *HalMgrGlobalData);
-uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, struct SpecificHalData *ApiToRemove);
-uint64_t HalUtlRemoveAllHalFromList(struct HalMgrData *HalMgrGlobalData);
-uint64_t HalUtlGetNumberOfHalInList(struct HalMgrData *HalMgrGlobalData);
-struct SpecificHalData *HalUtlSearchHalDataByApiName(struct HalMgrData *HalMgrGlobalData, char *apiName);
+struct SpecificHalData *HalUtlAddHalApiToHalList(struct SpecificHalData **firstHalData);
+uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *ApiToRemove);
+uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData);
+uint64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData);
+struct SpecificHalData *HalUtlSearchHalDataByApiName(struct SpecificHalData **firstHalData, char *apiName);
 
 // Exported verbs for 'struct HalMgrData' handling
 uint8_t HalUtlInitializeHalMgrData(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData, char *apiName, char *info);

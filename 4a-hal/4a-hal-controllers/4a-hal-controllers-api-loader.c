@@ -174,7 +174,7 @@ int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGl
 	}
 
 	// Allocation of current hal controller data
-	currentCtlHalData = HalUtlAddHalApiToHalList(HalMgrGlobalData);
+	currentCtlHalData = HalUtlAddHalApiToHalList(&HalMgrGlobalData->first);
 	if(! currentCtlHalData)
 		return -4;
 
