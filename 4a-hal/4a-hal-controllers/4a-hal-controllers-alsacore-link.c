@@ -65,10 +65,31 @@ snd_ctl_elem_type_t HalCtlsMapsAlsaTypeToEnum(const char *label)
 }
 
 /*******************************************************************************
- *		TODO JAI : add function to free 'CtlHalAlsaMapT'	       *
+ *		Free contents of 'CtlHalAlsaMapT' data structure	       *
  ******************************************************************************/
 
+uint8_t HalCtlsFreeAlsaCtlsMap(struct CtlHalAlsaMapT *alsaCtlsMap)
+{
+	int idx;
 
+	if(! alsaCtlsMap)
+		return -1;
+
+	if(alsaCtlsMap->ctlsCount > 0 && ! alsaCtlsMap->ctls)
+		return -2;
+
+	for(idx = 0; idx < alsaCtlsMap->ctlsCount; idx++) {
+		free(alsaCtlsMap->ctls[idx].action);
+		free(alsaCtlsMap->ctls[idx].ctl.alsaCtlProperties.enums);
+		free(alsaCtlsMap->ctls[idx].ctl.alsaCtlProperties.dbscale);
+	}
+
+	free(alsaCtlsMap->ctls);
+
+	free(alsaCtlsMap);
+
+	return 0;
+}
 
 /*******************************************************************************
  *		HAL controllers alsacore calls funtions			       *

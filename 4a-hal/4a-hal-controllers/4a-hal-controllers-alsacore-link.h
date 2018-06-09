@@ -49,7 +49,7 @@ struct CtlHalAlsaCtlProperties {
 	int step;
 	// TBD JAI : use them
 	const char **enums;
-	struct CtlHalAlsaDBScale dbscale;
+	struct CtlHalAlsaDBScale *dbscale;
 };
 
 struct CtlHalAlsaCtl {
@@ -75,6 +75,9 @@ struct CtlHalAlsaMapT {
 
 // Alsa control types map from string function
 snd_ctl_elem_type_t HalCtlsMapsAlsaTypeToEnum(const char *label);
+
+// Free contents of 'CtlHalAlsaMapT' data structure
+uint8_t HalCtlsFreeAlsaCtlsMap(struct CtlHalAlsaMapT *alsaCtlsMap);
 
 // HAL controllers alsacore calls funtions
 int HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, char *devPath);

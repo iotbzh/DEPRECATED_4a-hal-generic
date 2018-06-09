@@ -122,6 +122,8 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct HalMgrData *HalMgrGlobalData, str
 	else {
 		HalUtlRemoveAllCtlHalStreamsData(&matchingApi->ctlHalSpecificData->ctlHalStreamsData);
 
+		HalCtlsFreeAlsaCtlsMap(matchingApi->ctlHalSpecificData->ctlHalAlsaMapT);
+
 		free(matchingApi->ctlHalSpecificData);
 	}
 
