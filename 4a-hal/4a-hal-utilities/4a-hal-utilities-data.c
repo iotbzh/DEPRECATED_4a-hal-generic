@@ -42,7 +42,8 @@ uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalMixerDataT *ctlHalStreamsD
 		return -2;
 
 	for(cpt = 0; cpt < ctlHalStreamsData->count; cpt++) {
-		free(ctlHalStreamsData->data[cpt].name);
+		free(ctlHalStreamsData->data[cpt].verb);
+		free(ctlHalStreamsData->data[cpt].verbToCall);
 		free(ctlHalStreamsData->data[cpt].streamCardId);
 	}
 

@@ -32,7 +32,7 @@ int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object 
 int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *StreamControlsJ);
 
 // HAL controllers verbs functions
-void HalCtlsActionOnStream(AFB_ReqT request);
+void HalCtlsActionOnCall(AFB_ReqT request);
 void HalCtlsInfo(AFB_ReqT request);
 
 #endif /* _HALMGR_CB_INCLUDE_ */

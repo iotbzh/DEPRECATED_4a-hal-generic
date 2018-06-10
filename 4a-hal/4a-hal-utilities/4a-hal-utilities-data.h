@@ -38,7 +38,8 @@ enum HalStatus {
 
 // Structure to store stream data
 struct CtlHalMixerData {
-	char *name;
+	char *verb;
+	char *verbToCall;
 	char *streamCardId;
 };
 
@@ -51,10 +52,12 @@ struct CtlHalMixerDataT {
 // Structure to store specific controller hal  data
 struct CtlHalSpecificData {
 	char *mixerApiName;
-	char *mixerVerbName;
+	char *prefix;
 	json_object *halMixerJ;
 
 	struct CtlHalMixerDataT ctlHalStreamsData;
+	struct CtlHalMixerDataT ctlHalPlaybacksData;
+	struct CtlHalMixerDataT ctlHalCapturesData;
 	struct CtlHalAlsaMapT *ctlHalAlsaMapT;
 
 	AFB_ApiT apiHandle;

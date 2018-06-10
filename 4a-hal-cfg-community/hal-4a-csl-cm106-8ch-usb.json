@@ -4,7 +4,7 @@
         "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
         "version": "0.9",
         "api": "4a-hal-csl-cm106-8ch-usb",
-        "require": [ "alsacore", "softmixer" ],
+        "require": [ "alsacore", "smixer" ],
         "info": "4a hal for Jon's CSL CM106 8ch USB device",
         "author": "Jonathan Aillet",
         "date": "2018-06-09"
@@ -64,91 +64,140 @@
     ],
     "halmixer": {
         "uid": "csl-cm106-8ch-usb",
-        "mixerapi": "softmixer",
-        "backend": {
+        "mixerapi": "smixer",
+        "prefix": "cm106",
+        "ramps": [
+            {
+                "uid": "ramp-fast",
+                "delay": 50,
+                "up": 10,
+                "down": 3
+            },
+            {
+                "uid": "ramp-slow",
+                "delay": 250,
+                "up": 3,
+                "down": 1
+            },
+            {
+                "uid": "ramp-normal",
+                "delay": 100,
+                "up": 6,
+                "down": 2
+            }
+        ],
+        "playbacks" : {
             "uid": "CSL-CM106-8CH-USB",
-            "devpath": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
-            "sink": [
-                {
-                    "uid": "front-right",
-                    "port": 0
-                },
-                {
-                    "uid": "front-left",
-                    "port": 1
-                }
-            ]
-        },
-        "frontend" : {
-            "uid": "Alsa-Loop",
-            "devpath": "/dev/snd/by-path/platform-snd_aloop.0",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
             "params": {
                 "rate": 48000
             },
-            "ramps": [
-                {
-                    "uid": "ramp-fast",
-                    "delay": 50,
-                    "up": 10,
-                    "down": 3
+            "sink": {
+                "controls": {
+                    "volume": {
+                        "name": "Speaker Playback Volume",
+                        "value": 80
+                    },
+                    "mute": {
+                        "name": "Speaker Playback Switch"
+                    }
                 },
-                {
-                    "uid": "ramp-slow",
-                    "delay": 250,
-                    "up": 3,
-                    "down": 1
-                },
-                {
-                    "uid": "ramp-normal",
-                    "delay": 100,
-                    "up": 6,
-                    "down": 2
-                }
-            ],
-            "devices": {
-                "playback": 0,
-                "capture": 1
+                "channels": [
+                    {
+                        "uid": "front-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "front-left",
+                        "port": 1
+                    },
+                    {
+                        "uid": "middle-right",
+                        "port": 2
+                    },
+                    {
+                        "uid": "middle-left",
+                        "port": 3
+                    },
+                    {
+                        "uid": "back-right",
+                        "port": 4
+                    },
+                    {
+                        "uid": "back-left",
+                        "port": 5
+                    },
+                    {
+                        "uid": "center-right",
+                        "port": 6
+                    },
+                    {
+                        "uid": "center-left",
+                        "port": 7
+                    }
+                ]
+            }
+        },
+        "captures": {
+            "uid": "CSL-CM106-8CH-USB",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
+            "params": {
+                "rate": 48000
             },
-            "subdevs": [
-                {
-                    "subdev": 0,
-                    "numid": 51
+            "source": {
+                "controls": {
+                    "volume": {
+                        "name": "Capture Volume"
+                    },
+                    "mute": {
+                        "name": "Capture Switch"
+                    }
                 },
-                {
-                    "subdev": 1,
-                    "numid": 57
-                },
-                {
-                    "subdev": 2,
-                    "numid": 63
-                },
-                {
-                    "subdev": 3,
-                    "numid": 69
-                },
-                {
-                    "subdev": 4,
-                    "numid": 75
-                },
-                {
-                    "subdev": 5,
-                    "numid": 81
-                },
-                {
-                    "subdev": 6,
-                    "numid": 87
-                },
-                {
-                    "subdev": 7,
-                    "numid": 93
-                }
-            ]
+                "channels": [
+                    {
+                        "uid": "mic-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "mic-left",
+                        "port": 1
+                    }
+                ]
+            }
         },
         "zones": [
             {
                 "uid": "full-stereo",
-                "type": "playback",
-                "mapping": [
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    },
+                    {
+                        "target": "middle-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "middle-left",
+                        "channel": 1
+                    },
+                    {
+                        "target": "back-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "back-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "front-seats",
+                "sink": [
                     {
                         "target": "front-right",
                         "channel": 0
@@ -160,15 +209,27 @@
                 ]
             },
             {
-                "uid": "front-seats",
-                "type": "playback",
-                "mapping": [
+                "uid": "middle-seats",
+                "sink": [
                     {
-                        "target": "front-right",
+                        "target": "middle-right",
                         "channel": 0
                     },
                     {
-                        "target": "front-left",
+                        "target": "middle-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "back-seats",
+                "sink": [
+                    {
+                        "target": "back-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "back-left",
                         "channel": 1
                     }
                 ]
@@ -176,25 +237,45 @@
         ],
         "streams": [
             {
-                "uid": "multimedia",
+                "uid": "stream-multimedia",
+                "verb": "multimedia",
                 "zone": "full-stereo",
-                "ramp": "ramp-slow",
                 "volume": 60,
-                "mute": false
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
             },
             {
-                "uid": "navigation",
+                "uid": "stream-navigation",
+                "verb": "navigation",
                 "zone": "front-seats",
-                "ramp": "ramp-normal",
                 "volume": 70,
-                "mute": false
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
             },
             {
-                "uid": "emergency",
+                "uid": "stream-emergency",
+                "verb": "emergency",
                 "zone": "front-seats",
-                "ramp": "ramp-fast",
-                "volume": 80,
-                "mute": false
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "stream-pulseaudio",
+                "verb": "legacy",
+                "zone": "back-seats",
+                "source": "loop-legacy",
+                "volume": 50,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
             }
         ]
     }

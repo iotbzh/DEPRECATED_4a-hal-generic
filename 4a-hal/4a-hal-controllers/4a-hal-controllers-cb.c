@@ -144,8 +144,7 @@ int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object 
 		if(wrap_json_unpack(MixerJ, "{s:s}", "mixerapi", &currentHalData->ctlHalSpecificData->mixerApiName))
 			return -5;
 
-		if(wrap_json_unpack(MixerJ, "{s:s}", "uid", &currentHalData->ctlHalSpecificData->mixerVerbName))
-			return -6;
+		wrap_json_unpack(MixerJ, "{s?:s}", "prefix", &currentHalData->ctlHalSpecificData->prefix);
 	}
 
 	return 0;
@@ -379,18 +378,17 @@ int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *A
  *		HAL controllers verbs functions				       *
  ******************************************************************************/
 
-void HalCtlsActionOnStream(AFB_ReqT request)
+void HalCtlsActionOnCall(AFB_ReqT request)
 {
-	int verbToCallSize;
-
-	char *apiToCall, *mixerVerbName, *verbToCall;
+	char *apiToCall;
 
 	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 
 	struct SpecificHalData *currentCtlHalData;
+	struct CtlHalMixerData *currentMixerData;
 
-	json_object *requestJson, *returnJ, *toReturnJ;
+	json_object *requestJson, *returnJ;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -401,6 +399,12 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
 	if(! ctrlConfig) {
 		AFB_ReqFail(request, "hal_controller_config", "Can't get current hal controller config");
+		return;
+	}
+
+	currentMixerData = (struct CtlHalMixerData *) afb_request_get_vcbdata(request);
+	if(! currentMixerData) {
+		AFB_ReqFail(request, "hal_call_data", "Can't get current call data");
 		return;
 	}
 
@@ -422,54 +426,76 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 		return;
 	}
 
-	mixerVerbName = currentCtlHalData->ctlHalSpecificData->mixerVerbName;
-	if(! mixerVerbName) {
-		AFB_ReqFail(request, "hal_softmixer_verb", "Can't get hal mixer verb prefix");
-		return;
-	}
-
 	if(currentCtlHalData->status != HAL_STATUS_READY) {
 		AFB_ReqFail(request, "hal_not_ready", "Seems that hal is not ready");
 		return;
 	}
 
-	// TODO JAI : remove verb to call prefix, each hal should have its own api in softmixer, and each streams should be created as verb by mixer
-	verbToCallSize = (int) strlen(mixerVerbName) + (int) strlen(request->verb) + 2;
-	verbToCall = (char *) alloca(verbToCallSize * sizeof(char));
-	verbToCall[0] = '\0';
-	verbToCall[verbToCallSize - 1] = '\0';
+	// TBD JAI : handle the case of there is multiple 'playbacks' or 'captures' entries (call them all)
 
-	strcat(verbToCall, mixerVerbName);
-	strcat(verbToCall, "/");
-	strcat(verbToCall, request->verb);
+	if(AFB_ServiceSync(apiHandle, apiToCall, currentMixerData->verbToCall, json_object_get(requestJson), &returnJ)) {
+		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, currentMixerData->verbToCall, returnJ, "call_action");
+	}
 
-	if(AFB_ServiceSync(apiHandle, apiToCall, verbToCall, json_object_get(requestJson), &returnJ)) {
-		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, verbToCall, returnJ, "stream_action");
+	AFB_ReqSuccessF(request,
+			NULL,
+			"Action %s correctly transferred to %s without any error raised",
+			currentMixerData->verbToCall,
+			apiToCall);
+}
+
+json_object *HalCtlsGetJsonArrayForMixerDataTable(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentMixerDataT, enum MixerDataType dataType)
+{
+	unsigned int idx;
+
+	json_object *mixerDataArray, *currentMixerData;
+
+	if(! apiHandle) {
+		AFB_ApiError(apiHandle, "Can't get current hal controller api handle");
+		return NULL;
 	}
-	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)){
-		AFB_ReqSuccessF(request,
-			       toReturnJ,
-			       "Action %s correctly transferred to %s without any error raised",
-			       verbToCall,
-			       apiToCall);
+
+	if(! currentMixerDataT) {
+		AFB_ApiError(apiHandle, "Can't get mixer data table to handle");
+		return NULL;
 	}
-	else {
-		AFB_ReqFailF(request, "invalid_response", "Action %s correctly transferred to %s, but response is not valid",
-							verbToCall,
-							apiToCall);
+
+	mixerDataArray = json_object_new_array();
+	if(! mixerDataArray) {
+		AFB_ApiError(apiHandle, "Can't generate json mixer data array");
+		return NULL;
 	}
+
+	for(idx = 0; idx < currentMixerDataT->count; idx++) {
+		if(dataType == MIXER_DATA_STREAMS) {
+			wrap_json_pack(&currentMixerData,
+				       "{s:s s:s}",
+				       "name", currentMixerDataT->data[idx].verb,
+				       "cardId", currentMixerDataT->data[idx].streamCardId);
+		}
+		else {
+			wrap_json_pack(&currentMixerData,
+				       "{s:s s:s}",
+				       "name", currentMixerDataT->data[idx].verb,
+				       "mixer-name", currentMixerDataT->data[idx].verbToCall,
+				       "uid", currentMixerDataT->data[idx].streamCardId ? currentMixerDataT->data[idx].streamCardId : "none");
+		}
+		json_object_array_add(mixerDataArray, currentMixerData);
+	}
+
+	return mixerDataArray;
 }
 
 void HalCtlsInfo(AFB_ReqT request)
 {
-	unsigned int idx;
+	char *apiToCall;
 
 	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
 
 	struct SpecificHalData *currentCtlHalData;
 
-	json_object *requestJson, *requestAnswer, *streamsArray, *currentStream;
+	json_object *requestJson, *toReturnJ = NULL, *requestAnswer, *streamsArray, *playbacksArray, *capturesArray;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -489,34 +515,47 @@ void HalCtlsInfo(AFB_ReqT request)
 		return;
 	}
 
-	if(! currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count) {
-		AFB_ReqSuccess(request, NULL, "No data to answer, no streams found");
-		return;
-	}
-
 	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		AFB_ReqFail(request, "request_json", "Can't get request json");
+		AFB_ReqFail(request, "info_data", "Can't get request json");
 		return;
 	}
 
-	streamsArray = json_object_new_array();
+	if(json_object_is_type(requestJson, json_type_object)) {
+		apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
+		if(! apiToCall) {
+			AFB_ReqFail(request, "mixer_api", "Can't get mixer api");
+			return;
+		}
+
+		if(HalCtlsGetInfoFromMixer(apiHandle, apiToCall, requestJson, &toReturnJ)) {
+			AFB_ReqFail(request, "mixer_info", "Call to mixer info verb didn't succeed");
+			return;
+		}
+
+		AFB_ReqSuccess(request, toReturnJ, "Mixer requested data");
+		return;
+	}
+
+	streamsArray = HalCtlsGetJsonArrayForMixerDataTable(apiHandle, &currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData, MIXER_DATA_STREAMS);
 	if(! streamsArray) {
-		AFB_ReqFail(request, "json_answer", "Can't generate par of json answer");
+		AFB_ReqFail(request, "streams_data", "Didn't succeed to generate streams data array");
 		return;
 	}
 
-	for(idx = 0; idx < currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.count; idx++) {
-		wrap_json_pack(&currentStream,
-			       "{s:s s:s}",
-			       "name", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].name,
-			       "cardId", currentCtlHalData->ctlHalSpecificData->ctlHalStreamsData.data[idx].streamCardId);
-		json_object_array_add(streamsArray, currentStream);
+	playbacksArray = HalCtlsGetJsonArrayForMixerDataTable(apiHandle, &currentCtlHalData->ctlHalSpecificData->ctlHalPlaybacksData, MIXER_DATA_PLAYBACKS);
+	if(! playbacksArray) {
+		AFB_ReqFail(request, "playbacks_data", "Didn't succeed to generate playbacks data array");
+		return;
 	}
 
-	// TODO JAI : Add playback and capture with their card id to the response
+	capturesArray = HalCtlsGetJsonArrayForMixerDataTable(apiHandle, &currentCtlHalData->ctlHalSpecificData->ctlHalCapturesData, MIXER_DATA_CAPTURES);
+	if(! capturesArray) {
+		AFB_ReqFail(request, "captures_data", "Didn't succeed to generate captures data array");
+		return;
+	}
 
-	wrap_json_pack(&requestAnswer, "{s:o}", "streams", streamsArray);
+	wrap_json_pack(&requestAnswer, "{s:o s:o s:o}", "streams", streamsArray, "playbacks", playbacksArray, "captures", capturesArray);
 
 	AFB_ReqSuccess(request, requestAnswer, "Requested data");
 }
