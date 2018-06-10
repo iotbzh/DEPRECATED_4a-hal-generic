@@ -61,7 +61,7 @@ int HalCtlsConvertPercentageToValue(int percentage, int min, int max)
  *		Convert json object from percentage to value	 	       *
  ******************************************************************************/
 
-int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlProperties *alsaCtlProperties, json_object *toConvertJ, json_object ** ConvertedJ)
+int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlProperties *alsaCtlProperties, json_object *toConvertJ, json_object **ConvertedJ)
 {
 	int err = 0, idx, count, initialValue, convertedValue;
 
