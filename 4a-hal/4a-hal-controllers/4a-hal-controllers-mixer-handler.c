@@ -34,7 +34,7 @@
  *		HAL controllers handle mixer calls functions		       *
  ******************************************************************************/
 
-int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalStreamsDataT *currentHalStreamsData, json_object *mixerResponseJ)
+int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentHalStreamsData, json_object *mixerResponseJ)
 {
 	int err = (int) MIXER_NO_ERROR;
 	unsigned int idx;
@@ -63,7 +63,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalStreamsDat
 			return (int) MIXER_ERROR_NO_STREAMS;
 	}
 
-	currentHalStreamsData->data = (struct CtlHalStreamData *) calloc(currentHalStreamsData->count, sizeof(struct CtlHalStreamData));
+	currentHalStreamsData->data = (struct CtlHalMixerData *) calloc(currentHalStreamsData->count, sizeof(struct CtlHalMixerData));
 
 	CtlHalDynApiStreamVerbs = alloca((currentHalStreamsData->count + 1) * sizeof(struct HalUtlApiVerb));
 	memset(CtlHalDynApiStreamVerbs, '\0', (currentHalStreamsData->count + 1) * sizeof(struct HalUtlApiVerb));

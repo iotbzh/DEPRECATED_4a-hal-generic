@@ -31,7 +31,7 @@
  *		Specfic Hal controller streams data handling functions	       *
  ******************************************************************************/
 
-uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalStreamsDataT *ctlHalStreamsData)
+uint8_t HalUtlRemoveAllCtlHalStreamsData(struct CtlHalMixerDataT *ctlHalStreamsData)
 {
 	unsigned int cpt;
 
