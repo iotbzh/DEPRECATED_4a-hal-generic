@@ -33,6 +33,6 @@ int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *S
 
 // HAL controllers verbs functions
 void HalCtlsActionOnStream(AFB_ReqT request);
-void HalCtlsListVerbs(AFB_ReqT request);
+void HalCtlsInfo(AFB_ReqT request);
 
 #endif /* _HALMGR_CB_INCLUDE_ */

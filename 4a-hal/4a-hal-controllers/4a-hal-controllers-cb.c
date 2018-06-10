@@ -460,7 +460,7 @@ void HalCtlsActionOnStream(AFB_ReqT request)
 	}
 }
 
-void HalCtlsListVerbs(AFB_ReqT request)
+void HalCtlsInfo(AFB_ReqT request)
 {
 	unsigned int idx;
 
