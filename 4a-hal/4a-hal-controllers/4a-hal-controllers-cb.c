@@ -68,7 +68,10 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 	snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
 	currentHalAlsaCtlsT = currentHalData->ctlHalSpecificData->ctlHalAlsaMapT;
 
-	asprintf(&alsaCoreLabel, "%s/%s", ALSACORE_API, cardIdString);
+	if(asprintf(&alsaCoreLabel, "%s/%s", ALSACORE_API, cardIdString) < 0) {
+		AFB_ApiError(apiHandle, "%s: Didn't succeed to generate string for alascore events catching", __func__);
+		return;
+	}
 
 	if(strcmp(evtLabel, alsaCoreLabel) == 0 &&
 	   ! wrap_json_unpack(eventJ, "{s:i s:o !}", "id", &numid, "val", &valuesJ)) {
