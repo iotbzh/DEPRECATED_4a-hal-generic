@@ -11,11 +11,11 @@
 
 ### Cloning 4a-hal-generic with its submodules
 
-git clone --recurse-submodules https://github.com/iotbzh/4a-hal-generic.git
+git clone --recurse-submodules -b rc2 https://github.com/iotbzh/4a-hal-generic.git
 
 ### Cloning 4a-softmixer hal-rc1 version (needed to make work '4a-hal-generic') with its submodules
 
-git clone --recurse-submodules -b hal-rc1-sandbox https://github.com/iotbzh/4a-softmixer.git
+git clone --recurse-submodules -b hal-rc2-sandbox https://github.com/iotbzh/4a-softmixer.git
 
 ### Cloning 4a-alsacore with its submodules
 
@@ -65,33 +65,69 @@ sudo modprobe snd-aloop
 
 * In `metadata` section:
   * The `uid` field must be the path to your alsa audio device.
-  * The `api` field should be changed to the desired application framework api of your hal
+  * The `api` field should be changed to the desired application framework api of your hal.
 * For `onload`, `controls`, and `events` sections, please look at the controller documentation
   (In ./app-controller/README.md)
 * In `halcontrol` section:
-  * WARNING: use of this section is not yet implemented
-  * This section is where you put controls which are alsa control calls
-  * If a control is not available, it will be registered in alsa using '4a-alsa-core'
-  * These controls will be available as verb for your hal api using 'card/' prefix
+  * This section is where you put controls which are alsa control calls.
+  * If a control is not available, it will be registered in alsa using '4a-alsa-core'.
+  * These controls will be available as verb for your hal.
 * In `halmixer` section (what it is passed to the mixer):
-  * The `uid` field will be the name of the mixer corresponding to your hal
+  * The `uid` field will be the name of the mixer corresponding to your hal.
   * The `mixerapi` field should contain the name of the api to call for reaching the mixer
     (not need to be changed if you use '4a-softmixer').
-  * The `backend` section will contain your audio information (such as the path to you alsa audio device
-    and the configuration of your device).
-  * In `frontend` section:
-    * In `ramps` section: will be defined the ramp that you can use in your mixer (ramps in example files can be used).
-  * In `zones` section: (zones in example files can be used)
+  * The `prefix` field  is not mandatory, it is where you precise the prefix that will be applied
+    at mixer attach call. All the streams that the mixer will create will be prefixed with this field.
+  * In `ramps` section:
+    * Define the ramp that you can use in your mixer (ramps in example files can be used).
+    * The `uid` field is where you specify the name of the ramp.
+    * The ramp will set the current volume to the targeted volume step by step :
+      * The `delay` field is the delay between two volume modification.
+      * The `up` field is the volume increase in one step (when increasing volume is requested).
+      * The `down` field is the volume decrease in one step (when decreasing volume is requested).
+  * The `playbacks` section will contain your output audio information (such as the path to you alsa audio device
+    and the configuration of your device):
+    * A `uid` field that will be used by the mixer to identify the playback.
+    * The `params` field is an optional field where you can specify some parameters
+      for your playback (such as rate).
+    * The `sink` field is where you describe your playback:
+      * The `controls` field must contain the alsa control labels
+        that the mixer will use to set/mute volume on your audio device.
+      * The `channels` field must contain an object that will link an `uid` to
+        a physical output audio `port` that will be used in zone.
+  * The `captures` section will contain your input audio information (such as the path to you alsa audio device
+    and the configuration of your device):
+    * A `uid` field that will be used by the mixer to identify the capture.
+    * The `params` field is an optional field where you can specify some parameters
+      for your capture (such as rate).
+    * The `sink` field is where you describe your capture :
+      * The `controls` field must contain the alsa control labels
+        that the mixer will use to set/mute volume on your audio device.
+      * The `channels` field must contain an object that will link an `uid` to
+        a physical input audio `port` that will be used in zone.
+  * In `zones` section: (zones in example files can be used):
     * You can define the zones that you want for your mixer.
     * You must define which sink will be used in these zones.
     * These zones will be used to define streams.
-  * In `streams` section: (streams in example files can be used)
+    * The `sink` field must contain objects that will link a physical ouput audio port
+      (defined in `playbacks` section) using `target` field to a logical output audio `channel`
+      that will be used in zone.
+    * The `source` field must contain objects that will link a physical input audio port
+      (defined in `captures` section) using `target` field to a logical input audio `channel`
+      that will be used in zone.
+  * In `streams` section: (streams in example files can be used):
     * You can define the streams that you want for your mixer.
-    * It must contain:
-      * A `uid` field (which will be used to reach the stream).
+    * Mandatory fields:
+      * A `uid` field, it is the name used by the mixer to identify streams (e.g. when using `info` verb)
+      * The `verb` field is the name used by the mixer to declare the stream verb
+        (but prefixing it with `prefix` if defined).
+        It is also used by the hal to declare a verb to make it accessible from a hal point of view.
       * The `zone` field must correspond to the wanted zone of the stream.
-      * The `ramp` field must correspond to the wanted ramp of the stream.
-    * Other fields are optionals
+    * Optional fields:
+      * The `source` is where you can precise which loop to use for this stream (not the default one).
+        The loop are defined in the mixer configuration file.
+      * The `params` is where you can specify some parameters for your stream (such as rate).
+      * `volume` and `mute` fields are initiate values of the stream.
 
 ## Compile (for each repositories)
 
@@ -134,7 +170,7 @@ And now with more information:
 
 Now, you can obtain streams information of your initialized internal hal:
 
-```4a-hal-*halapiname* list```
+```4a-hal-*halapiname* info```
 
 All the streams listed are available as a verb of the hal api using `name` field.
 You can also get the corresponding card id of the stream in `cardId` field.
@@ -200,6 +236,4 @@ Within your hal, you must generate an event each time the status of your hal cha
 * Check that external hal really exist at loading
 * Handling external hal status events.
 * Generation of an '4a-hal-manager' event when a hal status change.
-* At mixer initialization, check that the specified device is not already used by another hal.
 * Dynamic handling of USB devices.
-* Update to the latest version of the softmixer.
