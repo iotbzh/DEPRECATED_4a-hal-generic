@@ -391,7 +391,7 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 	struct SpecificHalData *currentCtlHalData;
 	struct CtlHalMixerData *currentMixerData;
 
-	json_object *requestJson, *returnJ;
+	json_object *requestJson, *returnJ, *toReturnJ;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -434,17 +434,30 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 		return;
 	}
 
+	if(json_object_is_type(requestJson, json_type_object) && json_object_get_object(requestJson)->count > 0)
+		json_object_object_add(requestJson, "verbose", json_object_new_boolean(1));
+
 	// TBD JAI : handle the case of there is multiple 'playbacks' or 'captures' entries (call them all)
 
 	if(AFB_ServiceSync(apiHandle, apiToCall, currentMixerData->verbToCall, json_object_get(requestJson), &returnJ)) {
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, currentMixerData->verbToCall, returnJ, "call_action");
 	}
-
-	AFB_ReqSuccessF(request,
-			NULL,
-			"Action %s correctly transferred to %s without any error raised",
-			currentMixerData->verbToCall,
-			apiToCall);
+	else if(wrap_json_unpack(returnJ, "{s:o}", "response", &toReturnJ)) {
+		AFB_ReqFailF(request,
+			     "invalid_response",
+			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
+			     __func__,
+			     MIXER_ATTACH_VERB,
+			     apiToCall,
+			     json_object_get_string(returnJ));
+	}
+	else {
+		AFB_ReqSuccessF(request,
+				toReturnJ,
+				"Action %s correctly transferred to %s without any error raised",
+				MIXER_ATTACH_VERB,
+				apiToCall);
+	}
 }
 
 json_object *HalCtlsGetJsonArrayForMixerDataTable(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentMixerDataT, enum MixerDataType dataType)
