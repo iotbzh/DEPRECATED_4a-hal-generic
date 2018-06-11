@@ -54,6 +54,6 @@ enum MixerStatus {
 
 // HAL controllers handle mixer calls functions
 int HalCtlsAttachToMixer(AFB_ApiT apiHandle);
-int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *requestJson, json_object **toReturnJ);
+int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *requestJson, json_object **toReturnJ, char **returnedStatus, char **returnedInfo);
 
 #endif /* _HAL_CTLS_SOFTMIXER_LINK_INCLUDE_ */

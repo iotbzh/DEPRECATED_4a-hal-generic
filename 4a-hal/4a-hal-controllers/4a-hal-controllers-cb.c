@@ -491,7 +491,7 @@ json_object *HalCtlsGetJsonArrayForMixerDataTable(AFB_ApiT apiHandle, struct Ctl
 
 void HalCtlsInfo(AFB_ReqT request)
 {
-	char *apiToCall;
+	char *apiToCall, *returnedStatus = NULL, *returnedInfo = NULL;
 
 	AFB_ApiT apiHandle;
 	CtlConfigT *ctrlConfig;
@@ -524,15 +524,24 @@ void HalCtlsInfo(AFB_ReqT request)
 		return;
 	}
 
-	if(json_object_is_type(requestJson, json_type_object)) {
+	if(json_object_is_type(requestJson, json_type_object) && json_object_get_object(requestJson)->count > 0) {
 		apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
 		if(! apiToCall) {
 			AFB_ReqFail(request, "mixer_api", "Can't get mixer api");
 			return;
 		}
 
-		if(HalCtlsGetInfoFromMixer(apiHandle, apiToCall, requestJson, &toReturnJ)) {
-			AFB_ReqFail(request, "mixer_info", "Call to mixer info verb didn't succeed");
+		if(HalCtlsGetInfoFromMixer(apiHandle, apiToCall, requestJson, &toReturnJ, &returnedStatus, &returnedInfo)) {
+			if(returnedStatus && returnedInfo) {
+				AFB_ReqFailF(request,
+					     "mixer_info",
+					     "Call to mixer info verb didn't succeed with status '%s' and info '%s'",
+					     returnedStatus,
+					     returnedInfo);
+			}
+			else {
+				AFB_ReqFail(request, "mixer_info", "Call to mixer info verb didn't succeed");
+			}
 			return;
 		}
 

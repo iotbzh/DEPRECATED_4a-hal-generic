@@ -281,10 +281,8 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 	return 0;
 }
 
-int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *requestJson, json_object **toReturnJ)
+int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *requestJson, json_object **toReturnJ, char **returnedStatus, char **returnedInfo)
 {
-	char *returnedStatus = NULL, *returnedInfo = NULL;
-
 	enum CallError returnedError;
 
 	json_object *returnJ, *responseJ;
@@ -305,14 +303,14 @@ int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *re
 	}
 
 	if(AFB_ServiceSync(apiHandle, apiToCall, MIXER_INFO_VERB, json_object_get(requestJson), &returnJ)) {
-		returnedError = HalUtlHandleAppFwCallError(apiHandle, apiToCall, MIXER_INFO_VERB, returnJ, &returnedStatus, &returnedInfo);
+		returnedError = HalUtlHandleAppFwCallError(apiHandle, apiToCall, MIXER_INFO_VERB, returnJ, returnedStatus, returnedInfo);
 		AFB_ApiError(apiHandle,
 			     "Error %i during call to verb %s of %s api with status '%s' and info '%s'",
 			     (int) returnedError,
 			     apiToCall,
 			     MIXER_INFO_VERB,
-			     returnedStatus ? returnedStatus : "not returned",
-			     returnedInfo ? returnedInfo : "not returned");
+			     *returnedStatus ? *returnedStatus : "not returned",
+			     *returnedInfo ? *returnedInfo : "not returned");
 		return -4;
 	}
 	else if(json_object_object_get_ex(returnJ, "response", &responseJ)) {
