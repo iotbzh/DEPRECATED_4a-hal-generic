@@ -21,6 +21,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <afb-definitions.h>
+
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
 #include "../4a-hal-controllers/4a-hal-controllers-api-loader.h"
@@ -39,7 +41,7 @@ static struct HalMgrData localHalMgrGlobalData;
  ******************************************************************************/
 
 // Hal manager exported verbs
-struct HalUtlApiVerb HalManagerApiStaticVerbs[] =
+AFB_ApiVerbs HalManagerApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL			SHORT DESCRIPTION */
 	{ .verb = "ping",		.callback = HalMgrPing,			.info = "Ping test for DynApi"},

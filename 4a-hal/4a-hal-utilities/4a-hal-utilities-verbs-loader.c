@@ -21,6 +21,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <afb-definitions.h>
+
 #include "4a-hal-utilities-verbs-loader.h"
 
 /*******************************************************************************
@@ -28,7 +30,7 @@
  *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-int HalUtlLoadVerbs(AFB_ApiT apiHandle, struct HalUtlApiVerb *verbs)
+int HalUtlLoadVerbs(AFB_ApiT apiHandle, AFB_ApiVerbs *verbs)
 {
 	int idx, errCount = 0;
 

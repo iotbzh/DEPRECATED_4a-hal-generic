@@ -24,6 +24,8 @@
 #include <filescan-utils.h>
 #include <wrap-json.h>
 
+#include <afb-definitions.h>
+
 #include <ctl-config.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-verbs-loader.h"
@@ -57,7 +59,7 @@ static CtlSectionT ctrlSections[] =
  ******************************************************************************/
 
 // Every HAL export the same API & Interface Mapping from SndCard to AudioLogic is done through alsaHalSndCardT
-static struct HalUtlApiVerb CtlHalDynApiStaticVerbs[] =
+static AFB_ApiVerbs CtlHalDynApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL		SHORT DESCRIPTION */
 	{ .verb = "info",		.callback = HalCtlsInfo,	.info = "List available streams/playbacks/... for this api"},
