@@ -29,7 +29,7 @@
 
 #include "../4a-hal-manager/4a-hal-manager.h"
 
-#include "4a-hal-controllers-mixer-handler.h"
+#include "4a-hal-controllers-mixer-link.h"
 #include "4a-hal-controllers-cb.h"
 
 /*******************************************************************************
@@ -100,7 +100,10 @@ int HalCtlsHandleMixerData(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentM
 						       (void *) &currentMixerDataT->data[idx],
 						       NULL,
 						       0)) {
-					AFB_ApiError(apiHandle, "%s: error while creating verbs for stream : '%s'", __func__, currentMixerDataT->data[idx].verb);
+					AFB_ApiError(apiHandle,
+						     "%s: error while creating verbs for stream : '%s'",
+						     __func__,
+						     currentMixerDataT->data[idx].verb);
 					err += (int) MIXER_ERROR_STREAM_VERB_NOT_CREATED;
 				}
 			}

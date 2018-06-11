@@ -31,7 +31,7 @@
 #include "4a-hal-controllers-api-loader.h"
 #include "4a-hal-controllers-alsacore-link.h"
 #include "4a-hal-controllers-cb.h"
-#include "4a-hal-controllers-mixer-handler.h"
+#include "4a-hal-controllers-mixer-link.h"
 
 // Default api to print log when apihandle not available
 AFB_ApiT AFB_default;

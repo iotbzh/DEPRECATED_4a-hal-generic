@@ -28,7 +28,7 @@
 
 #include "4a-hal-controllers-cb.h"
 #include "4a-hal-controllers-alsacore-link.h"
-#include "4a-hal-controllers-mixer-handler.h"
+#include "4a-hal-controllers-mixer-link.h"
 #include "4a-hal-controllers-value-handler.h"
 
 /*******************************************************************************
