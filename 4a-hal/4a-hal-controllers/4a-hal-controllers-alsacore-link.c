@@ -242,7 +242,7 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 	if(wrap_json_unpack(returnedJ, "{s:{s:{s?:i s?:i s?:i s?:i s?:i}}}",
 					"response",
 					"ctl",
-					"type", (snd_ctl_elem_type_t) &currentAlsaCtl->alsaCtlProperties.type,
+					"type", (int *) &currentAlsaCtl->alsaCtlProperties.type,
 					"count", &currentAlsaCtl->alsaCtlProperties.count,
 					"min", &currentAlsaCtl->alsaCtlProperties.minval,
 					"max", &currentAlsaCtl->alsaCtlProperties.maxval,
