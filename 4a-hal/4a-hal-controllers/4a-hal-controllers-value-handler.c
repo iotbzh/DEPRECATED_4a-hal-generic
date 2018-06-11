@@ -69,7 +69,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 
 	switch(json_object_get_type(toConvertJ)) {
 		case json_type_array:
-			count = json_object_array_length(toConvertJ);
+			count = (int) json_object_array_length(toConvertJ);
 			break;
 
 		case json_type_null:

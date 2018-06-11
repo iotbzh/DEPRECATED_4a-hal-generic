@@ -225,7 +225,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 	}
 
 	// We load 1st file others are just warnings
-	for(index = 0; index < json_object_array_length(configJ); index++) {
+	for(index = 0; index < (int) json_object_array_length(configJ); index++) {
 		entryJ = json_object_array_get_idx(configJ, index);
 
 		if(wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName)) {
@@ -234,8 +234,8 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 		}
 
 		strncpy(filePath, fullPath, sizeof(filePath) - 1);
-		strncat(filePath, "/", sizeof(filePath));
-		strncat(filePath, fileName, sizeof(filePath));
+		strncat(filePath, "/", sizeof(filePath) - 1);
+		strncat(filePath, fileName, sizeof(filePath) - 1);
 
 		if(HalCtlsCreateApi(apiHandle, filePath, HalMgrGlobalData) < 0)
 			status--;

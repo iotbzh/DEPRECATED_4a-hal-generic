@@ -292,7 +292,7 @@ int HalCtlsProcessAllHalMap(AFB_ApiT apiHandle, json_object *AlsaMapJ, struct Ct
 
 	switch(json_object_get_type(AlsaMapJ)) {
 		case json_type_array:
-			currentCtlHalAlsaMapT->ctlsCount = json_object_array_length(AlsaMapJ);
+			currentCtlHalAlsaMapT->ctlsCount = (unsigned int) json_object_array_length(AlsaMapJ);
 			break;
 
 		case json_type_object:

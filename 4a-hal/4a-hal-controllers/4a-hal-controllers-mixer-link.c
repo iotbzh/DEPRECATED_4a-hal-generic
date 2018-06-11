@@ -50,7 +50,7 @@ int HalCtlsHandleMixerData(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentM
 			currentMixerDataT->count = 1;
 			break;
 		case json_type_array:
-			currentMixerDataT->count = json_object_array_length(currentDataJ);
+			currentMixerDataT->count = (unsigned int) json_object_array_length(currentDataJ);
 			break;
 		default:
 			currentMixerDataT->count = 0;
