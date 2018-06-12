@@ -46,11 +46,11 @@ AFB_ApiT AFB_default;
 static CtlSectionT ctrlSections[] =
 {
 	{.key="plugins" , .loadCB= PluginConfig},
-	{.key="onload"  , .loadCB= OnloadConfig},
 	{.key="controls", .loadCB= ControlConfig},
 	{.key="events"  , .loadCB= EventConfig},
 	{.key="halmap", .loadCB= HalCtlsHalMapConfig},
 	{.key="halmixer", .loadCB= HalCtlsHalMixerConfig},
+	{.key="onload"  , .loadCB= OnloadConfig},
 	{.key=NULL}
 };
 
