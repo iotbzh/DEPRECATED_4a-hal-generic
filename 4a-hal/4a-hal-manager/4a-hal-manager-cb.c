@@ -61,7 +61,7 @@ void HalMgrPing(AFB_ReqT request)
 
 void HalMgrLoaded(AFB_ReqT request)
 {
-	int requestJsonErr, requestOptionValue;
+	int requestJsonErr = 0, requestOptionValue;
 	uint64_t cpt, numberOfLoadedApi;
 
 	char cardIdString[10];
@@ -84,12 +84,6 @@ void HalMgrLoaded(AFB_ReqT request)
 		return;
 	}
 
-	requestJson = AFB_ReqJson(request);
-	if(! requestJson) {
-		AFB_ReqFail(request, "request_json", "Can't get request json");
-		return;
-	}
-
 	numberOfLoadedApi = HalUtlGetNumberOfHalInList(&HalMgrGlobalData->first);
 	if(! numberOfLoadedApi) {
 		AFB_ReqSuccess(request, NULL, "No Hal Api loaded");
@@ -104,8 +98,14 @@ void HalMgrLoaded(AFB_ReqT request)
 
 	currentHalData = HalMgrGlobalData->first;
 
-	// Get request option
-	requestJsonErr = wrap_json_unpack(requestJson, "{s:i}", "verbose", &requestOptionValue);
+	requestJson = AFB_ReqJson(request);
+	if(! requestJson) {
+		AFB_ReqNotice(request, "%s: Can't get request json", __func__);
+	}
+	else {
+		// Get request option
+		requestJsonErr = wrap_json_unpack(requestJson, "{s:i}", "verbose", &requestOptionValue);
+	}
 
 	// Case if request key is 'verbose' and value is bigger than 0
 	if(! requestJsonErr && requestOptionValue > 0) {

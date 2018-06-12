@@ -533,11 +533,9 @@ void HalCtlsInfo(AFB_ReqT request)
 
 	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		AFB_ReqFail(request, "info_data", "Can't get request json");
-		return;
+		AFB_ReqNotice(request, "%s: Can't get request json", __func__);
 	}
-
-	if(json_object_is_type(requestJson, json_type_object) && json_object_get_object(requestJson)->count > 0) {
+	else if(json_object_is_type(requestJson, json_type_object) && json_object_get_object(requestJson)->count > 0) {
 		apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;
 		if(! apiToCall) {
 			AFB_ReqFail(request, "mixer_api", "Can't get mixer api");
