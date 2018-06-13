@@ -82,7 +82,7 @@ int HalCtlsHandleMixerData(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentM
 
 				size = (int) strlen(currentDataVerbName);
 				for(verbStart = 0; verbStart < size; verbStart++) {
-					if(currentDataVerbName[verbStart] == ':')
+					if(currentDataVerbName[verbStart] == '#')
 						break;
 				}
 
