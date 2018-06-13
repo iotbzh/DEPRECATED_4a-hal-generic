@@ -72,6 +72,8 @@ sudo modprobe snd-aloop
   * This section is where you put controls which are alsa control calls.
   * If a control is not available, it will be registered in alsa using '4a-alsa-core'.
   * These controls will be available as verb for your hal.
+  * The value passed to these verbs should be in percentage, the hal will do the conversion to the correct alsa value.
+    To be recognize by the hal, the value should ba associated to the key `val` and should be an integer.
 * In `halmixer` section (what it is passed to the mixer):
   * The `uid` field will be the name of the mixer corresponding to your hal.
   * The `mixerapi` field should contain the name of the api to call for reaching the mixer
@@ -81,7 +83,7 @@ sudo modprobe snd-aloop
   * In `ramps` section:
     * Define the ramp that you can use in your mixer (ramps in example files can be used).
     * The `uid` field is where you specify the name of the ramp.
-    * The ramp will set the current volume to the targeted volume step by step :
+    * The ramp will set the current volume to the targeted volume step by step:
       * The `delay` field is the delay between two volume modification.
       * The `up` field is the volume increase in one step (when increasing volume is requested).
       * The `down` field is the volume decrease in one step (when decreasing volume is requested).
@@ -100,7 +102,7 @@ sudo modprobe snd-aloop
     * A `uid` field that will be used by the mixer to identify the capture.
     * The `params` field is an optional field where you can specify some parameters
       for your capture (such as rate).
-    * The `sink` field is where you describe your capture :
+    * The `sink` field is where you describe your capture:
       * The `controls` field must contain the alsa control labels
         that the mixer will use to set/mute volume on your audio device.
       * The `channels` field must contain an object that will link an `uid` to
@@ -187,7 +189,7 @@ Use the previously obtain card id to play audio in the selected stream:
 
 #### During playing, try the stream commands to change/ramp volume
 
-Now you can use your hal api to send commands to mixer. This way, you can change/ramp volume :
+Now you can use your hal api to send commands to mixer. This way, you can change/ramp volume:
 
 `4a-hal-*halapiname* *selected_stream* { "volume" : "+10" }`
 
