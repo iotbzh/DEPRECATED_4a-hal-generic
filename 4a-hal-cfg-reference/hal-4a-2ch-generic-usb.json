@@ -1,21 +1,14 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
+        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
         "version": "0.9",
-        "api": "4a-hal-csl-cm106-8ch-usb",
+        "api": "4a-hal-2ch-generic-usb",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for CSL CM106 8ch USB device",
+        "info": "4a hal for 2ch generic USB device",
         "author": "Jonathan Aillet",
         "date": "2018-06-09"
     },
-    "onload": [
-        {
-            "uid": "init-audio-hal",
-            "info": "Init current HAL",
-            "action": "api://4a-hal-manager#ping"
-        }
-    ],
     "controls": [
         {
             "uid": "ping",
@@ -23,71 +16,62 @@
             "action": "api://4a-hal-manager#ping"
         }
     ],
-    "events": [
-        {
-            "uid": "api/status_changed",
-            "action": "api://4a-hal-manager#ping"
-        }
-    ],
     "halmap": [
         {
-            "uid": "agl-mic-capture-volume",
+            "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Mic Capture Volume",
-                "value": 60
-            }
-        },
-        {
-            "uid": "agl-speaker-playback-volume",
-            "alsa": {
-                "numid": 8,
+                "name": "Speaker Playback Volume",
                 "value": 80
             }
         },
         {
-            "uid": "hal-ping",
-            "info": "ping this hal through alsa",
+            "uid": "agl-master-playback-switch",
             "alsa": {
-                "name": "Hal-Ping",
-                "value": 20,
-                "create":
-                {
-                    "type": "INTEGER",
-                    "count": 1,
-                    "minval": 0,
-                    "maxval": 100,
-                    "step": 1
-                }
-            },
-            "action": "api://4a-hal-csl-cm106-8ch-usb#ping"
+                "name": "Speaker Playback Switch",
+                "value": 1
+            }
+        },
+        {
+            "uid": "agl-mic-capture-volume",
+            "alsa": {
+                "name": "Mic Capture Volume",
+                "value": 80
+            }
+        },
+        {
+            "uid": "agl-mic-capture-switch",
+            "alsa": {
+                "name": "Mic Capture Switch",
+                "value": 1
+            }
         }
     ],
     "halmixer": {
-        "uid": "csl-cm106-8ch-usb",
+        "uid": "2ch-generic-usb",
         "mixerapi": "smixer",
         "ramps": [
             {
                 "uid": "ramp-fast",
                 "delay": 50,
-                "up": 10,
-                "down": 3
-            },
-            {
-                "uid": "ramp-slow",
-                "delay": 250,
-                "up": 3,
-                "down": 1
+                "up": 2,
+                "down": 10
             },
             {
                 "uid": "ramp-normal",
+                "delay": 50,
+                "up": 2,
+                "down": 4
+            },
+            {
+                "uid": "ramp-slow",
                 "delay": 100,
-                "up": 6,
-                "down": 2
+                "up": 1,
+                "down": 1
             }
         ],
         "playbacks" : {
-            "uid": "CSL-CM106-8CH-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
+            "uid": "2CH-GENERIC-USB",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
             "params": {
                 "rate": 48000
             },
@@ -109,37 +93,13 @@
                     {
                         "uid": "front-left",
                         "port": 1
-                    },
-                    {
-                        "uid": "middle-right",
-                        "port": 2
-                    },
-                    {
-                        "uid": "middle-left",
-                        "port": 3
-                    },
-                    {
-                        "uid": "back-right",
-                        "port": 4
-                    },
-                    {
-                        "uid": "back-left",
-                        "port": 5
-                    },
-                    {
-                        "uid": "center-right",
-                        "port": 6
-                    },
-                    {
-                        "uid": "center-left",
-                        "port": 7
                     }
                 ]
             }
         },
         "captures": {
-            "uid": "CSL-CM106-8CH-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
+            "uid": "2CH-GENERIC-USB",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
             "params": {
                 "rate": 48000
             },
@@ -175,22 +135,6 @@
                     {
                         "target": "front-left",
                         "channel": 1
-                    },
-                    {
-                        "target": "middle-right",
-                        "channel": 0
-                    },
-                    {
-                        "target": "middle-left",
-                        "channel": 1
-                    },
-                    {
-                        "target": "back-right",
-                        "channel": 0
-                    },
-                    {
-                        "target": "back-left",
-                        "channel": 1
                     }
                 ]
             },
@@ -203,32 +147,6 @@
                     },
                     {
                         "target": "front-left",
-                        "channel": 1
-                    }
-                ]
-            },
-            {
-                "uid": "middle-seats",
-                "sink": [
-                    {
-                        "target": "middle-right",
-                        "channel": 0
-                    },
-                    {
-                        "target": "middle-left",
-                        "channel": 1
-                    }
-                ]
-            },
-            {
-                "uid": "back-seats",
-                "sink": [
-                    {
-                        "target": "back-right",
-                        "channel": 0
-                    },
-                    {
-                        "target": "back-left",
                         "channel": 1
                     }
                 ]
@@ -260,17 +178,6 @@
                 "verb": "emergency",
                 "zone": "front-seats",
                 "volume": 60,
-                "mute": false,
-                "params": {
-                    "rate": 48000
-                }
-            },
-            {
-                "uid": "legacy",
-                "verb": "legacy",
-                "zone": "back-seats",
-                "source": "loop-legacy",
-                "volume": 50,
                 "mute": false,
                 "params": {
                     "rate": 48000

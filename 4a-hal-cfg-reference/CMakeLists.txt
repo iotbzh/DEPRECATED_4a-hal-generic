@@ -19,13 +19,13 @@
 ##################################################
 # Control Policy Config file
 ##################################################
-#PROJECT_TARGET_ADD(4a-hal-cfg-reference)
-#
-#	file(GLOB CONF_FILES "*.json")
-#
-#	add_input_files("${CONF_FILES}")
-#
-#	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-#	LABELS "BINDING-CONFIG"
-#	OUTPUT_NAME ${TARGET_NAME}
-#	)
+PROJECT_TARGET_ADD(4a-hal-cfg-reference)
+
+	file(GLOB CONF_FILES "*.json")
+
+	add_input_files("${CONF_FILES}")
+
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+	LABELS "BINDING-CONFIG"
+	OUTPUT_NAME ${TARGET_NAME}
+	)

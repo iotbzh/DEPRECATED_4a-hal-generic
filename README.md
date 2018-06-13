@@ -131,6 +131,13 @@ sudo modprobe snd-aloop
       * The `params` is where you can specify some parameters for your stream (such as rate).
       * `volume` and `mute` fields are initiate values of the stream.
 
+#### Note about using a USB device
+
+Dynamic handling of USB devices is not yet implemented, so you need to modify the 'hal-4a-2ch-generic-usb.json'
+to change the `uid` value in `metadata` section and `path` values in `playbacks` and `captures` sections.
+All these values should be replaced by the alsa entry path of your usb device, these entry are listed
+under directory '/dev/snd/by-id/...'.
+
 ## Compile (for each repositories)
 
 ```bash
