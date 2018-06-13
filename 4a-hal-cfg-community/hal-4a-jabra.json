@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-02",
         "version": "0.9",
-        "api": "4a-hal-2ch-generic-usb",
+        "api": "4a-hal-jabra-solemate",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for 2ch generic USB device",
+        "info": "4a hal for Jabra Solemate",
         "author": "Jonathan Aillet",
         "date": "2018-06-13"
     },
@@ -20,34 +20,33 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Volume",
+                "name": "PCM Playback Volume",
                 "value": 80
             }
         },
         {
-            "uid": "agl-master-playback-switch",
+            "uid": "agl-pcm-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Switch",
+                "name": "PCM Playback Volume",
+                "value": 80
+            }
+        },
+        {
+            "uid": "agl-pcm-playback-switch",
+            "alsa": {
+                "name": "PCM Playback Switch",
                 "value": 1
             }
         },
         {
             "uid": "agl-mic-capture-volume",
             "alsa": {
-                "name": "Mic Capture Volume",
-                "value": 80
-            }
-        },
-        {
-            "uid": "agl-mic-capture-switch",
-            "alsa": {
-                "name": "Mic Capture Switch",
-                "value": 1
+                "name": "Mic Capture Volume"
             }
         }
     ],
     "halmixer": {
-        "uid": "2ch-generic-usb",
+        "uid": "jabra-solemate",
         "mixerapi": "smixer",
         "ramps": [
             {
@@ -82,8 +81,8 @@
             }
         ],
         "playbacks" : {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "JABRA-SOLEMATE",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-02",
             "params": {
                 "rate": 48000
             },
@@ -110,8 +109,8 @@
             }
         },
         "captures": {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "JABRA-SOLEMATE",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-02",
             "params": {
                 "rate": 48000
             },

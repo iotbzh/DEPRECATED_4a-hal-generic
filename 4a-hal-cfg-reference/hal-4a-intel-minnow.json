@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+        "uid": "/dev/snd/by-path/pci-0000:00:1b.0",
         "version": "0.9",
-        "api": "4a-hal-2ch-generic-usb",
+        "api": "4a-hal-intel-minnow",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for 2ch generic USB device",
+        "info": "4a hal for Intel Minnow device",
         "author": "Jonathan Aillet",
         "date": "2018-06-13"
     },
@@ -20,34 +20,20 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Volume",
-                "value": 80
+                "name": "IEC958 Playback Switch",
+                "value": 100
             }
         },
         {
-            "uid": "agl-master-playback-switch",
+            "uid": "agl-pcm-playback-switch",
             "alsa": {
-                "name": "Speaker Playback Switch",
-                "value": 1
-            }
-        },
-        {
-            "uid": "agl-mic-capture-volume",
-            "alsa": {
-                "name": "Mic Capture Volume",
-                "value": 80
-            }
-        },
-        {
-            "uid": "agl-mic-capture-switch",
-            "alsa": {
-                "name": "Mic Capture Switch",
+                "name": "IEC958 Playback Switch",
                 "value": 1
             }
         }
     ],
     "halmixer": {
-        "uid": "2ch-generic-usb",
+        "uid": "intel-minnow",
         "mixerapi": "smixer",
         "ramps": [
             {
@@ -82,21 +68,12 @@
             }
         ],
         "playbacks" : {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "INTEL-MINNOW",
+            "path": "/dev/snd/by-path/pci-0000:00:1b.0",
             "params": {
                 "rate": 48000
             },
             "sink": {
-                "controls": {
-                    "volume": {
-                        "name": "Speaker Playback Volume",
-                        "value": 80
-                    },
-                    "mute": {
-                        "name": "Speaker Playback Switch"
-                    }
-                },
                 "channels": [
                     {
                         "uid": "front-right",
@@ -110,20 +87,12 @@
             }
         },
         "captures": {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "INTEL-MINNOW",
+            "path": "/dev/snd/by-path/pci-0000:00:1b.0",
             "params": {
                 "rate": 48000
             },
             "source": {
-                "controls": {
-                    "volume": {
-                        "name": "Capture Volume"
-                    },
-                    "mute": {
-                        "name": "Capture Switch"
-                    }
-                },
                 "channels": [
                     {
                         "uid": "mic-right",

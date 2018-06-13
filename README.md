@@ -131,12 +131,19 @@ sudo modprobe snd-aloop
       * The `params` is where you can specify some parameters for your stream (such as rate).
       * `volume` and `mute` fields are initiate values of the stream.
 
-#### Note about using a USB device
+### Note about using a USB device
 
 Dynamic handling of USB devices is not yet implemented, so you need to modify the 'hal-4a-2ch-generic-usb.json'
 to change the `uid` value in `metadata` section and `path` values in `playbacks` and `captures` sections.
 All these values should be replaced by the alsa entry path of your usb device, these entry are listed
 under directory '/dev/snd/by-id/...'.
+
+### Selection of the hal loaded at binding launch
+
+Currently, the 4a-hal binding will try to launch a hal for each json audio configuration
+files found in path specified with CONTROL_CONFIG_PATH (an audio configuration file should begin with 4a-hal-*).
+If you don't want a hal to be launch with the binding, you can just rename/remove the corresponding
+audio json configuration file.
 
 ## Compile (for each repositories)
 

@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+        "uid": "/dev/snd/by-path/platform-sound",
         "version": "0.9",
-        "api": "4a-hal-2ch-generic-usb",
+        "api": "4a-hal-rcar-m3",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for 2ch generic USB device",
+        "info": "4a hal for Rcar M3 device",
         "author": "Jonathan Aillet",
         "date": "2018-06-13"
     },
@@ -20,34 +20,33 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Volume",
+                "name": "Digital Playback Volume1",
                 "value": 80
             }
         },
         {
-            "uid": "agl-master-playback-switch",
+            "uid": "agl-pcm-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Switch",
-                "value": 1
-            }
-        },
-        {
-            "uid": "agl-mic-capture-volume",
-            "alsa": {
-                "name": "Mic Capture Volume",
+                "name": "Digital Playback Volume1",
                 "value": 80
             }
         },
         {
-            "uid": "agl-mic-capture-switch",
+            "uid": "agl-pcm-playback-switch",
             "alsa": {
-                "name": "Mic Capture Switch",
+                "name": "SRC Out Rate Switch",
                 "value": 1
+            }
+        },
+        {
+            "uid": "agl-capture-volume",
+            "alsa": {
+                "name": "DVC In Capture Volume"
             }
         }
     ],
     "halmixer": {
-        "uid": "2ch-generic-usb",
+        "uid": "rcar-m3",
         "mixerapi": "smixer",
         "ramps": [
             {
@@ -82,19 +81,19 @@
             }
         ],
         "playbacks" : {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "RCAR-M3",
+            "path": "/dev/snd/by-path/platform-sound",
             "params": {
                 "rate": 48000
             },
             "sink": {
                 "controls": {
                     "volume": {
-                        "name": "Speaker Playback Volume",
+                        "name": "Digital Playback Volume1",
                         "value": 80
                     },
                     "mute": {
-                        "name": "Speaker Playback Switch"
+                        "name": "SRC Out Rate Switch"
                     }
                 },
                 "channels": [
@@ -110,18 +109,18 @@
             }
         },
         "captures": {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "RCAR-M3",
+            "path": "/dev/snd/by-path/platform-sound",
             "params": {
                 "rate": 48000
             },
             "source": {
                 "controls": {
                     "volume": {
-                        "name": "Capture Volume"
+                        "name": "DVC In Capture Volume"
                     },
                     "mute": {
-                        "name": "Capture Switch"
+                        "name": "DVC In Mute Switch"
                     }
                 },
                 "channels": [

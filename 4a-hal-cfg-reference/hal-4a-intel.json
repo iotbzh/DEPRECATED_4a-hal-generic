@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+        "uid": "/dev/snd/by-path/pci-0000:00:1b.1",
         "version": "0.9",
-        "api": "4a-hal-2ch-generic-usb",
+        "api": "4a-hal-intel",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for 2ch generic USB device",
+        "info": "4a hal for Intel device",
         "author": "Jonathan Aillet",
         "date": "2018-06-13"
     },
@@ -20,34 +20,33 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Speaker Playback Volume",
-                "value": 80
+                "name": "Master Playback Volume",
+                "value": 100
+            }
+        },
+        {
+            "uid": "agl-pcm-playback-volume",
+            "alsa": {
+                "name": "PCM Playback Volume",
+                "value": 100
             }
         },
         {
             "uid": "agl-master-playback-switch",
             "alsa": {
-                "name": "Speaker Playback Switch",
+                "name": "Master Playback Switch",
                 "value": 1
             }
         },
         {
-            "uid": "agl-mic-capture-volume",
+            "uid": "agl-capture-volume",
             "alsa": {
-                "name": "Mic Capture Volume",
-                "value": 80
-            }
-        },
-        {
-            "uid": "agl-mic-capture-switch",
-            "alsa": {
-                "name": "Mic Capture Switch",
-                "value": 1
+                "name": "Capture Volume"
             }
         }
     ],
     "halmixer": {
-        "uid": "2ch-generic-usb",
+        "uid": "intel",
         "mixerapi": "smixer",
         "ramps": [
             {
@@ -82,19 +81,19 @@
             }
         ],
         "playbacks" : {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "INTEL",
+            "path": "/dev/snd/by-path/pci-0000:00:1b.1",
             "params": {
                 "rate": 48000
             },
             "sink": {
                 "controls": {
                     "volume": {
-                        "name": "Speaker Playback Volume",
+                        "name": "Master Playback Volume",
                         "value": 80
                     },
                     "mute": {
-                        "name": "Speaker Playback Switch"
+                        "name": "Master Playback Switch"
                     }
                 },
                 "channels": [
@@ -110,8 +109,8 @@
             }
         },
         "captures": {
-            "uid": "2CH-GENERIC-USB",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-01",
+            "uid": "INTEL",
+            "path": "/dev/snd/by-path/pci-0000:00:1b.1",
             "params": {
                 "rate": 48000
             },
