@@ -138,13 +138,6 @@ to change the `uid` value in `metadata` section and `path` values in `playbacks`
 All these values should be replaced by the alsa entry path of your usb device, these entry are listed
 under directory '/dev/snd/by-id/...'.
 
-### Selection of the hal loaded at binding launch
-
-Currently, the 4a-hal binding will try to launch a hal for each json audio configuration
-files found in path specified with CONTROL_CONFIG_PATH (an audio configuration file should begin with 4a-hal-*).
-If you don't want a hal to be launch with the binding, you can just rename/remove the corresponding
-audio json configuration file.
-
 ## Compile (for each repositories)
 
 ```bash
@@ -155,6 +148,16 @@ make
 ```
 
 ## Using '4a-hal' binder
+
+### Selection of the hal loaded at binding launch
+
+Currently, the 4a-hal binding will try to launch a hal for each json audio configuration
+files found in path specified with CONTROL_CONFIG_PATH (an audio configuration file should begin with 4a-hal-*).
+If you don't want a hal to be launch with the binding, you can just rename/remove the corresponding
+audio json configuration file.
+
+Be aware that every hal which will find its associated audio device will attach to the mixer.
+So, if you work on M3 and want to use an external usb audio device, be sure to rename the m3 configuration file.
 
 ### Run your binder from shell
 
@@ -232,13 +235,14 @@ To load an external to '4a-hal-manger', you need to you use an 'api_call' from y
 With this 'api_call' you must sent a json description of your api:
 
 ```json
-{
-  "api" : mandatory, string that is your hal binding api
-  "uid" : mandatory, string that specify your hal uid (usually the device used by your hal)
-  "info" : optional, string that describes your hal
-  "author" : optional, string that says who is the author of your hal
-  "version" : optional, string that says what is the version of your hal
-  "date" : optional, string that says the date of your hal
+"metadata" : {
+  "api" : "mandatory, string that is your hal binding api",
+  "uid" : "mandatory, string that specify your hal uid (usually the device used by your hal)",
+  "info" : "optional, string that describes your hal",
+  "author" : "optional, string that says who is the author of your hal",
+  "version" : "optional, string that says what is the version of your hal",
+  "date" : "optional, string that says the date of your hal",
+  "snd-dev-id": "optional, integer that specify you alsa device id (hw:X), -1 if not available"
 }
 ```
 
@@ -246,6 +250,20 @@ Your hal must also have a 'subscribe' verb available and event name 'hal_status'
 
 At external hal loading, the '4a-hal-manager' will subscribe to this event.
 Within your hal, you must generate an event each time the status of your hal changes.
+
+### Known issues
+
+#### Fail to find json configuration files
+
+When compiling and executing 4a-hal-generic and 4a-softmixer for a specific target using an sdk,
+some bindings won't find there json configuration files.
+This issue does not appears when compiling and deploying the 4a-hal-generic/4a-softmixer
+with yocto because a recipe its taking charge of these issues.
+
+Nevertheless, to make the bindings find their configuration files, you can export the `CONTROL_CONFIG_PATH`
+environment variable to the directories where the configuration files are stored.
+Example on a target where the 4a-hal and 4a-softmixer are deployed into `/home/root/4a` directory :
+`export CONTROL_CONFIG_PATH=/home/root/4a/smixer/etc:/home/root/4a/4a-hal/etc`.
 
 ## What is missing in this version
 
