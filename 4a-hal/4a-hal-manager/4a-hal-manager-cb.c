@@ -174,7 +174,7 @@ void HalMgrLoad(AFB_ReqT request)
 	}
 
 	if(! json_object_object_get_ex(requestJson, "metadata", &apiReceviedMetadata)) {
-		AFB_ReqFail(request, "api_metadata", "Can't get api to register metadata");
+		AFB_ReqFail(request, "api_metadata", "Can't get json metadata section to register external hal");
 		return;
 	}
 
