@@ -1,0 +1,199 @@
+{
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
+    "metadata": {
+        "uid": "/dev/snd/by-path/platform-sound@1",
+        "version": "0.9",
+        "api": "4a-hal-rcar-m3",
+        "require": [ "alsacore", "smixer" ],
+        "info": "4a hal for Rcar M3 device when plugged on Kingfisher board",
+        "author": "Jonathan Aillet, Stephane Desneux",
+        "date": "2018-06-15"
+    },
+    "controls": [
+        {
+            "uid": "ping",
+            "info": "Ping hal",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ],
+    "halmap": [
+        {
+            "uid": "agl-master-playback-volume",
+            "alsa": {
+                "name": "Digital Playback Volume1",
+                "value": 80
+            }
+        },
+        {
+            "uid": "agl-pcm-playback-volume",
+            "alsa": {
+                "name": "Digital Playback Volume1",
+                "value": 80
+            }
+        },
+        {
+            "uid": "agl-pcm-playback-switch",
+            "alsa": {
+                "name": "SRC Out Rate Switch",
+                "value": 1
+            }
+        },
+        {
+            "uid": "agl-capture-volume",
+            "alsa": {
+                "name": "DVC In Capture Volume"
+            }
+        }
+    ],
+    "halmixer": {
+        "uid": "rcar-m3",
+        "mixerapi": "smixer",
+        "ramps": [
+            {
+                "uid": "ramp-very-fast",
+                "delay": 50,
+                "up": 6,
+                "down": 10
+            },
+            {
+                "uid": "ramp-fast",
+                "delay": 50,
+                "up": 2,
+                "down": 10
+            },
+            {
+                "uid": "ramp-normal",
+                "delay": 50,
+                "up": 2,
+                "down": 4
+            },
+            {
+                "uid": "ramp-slow",
+                "delay": 50,
+                "up": 2,
+                "down": 2
+            },
+            {
+                "uid": "ramp-very-slow",
+                "delay": 100,
+                "up": 1,
+                "down": 1
+            }
+        ],
+        "playbacks" : {
+            "uid": "RCAR-M3",
+            "path": "/dev/snd/by-path/platform-sound@1",
+            "params": {
+                "rate": 48000
+            },
+            "sink": {
+                "controls": {
+                    "volume": {
+                        "name": "Digital Playback Volume1",
+                        "value": 80
+                    },
+                    "mute": {
+                        "name": "SRC Out Rate Switch"
+                    }
+                },
+                "channels": [
+                    {
+                        "uid": "front-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "front-left",
+                        "port": 1
+                    }
+                ]
+            }
+        },
+        "captures": {
+            "uid": "RCAR-M3",
+            "path": "/dev/snd/by-path/platform-sound@1",
+            "params": {
+                "rate": 48000
+            },
+            "source": {
+                "controls": {
+                    "volume": {
+                        "name": "DVC In Capture Volume"
+                    },
+                    "mute": {
+                        "name": "DVC In Mute Switch"
+                    }
+                },
+                "channels": [
+                    {
+                        "uid": "mic-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "mic-left",
+                        "port": 1
+                    }
+                ]
+            }
+        },
+        "zones": [
+            {
+                "uid": "full-stereo",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "front-seats",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            }
+        ],
+        "streams": [
+            {
+                "uid": "multimedia",
+                "verb": "multimedia",
+                "zone": "full-stereo",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "navigation",
+                "verb": "navigation",
+                "zone": "front-seats",
+                "volume": 70,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "emergency",
+                "verb": "emergency",
+                "zone": "front-seats",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            }
+        ]
+    }
+}
