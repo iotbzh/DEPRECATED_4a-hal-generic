@@ -189,7 +189,7 @@ And now with more information:
 
 Now, you can obtain streams information of your initialized internal hal:
 
-```4a-hal-*halapiname* info```
+```*halapiname* info```
 
 All the streams listed are available as a verb of the hal api using `name` field.
 You can also get the corresponding card id of the stream in `cardId` field.
@@ -208,13 +208,13 @@ Use the previously obtain card id to play audio in the selected stream:
 
 Now you can use your hal api to send commands to mixer. This way, you can change/ramp volume:
 
-`4a-hal-*halapiname* *selected_stream* { "volume" : "+10" }`
+`*halapiname* *selected_stream* { "volume" : "+10" }`
 
-`4a-hal-*halapiname* *selected_stream* { "volume" : 70 }`
+`*halapiname* *selected_stream* { "volume" : 70 }`
 
-`4a-hal-*halapiname* *selected_stream* { "ramp" : "-10" }`
+`*halapiname* *selected_stream* { "ramp" : "-10" }`
 
-`4a-hal-*halapiname* *selected_stream* { "ramp" : 100 }`
+`*halapiname* *selected_stream* { "ramp" : 100 }`
 
 #### Warning
 
