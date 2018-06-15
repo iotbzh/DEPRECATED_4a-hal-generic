@@ -221,8 +221,8 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 
 	configJ = CtlConfigScan(dirList, "hal");
 	if(! configJ) {
-		AFB_ApiError(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s ", __func__, dirList);
-		return -2;
+		AFB_ApiWarning(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s, 4a-hal-manager will only works with external hal", __func__, dirList);
+		return 0;
 	}
 
 	// We load 1st file others are just warnings
@@ -231,7 +231,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 
 		if(wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName)) {
 			AFB_ApiError(apiHandle, "%s: HOOPs invalid JSON entry = %s", __func__, json_object_get_string(entryJ));
-			return -1;
+			return -2;
 		}
 
 		strncpy(filePath, fullPath, sizeof(filePath) - 1);
