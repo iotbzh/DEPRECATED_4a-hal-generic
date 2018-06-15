@@ -156,18 +156,18 @@ int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalSpecificDa
 		return (int) MIXER_ERROR_API_UNAVAILABLE;
 	}
 
-	if(wrap_json_unpack(mixerResponseJ, "{s:o s:o s:o}", "streams", &mixerStreamsJ, "playbacks", &mixerPlaybacksJ, "captures", &mixerCapturesJ)) {
+	if(wrap_json_unpack(mixerResponseJ, "{s?:o s?:o s?:o}", "streams", &mixerStreamsJ, "playbacks", &mixerPlaybacksJ, "captures", &mixerCapturesJ)) {
 		AFB_ApiError(apiHandle, "%s: Can't get streams|playbacks|captures object in '%s'", __func__, json_object_get_string(mixerResponseJ));
 		return (int) MIXER_ERROR_DATA_UNAVAILABLE;
 	}
 
-	if((err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalStreamsData, mixerStreamsJ, MIXER_DATA_STREAMS)))
+	if(mixerStreamsJ && (err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalStreamsData, mixerStreamsJ, MIXER_DATA_STREAMS)))
 		AFB_ApiError(apiHandle, "%s: Error during handling response mixer streams data '%s'", __func__, json_object_get_string(mixerStreamsJ));
 
-	if((err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalPlaybacksData, mixerPlaybacksJ, MIXER_DATA_PLAYBACKS)))
+	if(mixerPlaybacksJ && (err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalPlaybacksData, mixerPlaybacksJ, MIXER_DATA_PLAYBACKS)))
 		AFB_ApiError(apiHandle, "%s: Error during handling response mixer playbacks data '%s'", __func__, json_object_get_string(mixerPlaybacksJ));
 
-	if((err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalCapturesData, mixerCapturesJ, MIXER_DATA_CAPTURES)))
+	if(mixerCapturesJ && (err += HalCtlsHandleMixerData(apiHandle, &currentHalSpecificData->ctlHalCapturesData, mixerCapturesJ, MIXER_DATA_CAPTURES)))
 		AFB_ApiError(apiHandle, "%s: Error during handling response mixer captures data '%s'", __func__, json_object_get_string(mixerCapturesJ));
 
 	return err;
