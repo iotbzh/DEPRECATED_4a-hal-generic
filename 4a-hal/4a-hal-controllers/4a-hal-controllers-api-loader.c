@@ -45,12 +45,12 @@ AFB_ApiT AFB_default;
 // Config Section definition
 static CtlSectionT ctrlSections[] =
 {
-	{.key="plugins" , .loadCB= PluginConfig},
+	{.key="resources", .loadCB= PluginConfig},
+	{.key="onload", .loadCB= OnloadConfig},
 	{.key="controls", .loadCB= ControlConfig},
-	{.key="events"  , .loadCB= EventConfig},
+	{.key="events", .loadCB= EventConfig},
 	{.key="halmap", .loadCB= HalCtlsHalMapConfig},
 	{.key="halmixer", .loadCB= HalCtlsHalMixerConfig},
-	{.key="onload"  , .loadCB= OnloadConfig},
 	{.key=NULL}
 };
 
