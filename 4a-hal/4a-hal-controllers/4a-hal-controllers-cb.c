@@ -439,19 +439,19 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 		HalUtlHandleAppFwCallErrorInRequest(request, apiToCall, currentMixerData->verbToCall, returnJ, "call_action");
 	}
 	else if(wrap_json_unpack(returnJ, "{s:o}", "response", &toReturnJ)) {
-		AFB_ReqFailF(request,
-			     "invalid_response",
-			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
-			     __func__,
-			     MIXER_ATTACH_VERB,
-			     apiToCall,
-			     json_object_get_string(returnJ));
+		AFB_ReqSuccessF(request,
+				returnJ,
+				"%s: Seems that %s call to api %s succeed, but no response was found : '%s'",
+				__func__,
+				currentMixerData->verbToCall,
+				apiToCall,
+				json_object_get_string(returnJ));
 	}
 	else {
 		AFB_ReqSuccessF(request,
 				toReturnJ,
 				"Action %s correctly transferred to %s without any error raised",
-				MIXER_ATTACH_VERB,
+				currentMixerData->verbToCall,
 				apiToCall);
 	}
 }
