@@ -103,7 +103,7 @@ int HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, char *devPath)
 
 	enum CallError returnedError;
 
-	json_object *toSendJ, *returnJ, *responsJ, *devidJ;
+	json_object *toSendJ, *returnJ = NULL, *responsJ, *devidJ;
 
 	if(! apiHandle) {
 		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
@@ -140,16 +140,21 @@ int HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, char *devPath)
 		}
 	}
 
+	if(returnJ)
+		json_object_put(returnJ);
+
 	return cardId;
 }
 
 int HalCtlsSubscribeToAlsaCardEvent(AFB_ApiT apiHandle, char *cardId)
 {
+	int err = 0;
+
 	char *returnedStatus = NULL, *returnedInfo = NULL;
 
 	enum CallError returnedError;
 
-	json_object *subscribeQueryJ, *returnedJ, *returnedWarningJ;
+	json_object *subscribeQueryJ, *returnedJ = NULL, *returnedWarningJ;
 
 	wrap_json_pack(&subscribeQueryJ, "{s:s}", "devid", cardId);
 	if(AFB_ServiceSync(apiHandle, ALSACORE_API, ALSACORE_SUBSCRIBE_VERB, subscribeQueryJ, &returnedJ)) {
@@ -161,7 +166,7 @@ int HalCtlsSubscribeToAlsaCardEvent(AFB_ApiT apiHandle, char *cardId)
 			     ALSACORE_API,
 			     returnedStatus ? returnedStatus : "not returned",
 			     returnedInfo ? returnedInfo : "not returned");
-		return -1;
+		err = -1;
 	}
 	else if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "info", &returnedWarningJ)) {
 		AFB_ApiError(apiHandle,
@@ -169,19 +174,24 @@ int HalCtlsSubscribeToAlsaCardEvent(AFB_ApiT apiHandle, char *cardId)
 			     ALSACORE_SUBSCRIBE_VERB,
 			     ALSACORE_API,
 			     json_object_get_string(returnedWarningJ));
-		return -2;
+		err = -2;
 	}
 
-	return 0;
+	if(returnedJ)
+		json_object_put(returnedJ);
+
+	return err;
 }
 
 int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl *currentAlsaCtl)
 {
+	int err = 0;
+
 	char *returnedStatus = NULL, *returnedInfo = NULL;
 
 	enum CallError returnedError;
 
-	json_object *queryJ, *returnedJ;
+	json_object *queryJ, *returnedJ = NULL;
 
 	if(! apiHandle) {
 		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
@@ -226,45 +236,48 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 			     ALSACORE_API,
 			     returnedStatus ? returnedStatus : "not returned",
 			     returnedInfo ? returnedInfo : "not returned");
-		return -6;
+		err = -6;
 	}
-
-	if(currentAlsaCtl->name && wrap_json_unpack(returnedJ, "{s:{s:i}}", "response", "id", &currentAlsaCtl->numid)) {
+	else if(currentAlsaCtl->name && wrap_json_unpack(returnedJ, "{s:{s:i}}", "response", "id", &currentAlsaCtl->numid)) {
 		AFB_ApiError(apiHandle, "Can't find alsa control 'id' from control 'name': '%s' on device '%s'", currentAlsaCtl->name, cardId);
-		return -7;
+		err = -7;
 	}
 	else if(! json_object_object_get_ex(returnedJ, "response", NULL)) {
 		AFB_ApiError(apiHandle, "Can't find alsa control 'id': %i on device '%s'", currentAlsaCtl->numid, cardId);
-		return -8;
+		err = -8;
 	}
-
 	// TBD JAI : get dblinear/dbminmax/... values
-	if(wrap_json_unpack(returnedJ, "{s:{s:{s?:i s?:i s?:i s?:i s?:i}}}",
-					"response",
-					"ctl",
-					"type", (int *) &currentAlsaCtl->alsaCtlProperties.type,
-					"count", &currentAlsaCtl->alsaCtlProperties.count,
-					"min", &currentAlsaCtl->alsaCtlProperties.minval,
-					"max", &currentAlsaCtl->alsaCtlProperties.maxval,
-					"step", &currentAlsaCtl->alsaCtlProperties.step)) {
+	else if(wrap_json_unpack(returnedJ, "{s:{s:{s?:i s?:i s?:i s?:i s?:i}}}",
+					    "response",
+					    "ctl",
+					    "type", (int *) &currentAlsaCtl->alsaCtlProperties.type,
+					    "count", &currentAlsaCtl->alsaCtlProperties.count,
+					    "min", &currentAlsaCtl->alsaCtlProperties.minval,
+					    "max", &currentAlsaCtl->alsaCtlProperties.maxval,
+					    "step", &currentAlsaCtl->alsaCtlProperties.step)) {
 		AFB_ApiError(apiHandle,
 			     "Didn't succeed to get control %i properties on device '%s' : '%s'",
 			     currentAlsaCtl->numid,
 			     cardId,
 			     json_object_get_string(returnedJ));
-		return -9;
+		err = -9;
 	}
 
-	return 0;
+	if(returnedJ)
+		json_object_put(returnedJ);
+
+	return err;
 }
 
 int HalCtlsSetAlsaCtlValue(AFB_ApiT apiHandle, char *cardId, int ctlId, json_object *valuesJ)
 {
+	int err = 0;
+
 	char *returnedStatus = NULL, *returnedInfo = NULL;
 
 	enum CallError returnedError;
 
-	json_object *queryJ, *returnedJ, *returnedWarningJ;
+	json_object *queryJ, *returnedJ = NULL, *returnedWarningJ;
 
 	if(! apiHandle) {
 		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
@@ -297,28 +310,32 @@ int HalCtlsSetAlsaCtlValue(AFB_ApiT apiHandle, char *cardId, int ctlId, json_obj
 			     ALSACORE_API,
 			     returnedStatus ? returnedStatus : "not returned",
 			     returnedInfo ? returnedInfo : "not returned");
-		return 1;
+		err = 1;
 	}
-
-	if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "request", "info", &returnedWarningJ)) {
+	else if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "request", "info", &returnedWarningJ)) {
 		AFB_ApiError(apiHandle,
 			     "Warning raised during call to verb %s of %s api : '%s'",
 			     ALSACORE_CTLSET_VERB,
 			     ALSACORE_API,
 			     json_object_get_string(returnedWarningJ));
-		return 2;
+		err = 2;
 	}
 
-	return 0;
+	if(returnedJ)
+		json_object_put(returnedJ);
+
+	return err;
 }
 
 int HalCtlsCreateAlsaCtl(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl *alsaCtlToCreate)
 {
+	int err = 0;
+
 	char *returnedStatus = NULL, *returnedInfo = NULL;
 
 	enum CallError returnedError;
 
-	json_object *queryJ, *returnedJ, *returnedWarningJ, *responseJ;
+	json_object *queryJ, *returnedJ = NULL, *returnedWarningJ, *responseJ;
 
 	if(! apiHandle) {
 		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
@@ -360,16 +377,15 @@ int HalCtlsCreateAlsaCtl(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl 
 			     ALSACORE_API,
 			     returnedStatus ? returnedStatus : "not returned",
 			     returnedInfo ? returnedInfo : "not returned");
-		return -5;
+		err = -5;
 	}
-
-	if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "request", "info", &returnedWarningJ)) {
+	else if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "request", "info", &returnedWarningJ)) {
 		AFB_ApiError(apiHandle,
 			     "Warning raised during call to verb %s of %s api : '%s'",
 			     ALSACORE_GETINFO_VERB,
 			     ALSACORE_API,
 			     json_object_get_string(returnedWarningJ));
-		return -6;
+		err = -6;
 	}
 	else if(wrap_json_unpack(returnedJ, "{s:o}", "response", &responseJ)) {
 		AFB_ApiError(apiHandle,
@@ -377,20 +393,23 @@ int HalCtlsCreateAlsaCtl(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl 
 			     ALSACORE_GETINFO_VERB,
 			     ALSACORE_API,
 			     json_object_get_string(returnedJ));
-		return -7;
+		err = -7;
 	}
 	else if(wrap_json_unpack(responseJ, "{s:i}", "id", &alsaCtlToCreate->numid)) {
 		AFB_ApiError(apiHandle,
 			     "Can't get create id from %s of %s api",
 			     ALSACORE_GETINFO_VERB,
 			     ALSACORE_API);
-		return -8;
+		err = -8;
 	}
 	else if(wrap_json_unpack(responseJ, "{s:o}", "ctl", NULL)) {
 		AFB_ApiWarning(apiHandle, "Control %s was already present but has been updated", alsaCtlToCreate->name);
 	}
 
-	return 0;
+	if(returnedJ)
+		json_object_put(returnedJ);
+
+	return err;
 }
 
 /*******************************************************************************
@@ -481,10 +500,11 @@ void HalCtlsActionOnAlsaCtl(AFB_ReqT request)
 			     currentAlsaCtl->ctl.numid,
 			     cardIdString,
 			     json_object_get_string(requestJson));
+		json_object_put(convertedJ);
 		return;
 	}
 
-	json_object_put(convertedJ);
-
 	AFB_ReqSuccess(request, NULL, "Action on alsa control correclty done");
+
+	json_object_put(convertedJ);
 }

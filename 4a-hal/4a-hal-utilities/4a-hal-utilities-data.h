@@ -49,7 +49,7 @@ struct CtlHalMixerDataT {
 	unsigned int count;
 };
 
-// Structure to store specific controller hal  data
+// Structure to store specific controller hal data
 struct CtlHalSpecificData {
 	char *mixerApiName;
 	char *prefix;

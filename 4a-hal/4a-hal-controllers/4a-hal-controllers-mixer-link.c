@@ -177,7 +177,7 @@ int HalCtlsHandleMixerAttachResponse(AFB_ApiT apiHandle, struct CtlHalSpecificDa
 
 int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 {
-	unsigned int err;
+	int err = 0, mixerError;
 
 	char *apiToCall, *returnedStatus = NULL, *returnedInfo = NULL;
 
@@ -188,7 +188,7 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 	struct SpecificHalData *currentCtlHalData, *concurentHalData = NULL;
 	struct SpecificHalData **firstHalData;
 
-	json_object *returnJ, *toReturnJ;
+	json_object *returnJ = NULL, *toReturnJ;
 
 	if(! apiHandle) {
 		AFB_ApiError(apiHandle, "%s: Can't get current hal api handle", __func__);
@@ -246,21 +246,28 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 			    MIXER_ATTACH_VERB,
 			    returnedStatus ? returnedStatus : "not returned",
 			    returnedInfo ? returnedInfo : "not returned");
-		return -7;
+		err = -7;
 	}
-	else if(json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
-		err = HalCtlsHandleMixerAttachResponse(apiHandle, currentCtlHalData->ctlHalSpecificData, toReturnJ);
-		if(err != (int) MIXER_NO_ERROR) {
-			AFB_ApiError(apiHandle,
-				     "%s: Seems that %s call to api %s succeed but this warning was risen by response decoder : %i '%s'",
-				     __func__,
-				     MIXER_ATTACH_VERB,
-				     apiToCall,
-				     err,
-				     json_object_get_string(toReturnJ));
-			return -8;
-		}
-
+	else if(! json_object_object_get_ex(returnJ, "response", &toReturnJ)) {
+		AFB_ApiError(apiHandle,
+			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
+			     __func__,
+			     MIXER_ATTACH_VERB,
+			     apiToCall,
+			     json_object_get_string(returnJ));
+		err = -8;
+	}
+	else if((mixerError = HalCtlsHandleMixerAttachResponse(apiHandle, currentCtlHalData->ctlHalSpecificData, toReturnJ)) != (int) MIXER_NO_ERROR) {
+		AFB_ApiError(apiHandle,
+			     "%s: Seems that %s call to api %s succeed but this warning was risen by response decoder : %i '%s'",
+			     __func__,
+			     MIXER_ATTACH_VERB,
+			     apiToCall,
+			     mixerError,
+			     json_object_get_string(toReturnJ));
+		err = -9;
+	}
+	else {
 		AFB_ApiNotice(apiHandle,
 			      "%s: Seems that %s call to api %s succeed with no warning raised : '%s'",
 			      __func__,
@@ -270,21 +277,17 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 
 		currentCtlHalData->status = HAL_STATUS_READY;
 	}
-	else {
-		AFB_ApiError(apiHandle,
-			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
-			     __func__,
-			     MIXER_ATTACH_VERB,
-			     apiToCall,
-			     json_object_get_string(returnJ));
-		return -9;
-	}
 
-	return 0;
+	if(returnJ)
+		json_object_put(returnJ);
+
+	return err;
 }
 
 int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *requestJson, json_object **toReturnJ, char **returnedStatus, char **returnedInfo)
 {
+	int err = 0;
+
 	enum CallError returnedError;
 
 	json_object *returnJ, *responseJ;
@@ -313,9 +316,18 @@ int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *re
 			     MIXER_INFO_VERB,
 			     *returnedStatus ? *returnedStatus : "not returned",
 			     *returnedInfo ? *returnedInfo : "not returned");
-		return -4;
+		err = -4;
 	}
-	else if(json_object_object_get_ex(returnJ, "response", &responseJ)) {
+	else if(! json_object_object_get_ex(returnJ, "response", &responseJ)) {
+		AFB_ApiError(apiHandle,
+			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
+			     __func__,
+			     MIXER_INFO_VERB,
+			     apiToCall,
+			     json_object_get_string(returnJ));
+		err = -5;
+	}
+	else {
 		AFB_ApiNotice(apiHandle,
 			      "%s: Seems that %s call to api %s succeed with no warning raised : '%s'",
 			      __func__,
@@ -323,17 +335,9 @@ int HalCtlsGetInfoFromMixer(AFB_ApiT apiHandle, char *apiToCall, json_object *re
 			      apiToCall,
 			      json_object_get_string(responseJ));
 
-		*toReturnJ = responseJ;
-	}
-	else {
-		AFB_ApiError(apiHandle,
-			     "%s: Seems that %s call to api %s succeed, but response is not valid : '%s'",
-			     __func__,
-			     MIXER_INFO_VERB,
-			     apiToCall,
-			     json_object_get_string(returnJ));
-		return -8;
+		*toReturnJ = json_object_get(responseJ);
 	}
 
-	return 0;
+	json_object_put(returnJ);
+	return err;
 }

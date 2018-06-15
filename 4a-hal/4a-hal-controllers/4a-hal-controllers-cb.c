@@ -222,7 +222,9 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 
 int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaMap *alsaMap)
 {
-	json_object *valueJ, *convertedValueJ;
+	int err;
+
+	json_object *valueJ, *convertedValueJ = NULL;
 
 	if(alsaMap->ctl.alsaCtlCreation) {
 		if(HalCtlsCreateAlsaCtl(apiHandle, cardId, &alsaMap->ctl)) {
@@ -242,20 +244,28 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 	if(alsaMap->ctl.value) {
 		// TBD JAI : handle alsa controls type
 		valueJ = json_object_new_int(alsaMap->ctl.value);
+		err = 0;
 
 		if(HalCtlsNormalizeJsonValues(apiHandle, &alsaMap->ctl.alsaCtlProperties, valueJ, &convertedValueJ)) {
 			AFB_ApiError(apiHandle, "Error when trying to convert initiate value json '%s'", json_object_get_string(valueJ));
-			return -3;
+			err = -3;
 		}
-
-		if(HalCtlsSetAlsaCtlValue(apiHandle, cardId, alsaMap->ctl.numid, convertedValueJ)) {
+		else if(HalCtlsSetAlsaCtlValue(apiHandle, cardId, alsaMap->ctl.numid, convertedValueJ)) {
 			AFB_ApiError(apiHandle,
 				     "Error while trying to set initial value on alsa control %i, device '%s', value '%s'",
 				     alsaMap->ctl.numid,
 				     cardId,
 				     json_object_get_string(valueJ));
-			return -4;
+			err = -4;
 		}
+
+		json_object_put(valueJ);
+
+		if(convertedValueJ)
+			json_object_put(convertedValueJ);
+
+		if(err)
+			return err;
 	}
 
 	if(alsaMap->actionJ) {
@@ -390,7 +400,7 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 	struct SpecificHalData *currentCtlHalData;
 	struct CtlHalMixerData *currentMixerData;
 
-	json_object *requestJson, *returnJ, *toReturnJ;
+	json_object *requestJson, *returnJ = NULL, *toReturnJ;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -443,7 +453,7 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 	}
 	else if(wrap_json_unpack(returnJ, "{s:o}", "response", &toReturnJ)) {
 		AFB_ReqSuccessF(request,
-				returnJ,
+				json_object_get(returnJ),
 				"%s: Seems that %s call to api %s succeed, but no response was found : '%s'",
 				__func__,
 				currentMixerData->verbToCall,
@@ -452,11 +462,14 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 	}
 	else {
 		AFB_ReqSuccessF(request,
-				toReturnJ,
+				json_object_get(toReturnJ),
 				"Action %s correctly transferred to %s without any error raised",
 				currentMixerData->verbToCall,
 				apiToCall);
 	}
+
+	if(returnJ)
+		json_object_put(returnJ);
 }
 
 json_object *HalCtlsGetJsonArrayForMixerDataTable(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentMixerDataT, enum MixerDataType dataType)
