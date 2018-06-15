@@ -1,0 +1,243 @@
+{
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
+    "metadata": {
+        "uid": "/dev/snd/by-id/usb-Microchip-SMSC_OS81118_0000-0000004C-02",
+        "version": "0.9",
+        "api": "4a-hal-unicens",
+        "require": [ "alsacore", "UNICENS", "smixer" ],
+        "info": "4a hal for MICROCHIP MOST sound card controlled by UNICENS binding",
+        "author": "Jonathan Aillet",
+        "date": "2018-06-15"
+    },
+    "resources": [
+        {
+            "uid": "hal-unicens",
+            "info": "Unicens hal plugin to handle communication with unicens binder",
+            "spath": "./package/lib/plugins:./package/var:./lib/plugins:./var:/usr/libexec/agl/4a-hal",
+            "libs": ["hal-unicens.ctlso"]
+        }
+    ],
+    "onload": [
+        {
+            "uid": "init-audio-hal",
+            "info": "Init current HAL",
+            "action": "plugin://hal-unicens#Init"
+        }
+    ],
+    "controls": [
+        {
+            "uid": "ping",
+            "info": "Ping hal",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ],
+    "events": [
+        {
+            "uid": "UNICENS/node-availibility",
+            "action": "plugin://hal-unicens#Events"
+        }
+    ],
+    "halmap": [
+        {
+            "uid": "agl-master-playback-volume",
+            "info": "Sets master playback volume",
+            "alsa": {
+                "name": "Master Playback Volume",
+                "value": 80,
+                "create":
+                {
+                    "type": "INTEGER",
+                    "count": 1,
+                    "minval": 0,
+                    "maxval": 100,
+                    "step": 1
+                }
+            },
+            "action": "plugin://hal-unicens#MasterVol"
+        },
+        {
+            "uid": "agl-pcm-playback-volume",
+            "info": "Sets PCM playback volume",
+            "alsa": {
+                "name": "PCM Playback Volume",
+                "value": 100,
+                "create":
+                {
+                    "type": "INTEGER",
+                    "count": 1,
+                    "minval": 0,
+                    "maxval": 100,
+                    "step": 1
+                }
+            },
+            "action": "plugin://hal-unicens#PCMVol"
+        }
+    ],
+    "halmixer": {
+        "uid": "unicens",
+        "mixerapi": "smixer",
+        "ramps": [
+            {
+                "uid": "ramp-fast",
+                "delay": 50,
+                "up": 2,
+                "down": 10
+            },
+            {
+                "uid": "ramp-normal",
+                "delay": 50,
+                "up": 2,
+                "down": 4
+            },
+            {
+                "uid": "ramp-slow",
+                "delay": 100,
+                "up": 1,
+                "down": 1
+            }
+        ],
+        "playbacks" : {
+            "uid": "UNICENS",
+            "path": "/dev/snd/by-id/usb-Microchip-SMSC_OS81118_0000-0000004C-02",
+            "params": {
+                "rate": 48000
+            },
+            "sink": {
+                "controls": {
+                    "volume": {
+                        "name": "Master Playback Volume",
+                        "value": 80
+                    }
+                },
+                "channels": [
+                    {
+                        "uid": "front-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "front-left",
+                        "port": 1
+                    },
+                    {
+                        "uid": "middle-right",
+                        "port": 2
+                    },
+                    {
+                        "uid": "middle-left",
+                        "port": 3
+                    },
+                    {
+                        "uid": "back-right",
+                        "port": 4
+                    },
+                    {
+                        "uid": "back-left",
+                        "port": 5
+                    }
+                ]
+            }
+        },
+        "zones": [
+            {
+                "uid": "full-stereo",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    },
+                    {
+                        "target": "middle-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "middle-left",
+                        "channel": 1
+                    },
+                    {
+                        "target": "back-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "back-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "front-seats",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "middle-seats",
+                "sink": [
+                    {
+                        "target": "middle-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "middle-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "back-seats",
+                "sink": [
+                    {
+                        "target": "back-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "back-left",
+                        "channel": 1
+                    }
+                ]
+            }
+        ],
+        "streams": [
+            {
+                "uid": "multimedia",
+                "verb": "multimedia",
+                "zone": "full-stereo",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "navigation",
+                "verb": "navigation",
+                "zone": "front-seats",
+                "volume": 70,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "emergency",
+                "verb": "emergency",
+                "zone": "front-seats",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            }
+        ]
+    }
+}
