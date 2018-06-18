@@ -37,11 +37,7 @@
 
 void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_object *eventJ)
 {
-	int numid, idx;
-
-	char cardIdString[6];
-
-	char *alsaCoreLabel;
+	int numid, idx = 0, cardidx;
 
 	CtlConfigT *ctrlConfig;
 	CtlSourceT source;
@@ -65,17 +61,19 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 		return;
 	}
 
-	snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
-	currentHalAlsaCtlsT = currentHalData->ctlHalSpecificData->ctlHalAlsaMapT;
+	// Extract sound card index from event
+	while(evtLabel[idx] != '\0' && evtLabel[idx] != ':')
+		idx++;
 
-	if(asprintf(&alsaCoreLabel, "%s/%s", ALSACORE_API, cardIdString) < 0) {
-		AFB_ApiError(apiHandle, "%s: Didn't succeed to generate string for alascore events catching", __func__);
-		return;
-	}
+	if(evtLabel[idx] != '\0' &&
+	   sscanf(&evtLabel[idx + 1], "%d", &cardidx) == 1 &&
+	   currentHalData->sndCardId == cardidx) {
+		if(wrap_json_unpack(eventJ, "{s:i s:o !}", "id", &numid, "val", &valuesJ)) {
+			AFB_ApiError(apiHandle, "%s: Invalid Alsa Event label=%s value=%s", __func__, evtLabel, json_object_get_string(eventJ));
+			return;
+		}
 
-	if(strcmp(evtLabel, alsaCoreLabel) == 0 &&
-	   ! wrap_json_unpack(eventJ, "{s:i s:o !}", "id", &numid, "val", &valuesJ)) {
-		free(alsaCoreLabel);
+		currentHalAlsaCtlsT = currentHalData->ctlHalSpecificData->ctlHalAlsaMapT;
 
 		// Search for corresponding numid in halCtls, if found, launch callback (if available)
 		for(idx = 0; idx < currentHalAlsaCtlsT->ctlsCount; idx++) {
@@ -106,8 +104,6 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 
 		return;
 	}
-
-	free(alsaCoreLabel);
 
 	AFB_ApiNotice(apiHandle,
 		      "%s: not an alsacore event '%s' [msg=%s]",
@@ -231,8 +227,8 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 	if(alsaMap->ctl.alsaCtlCreation) {
 		if(HalCtlsCreateAlsaCtl(apiHandle, cardId, &alsaMap->ctl)) {
 			AFB_ApiError(apiHandle,
-				"%s: An error happened when trying to create a new alsa control",
-				__func__);
+				     "%s: An error happened when trying to create a new alsa control",
+				     __func__);
 			return -1;
 		}
 	}
