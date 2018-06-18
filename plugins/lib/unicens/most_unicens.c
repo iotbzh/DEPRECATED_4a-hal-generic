@@ -37,55 +37,115 @@ CTLP_CAPI_REGISTER("hal-unicens")
 
 AFB_ApiT unicensHalApiHandle;
 
-static int master_volume = 80;
-static json_bool master_switch;
-static int pcm_volume[PCM_MAX_CHANNELS] = {100,100,100,100,100,100};
+static uint8_t initialized = 0;
+
+// Call at initialisation time
+CTLP_ONLOAD(plugin, callbacks)
+{
+	AFB_ApiNotice(plugin->api, "Hal-Unicens Plugin Register: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+
+	unicensHalApiHandle = plugin->api;
+
+	return 0;
+}
 
 CTLP_CAPI(MasterVol, source, argsJ, queryJ)
 {
-	const char *j_str = json_object_to_json_string(queryJ);
+	int master_volume;
 
-	if(! wrap_json_unpack(queryJ, "[i!]", "val", &master_volume)) {
-		AFB_ApiNotice(source->api, "master_volume: %s, value=%d", j_str, master_volume);
-		wrap_volume_master(source->api, master_volume);
+	json_object *valueJ;
+
+	if(! initialized) {
+		AFB_ApiWarning(source->api, "%s: Link to unicens binder is not initialized, can't set master volume, value=%s", __func__, json_object_get_string(queryJ));
+		return -1;
 	}
-	else {
-		AFB_ApiNotice(source->api, "master_volume: INVALID STRING %s", j_str);
+
+	if(! json_object_is_type(queryJ, json_type_array) || json_object_array_length(queryJ) <= 0) {
+		AFB_ApiError(source->api, "%s: invalid json (should be a non empty json array) value=%s", __func__, json_object_get_string(queryJ));
+		return -2;
 	}
+
+	valueJ = json_object_array_get_idx(queryJ, 0);
+	if(! json_object_is_type(valueJ, json_type_int)) {
+		AFB_ApiError(source->api, "%s: invalid json (should be an array of int) value=%s", __func__, json_object_get_string(queryJ));
+		return -3;
+	}
+
+	master_volume = json_object_get_int(valueJ);
+	wrap_volume_master(source->api, master_volume);
 
 	return 0;
 }
 
 CTLP_CAPI(MasterSwitch, source, argsJ, queryJ)
 {
-	const char *j_str = json_object_to_json_string(queryJ);
+	json_bool master_switch;
+	json_object *valueJ;
 
-	if(! wrap_json_unpack(queryJ, "[b!]", "val", &master_switch))
-		AFB_ApiNotice(source->api, "master_switch: %s, value=%d", j_str, master_switch);
-	else
-		AFB_ApiNotice(source->api, "master_switch: INVALID STRING %s", j_str);
+	if(! initialized) {
+		AFB_ApiWarning(source->api, "%s: Link to unicens binder is not initialized, can't set master switch, value=%s", __func__, json_object_get_string(queryJ));
+		return -1;
+	}
+
+	if(! json_object_is_type(queryJ, json_type_array) || json_object_array_length(queryJ) <= 0) {
+		AFB_ApiError(source->api, "%s: invalid json (should be a non empty json array) value=%s", __func__, json_object_get_string(queryJ));
+		return -2;
+	}
+
+	// In case if alsa doesn't return a proper json boolean
+	valueJ = json_object_array_get_idx(queryJ, 0);
+	switch(json_object_get_type(valueJ)) {
+		case json_type_boolean:
+			master_switch = json_object_get_boolean(valueJ);
+			break;
+
+		case json_type_int:
+			master_switch = json_object_get_int(valueJ);
+			break;
+
+		default:
+			AFB_ApiError(source->api, "%s: invalid json (should be an array of boolean/int) value=%s", __func__, json_object_get_string(queryJ));
+			return -3;
+	}
+
+	// TBD: implement pause action for Unicens
+	AFB_ApiWarning(source->api, "%s: Try to set master switch to %i, but function is not implemented", __func__, (int) master_switch);
 
 	return 0;
 }
 
 CTLP_CAPI(PCMVol, source, argsJ, queryJ)
 {
-	const char *j_str = json_object_to_json_string(queryJ);
+	int idx;
+	int pcm_volume[PCM_MAX_CHANNELS];
 
-	if(! wrap_json_unpack(queryJ, "[iiiiii!]",
-				     "val",
-				     &pcm_volume[0],
-				     &pcm_volume[1],
-				     &pcm_volume[2],
-				     &pcm_volume[3],
-				     &pcm_volume[4],
-				     &pcm_volume[5])) {
-		AFB_ApiNotice(source->api, "pcm_vol: %s", j_str);
-		wrap_volume_pcm(source->api, pcm_volume, PCM_MAX_CHANNELS);
+	json_object *valueJ;
+
+	if(! initialized) {
+		AFB_ApiWarning(source->api, "%s: Link to unicens binder is not initialized, can't set PCM volume, value=%s", __func__, json_object_get_string(queryJ));
+		return -1;
 	}
-	else {
-		AFB_ApiNotice(source->api, "pcm_vol: INVALID STRING %s", j_str);
+
+	if(! json_object_is_type(queryJ, json_type_array) || json_object_array_length(queryJ) <= 0) {
+		AFB_ApiError(source->api, "%s: invalid json (should be a non empty json array) value=%s", __func__, json_object_get_string(queryJ));
+		return -1;
 	}
+
+	for(idx = 0; idx < json_object_array_length(queryJ); idx++) {
+		valueJ = json_object_array_get_idx(queryJ, idx);
+		if(! json_object_is_type(valueJ, json_type_int)) {
+			AFB_ApiError(source->api, "%s: invalid json (should be an array of int) value=%s", __func__, json_object_get_string(queryJ));
+			return -2;
+		}
+
+		pcm_volume[idx] = json_object_get_int(valueJ);
+	}
+
+	// If control only has one value, then replicate the first value
+	for(idx = idx; idx < 6; idx ++)
+		pcm_volume[idx] = pcm_volume[0];
+
+	wrap_volume_pcm(source->api, pcm_volume, PCM_MAX_CHANNELS);
 
 	return 0;
 }
@@ -94,10 +154,9 @@ CTLP_CAPI(PCMVol, source, argsJ, queryJ)
 CTLP_CAPI(Init, source, argsJ, queryJ)
 {
 	int err = 0;
+	int pcm_volume[PCM_MAX_CHANNELS] = { 80, 80, 80, 80, 80, 80 };
 
 	AFB_ApiNotice(source->api, "Initializing HAL-MOST-UNICENS-BINDING");
-
-	unicensHalApiHandle = source->api;
 
 	if((err = wrap_ucs_subscribe_sync(source->api))) {
 		AFB_ApiError(source->api, "Failed to subscribe to UNICENS binding");
@@ -115,6 +174,8 @@ CTLP_CAPI(Init, source, argsJ, queryJ)
 	wrap_volume_pcm(source->api, pcm_volume, PCM_MAX_CHANNELS);
 
 	AFB_ApiNotice(source->api, "Initializing HAL-MOST-UNICENS-BINDING done..");
+
+	initialized = 1;
 
 	return 0;
 }

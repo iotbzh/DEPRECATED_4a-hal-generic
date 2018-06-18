@@ -103,12 +103,6 @@
                 "rate": 48000
             },
             "sink": {
-                "controls": {
-                    "volume": {
-                        "name": "Master Playback Volume",
-                        "value": 80
-                    }
-                },
                 "channels": [
                     {
                         "uid": "front-right",

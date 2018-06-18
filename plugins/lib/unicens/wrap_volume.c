@@ -36,6 +36,8 @@
 
 #include "libmostvolume.h"
 
+#define MAX_PCM_CHANNELS 6
+
 static int wrap_volume_service_timeout_cb(sd_event_source* source,
 					  uint64_t timer __attribute__((__unused__)),
 					  void *userdata __attribute__((__unused__)))
@@ -106,8 +108,7 @@ extern int wrap_volume_master(AFB_ApiT apiHandle, int volume)
 
 extern int wrap_volume_pcm(AFB_ApiT apiHandle, int *volume_ptr, int volume_sz)
 {
-	const int MAX_PCM_CHANNELS = 6;
-	int cnt, ret, new_value;
+	int cnt, new_value, ret = 0;
 
 	assert(volume_ptr != NULL);
 	assert(volume_sz <= MAX_PCM_CHANNELS);
