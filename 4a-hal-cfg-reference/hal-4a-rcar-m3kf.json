@@ -3,7 +3,7 @@
     "metadata": {
         "uid": "/dev/snd/by-path/platform-sound@1",
         "version": "0.9",
-        "api": "4a-hal-rcar-m3",
+        "api": "4a-hal-rcar-m3kf",
         "require": [ "alsacore", "smixer" ],
         "info": "4a hal for Rcar M3 device when plugged on Kingfisher board",
         "author": "Jonathan Aillet, Stephane Desneux",
