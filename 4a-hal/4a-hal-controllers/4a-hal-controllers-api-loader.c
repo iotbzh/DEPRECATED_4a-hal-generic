@@ -45,13 +45,13 @@ AFB_ApiT AFB_default;
 // Config Section definition
 static CtlSectionT ctrlSections[] =
 {
-	{.key="resources", .loadCB= PluginConfig},
-	{.key="onload", .loadCB= OnloadConfig},
-	{.key="controls", .loadCB= ControlConfig},
-	{.key="events", .loadCB= EventConfig},
-	{.key="halmap", .loadCB= HalCtlsHalMapConfig},
-	{.key="halmixer", .loadCB= HalCtlsHalMixerConfig},
-	{.key=NULL}
+	{ .key = "resources",	.loadCB = PluginConfig },
+	{ .key = "onload",	.loadCB = OnloadConfig },
+	{ .key = "controls",	.loadCB = ControlConfig },
+	{ .key = "halmixer",	.loadCB = HalCtlsHalMixerConfig },
+	{ .key = "halmap",	.loadCB = HalCtlsHalMapConfig },
+	{ .key = "events",	.loadCB = EventConfig },
+	{ .key = NULL }
 };
 
 /*******************************************************************************
@@ -62,7 +62,7 @@ static CtlSectionT ctrlSections[] =
 static AFB_ApiVerbs CtlHalDynApiStaticVerbs[] =
 {
 	/* VERB'S NAME			FUNCTION TO CALL		SHORT DESCRIPTION */
-	{ .verb = "info",		.callback = HalCtlsInfo,	.info = "List available streams/playbacks/... for this api"},
+	{ .verb = "info",		.callback = HalCtlsInfo,	.info = "List available streams/playbacks/captures... for this api" },
 	{ .verb = NULL }		// Marker for end of the array
 };
 
@@ -111,8 +111,9 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	currentCtlHalData->sndCardId = HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData->sndCardPath);
 
-	if(currentCtlHalData->sndCardId < 0)
+	if(currentCtlHalData->sndCardId < 0) {
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
+	}
 	else {
 		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
 		if((err = HalCtlsAttachToMixer(apiHandle))) {
@@ -131,7 +132,7 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 	int err;
 	CtlConfigT *ctrlConfig;
 
-	if(! cbdata || ! apiHandle )
+	if(! cbdata || ! apiHandle)
 		return -1;
 
 	ctrlConfig = (CtlConfigT*) cbdata;
@@ -146,7 +147,8 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 	}
 
 	// Load section for corresponding Api
-	err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections);
+	if((err = CtlLoadSections(apiHandle, ctrlConfig, ctrlSections)))
+		return err;
 
 	// Declare an event manager for this Api
 	afb_dynapi_on_event(apiHandle, HalCtlsDispatchApiEvent);
@@ -154,7 +156,7 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 	// Init Api function (does not receive user closure ???)
 	afb_dynapi_on_init(apiHandle, HalCtlsInitOneApi);
 
-	return err;
+	return 0;
 }
 
 int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGlobalData)
@@ -189,7 +191,10 @@ int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGl
 	currentCtlHalData->ctlHalSpecificData = calloc(1, sizeof(struct CtlHalSpecificData));
 
 	// Create one API (Pre-V3 return code ToBeChanged)
-	return afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, HalCtlsLoadOneApi, ctrlConfig);
+	if(afb_dynapi_new_api(apiHandle, ctrlConfig->api, ctrlConfig->info, 1, HalCtlsLoadOneApi, ctrlConfig))
+		return -5;
+
+	return 0;
 }
 
 int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
