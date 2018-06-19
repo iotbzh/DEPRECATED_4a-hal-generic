@@ -18,7 +18,6 @@
 #define _GNU_SOURCE
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include <filescan-utils.h>
@@ -94,7 +93,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 		return -3;
 
 	// Fill SpecificHalDatadata structure
-	currentCtlHalData->internal = true;
+	currentCtlHalData->internal = 1;
 
 	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 	currentCtlHalData->sndCardPath = (char *) ctrlConfig->uid;

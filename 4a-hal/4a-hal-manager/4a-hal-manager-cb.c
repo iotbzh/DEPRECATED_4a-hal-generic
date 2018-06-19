@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include <wrap-json.h>
 
@@ -193,7 +192,7 @@ void HalMgrLoad(AFB_ReqT request)
 
 	addedHal = HalUtlAddHalApiToHalList(&HalMgrGlobalData->first);
 
-	addedHal->internal = false;
+	addedHal->internal = 0;
 	// TBD JAI : initialize external to unavailable once event from external hal will be handled
 	addedHal->status = HAL_STATUS_READY;
 
@@ -278,7 +277,7 @@ void HalMgrSubscribeEvent(AFB_ReqT request)
 {
 	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
-	AFB_ReqSuccess(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSuccess(request, json_object_new_boolean(0), NULL);
 }
 
 // TBD JAI : to implement
@@ -286,5 +285,5 @@ void HalMgrUnsubscribeEvent(AFB_ReqT request)
 {
 	AFB_ReqWarning(request, "%s not implemented yet", __func__);
 
-	AFB_ReqSuccess(request, json_object_new_boolean(false), NULL);
+	AFB_ReqSuccess(request, json_object_new_boolean(0), NULL);
 }

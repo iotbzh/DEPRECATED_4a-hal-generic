@@ -19,7 +19,6 @@
 #define _HAL_CTLS_ALSACORE_LINK_INCLUDE_
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #include <wrap-json.h>
 
