@@ -43,9 +43,11 @@ int HalCtlsHandleMixerData(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentM
 
 	char *currentDataVerbName, *currentStreamCardId;
 
+	json_type currentDataType;
 	json_object *currentJ;
 
-	switch(json_object_get_type(currentDataJ)) {
+	currentDataType = json_object_get_type(currentDataJ);
+	switch(currentDataType) {
 		case json_type_object:
 			currentMixerDataT->count = 1;
 			break;
@@ -61,7 +63,7 @@ int HalCtlsHandleMixerData(AFB_ApiT apiHandle, struct CtlHalMixerDataT *currentM
 	currentMixerDataT->data = (struct CtlHalMixerData *) calloc(currentMixerDataT->count, sizeof(struct CtlHalMixerData));
 
 	for(idx = 0; idx < currentMixerDataT->count; idx++) {
-		if(currentMixerDataT->count > 1)
+		if(currentDataType == json_type_array)
 			currentJ = json_object_array_get_idx(currentDataJ, (int) idx);
 		else
 			currentJ = currentDataJ;

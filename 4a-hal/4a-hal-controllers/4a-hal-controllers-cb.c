@@ -286,7 +286,10 @@ int HalCtlsProcessAllHalMap(AFB_ApiT apiHandle, json_object *AlsaMapJ, struct Ct
 
 	struct CtlHalAlsaMap *ctlMaps;
 
-	switch(json_object_get_type(AlsaMapJ)) {
+	json_type alsaMapType;
+
+	alsaMapType = json_object_get_type(AlsaMapJ);
+	switch(alsaMapType) {
 		case json_type_array:
 			currentCtlHalAlsaMapT->ctlsCount = (unsigned int) json_object_array_length(AlsaMapJ);
 			break;
@@ -305,7 +308,7 @@ int HalCtlsProcessAllHalMap(AFB_ApiT apiHandle, json_object *AlsaMapJ, struct Ct
 	ctlMaps = calloc(currentCtlHalAlsaMapT->ctlsCount, sizeof(struct CtlHalAlsaMap));
 
 	for(idx = 0; idx < currentCtlHalAlsaMapT->ctlsCount; idx++)
-		err += HalCtlsProcessOneHalMapObject(apiHandle, &ctlMaps[idx], currentCtlHalAlsaMapT->ctlsCount == 1 ? AlsaMapJ : json_object_array_get_idx(AlsaMapJ, idx));
+		err += HalCtlsProcessOneHalMapObject(apiHandle, &ctlMaps[idx], alsaMapType == json_type_array ? json_object_array_get_idx(AlsaMapJ, idx) : AlsaMapJ);
 
 	currentCtlHalAlsaMapT->ctls = ctlMaps;
 
