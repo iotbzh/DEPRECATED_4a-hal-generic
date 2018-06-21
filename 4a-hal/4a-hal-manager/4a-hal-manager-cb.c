@@ -60,8 +60,7 @@ void HalMgrPing(AFB_ReqT request)
 
 void HalMgrLoaded(AFB_ReqT request)
 {
-	int requestJsonErr = 0, requestOptionValue;
-	uint64_t cpt, numberOfLoadedApi;
+	int requestJsonErr = 0, allHal = 0, verbose = 0;
 
 	char cardIdString[10];
 
@@ -83,8 +82,9 @@ void HalMgrLoaded(AFB_ReqT request)
 		return;
 	}
 
-	numberOfLoadedApi = HalUtlGetNumberOfHalInList(&HalMgrGlobalData->first);
-	if(! numberOfLoadedApi) {
+	currentHalData = HalMgrGlobalData->first;
+
+	if(! currentHalData) {
 		AFB_ReqSuccess(request, NULL, "No Hal Api loaded");
 		return;
 	}
@@ -95,48 +95,41 @@ void HalMgrLoaded(AFB_ReqT request)
 		return;
 	}
 
-	currentHalData = HalMgrGlobalData->first;
-
 	requestJson = AFB_ReqJson(request);
-	if(! requestJson) {
+	if(! requestJson)
 		AFB_ReqNotice(request, "%s: Can't get request json", __func__);
-	}
-	else {
-		// Get request option
-		requestJsonErr = wrap_json_unpack(requestJson, "{s:i}", "verbose", &requestOptionValue);
-	}
+	else
+		requestJsonErr = wrap_json_unpack(requestJson, "{s?:b s?:b}", "all", &allHal, "verbose", &verbose);
 
-	// Case if request key is 'verbose' and value is bigger than 0
-	if(! requestJsonErr && requestOptionValue > 0) {
-		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
-			if(currentHalData->sndCardId >= 0)
-				snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
-			else
-				snprintf(cardIdString, 10, "not-found");
+	while(currentHalData) {
+		if(allHal || currentHalData->status == HAL_STATUS_READY) {
+			// Case if request key is 'verbose' and value is bigger than 0
+			if(! requestJsonErr && verbose) {
+				if(currentHalData->sndCardId >= 0)
+					snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
+				else
+					snprintf(cardIdString, 10, "not-found");
 
-			wrap_json_pack(&apiObject,
-				       "{s:s s:i s:s s:i s:s s:s s:s s:s s:s}",
-				       "api", currentHalData->apiName,
-				       "status", (int) currentHalData->status,
-				       "sndcard", currentHalData->sndCardPath,
-				       "internal", (int) currentHalData->internal,
-				       "info", currentHalData->info ? currentHalData->info : "",
-				       "author", currentHalData->author ? currentHalData->author : "",
-				       "version", currentHalData->version ? currentHalData->version : "",
-				       "date", currentHalData->date ? currentHalData->date : "",
-				       "snd-dev-id", cardIdString);
-			json_object_array_add(requestAnswer, apiObject);
-
-			currentHalData = currentHalData->next;
+				wrap_json_pack(&apiObject,
+					       "{s:s s:i s:s s:i s:s s:s s:s s:s s:s}",
+					       "api", currentHalData->apiName,
+					       "status", (int) currentHalData->status,
+					       "sndcard", currentHalData->sndCardPath,
+					       "internal", (int) currentHalData->internal,
+					       "info", currentHalData->info ? currentHalData->info : "",
+					       "author", currentHalData->author ? currentHalData->author : "",
+					       "version", currentHalData->version ? currentHalData->version : "",
+					       "date", currentHalData->date ? currentHalData->date : "",
+					       "snd-dev-id", cardIdString);
+				json_object_array_add(requestAnswer, apiObject);
+			}
+			// Case if request is empty or not handled
+			else {
+				json_object_array_add(requestAnswer, json_object_new_string(currentHalData->apiName));
+			}
 		}
-	}
-	// Case if request is empty or not handled
-	else {
-		for(cpt = 0; cpt < numberOfLoadedApi; cpt++) {
-			json_object_array_add(requestAnswer, json_object_new_string(currentHalData->apiName));
 
-			currentHalData = currentHalData->next;
-		}
+		currentHalData = currentHalData->next;
 	}
 
 	AFB_ReqSuccess(request, requestAnswer, "Requested data");

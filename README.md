@@ -173,15 +173,15 @@ Connect to your 4a binder using afb-client-demo
 afb-client-demo ws://localhost:1234/api?token=
 ```
 
-### List the loaded hal
+### List the ready hal
 
-In the connected client, try to list the loaded hal:
+In the connected client, try to list the ready hal:
 
 ```4a-hal-manager loaded```
 
 And now with more information:
 
-```4a-hal-manager loaded { "verbose" : 1 }```
+```4a-hal-manager loaded { "verbose" : true }```
 
 ### Play with an 'internal' hal (described in a json configuration file)
 
