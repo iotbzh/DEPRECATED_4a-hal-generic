@@ -24,17 +24,17 @@ git clone --recurse-submodules https://gerrit.automotivelinux.org/gerrit/src/4a-
 ## Quick introduction to how hal are handled with 4a-hal-generic
 
 * At startup of the 4a-hal binding, a new api called '4a-hal-manger' will be created.
-  This api is meant to provide verbs to list the loaded hals in your system and to know there current status.
-* The '4a-hal-manager' will also create a new hal for each audio configuration files found.
+  This api is meant to provide verbs to list the loaded hals in your system and to know their current status.
+* The '4a-hal-manager' will also create a new hal for each audio configuration file found.
   These configuration files are used by the controller and are meant to be used with a mixer.
-* External hal (e.g. loaded in another binding) can be loaded/unloaded into '4a-hal-manger' by reaching it
+* External hal (e.g. loaded in another binding) can be loaded/unloaded into '4a-hal-manager' by reaching it
   with this hal. It must provide information such as 'api' and 'uid' at loading. It must also provide
   a subscription to an event that the '4a-hal-manager' will use to know this hal status.
   WARNING: not fully implemented yet.
 
 ## Preparation
 
-### Install Alsa Loopback
+### Install Alsa Loopback (DEPRECATED)
 
 You must have snd-aloop enabled as a module in the running kernel.
 Check that this way on the target:
@@ -57,7 +57,7 @@ sudo modprobe snd-aloop
 
 * All audio hardware configuration files are a json description of your audio devices.
 * They all must be in ./4a-hal-cfg-reference or ./4a-hal-cfg-community and must begin with 'hal-4a'.
-* You can found some examples of these configurations in this directory.
+* You can find some examples of these configurations in this directory.
 * Each configuration file found at startup will create a new hal with its own api.
 * At 'init-mixer' hal command, your mixer configuration will be sent.
 
@@ -69,17 +69,17 @@ sudo modprobe snd-aloop
 * For `onload`, `controls`, and `events` sections, please look at the controller documentation
   (In ./app-controller/README.md)
 * In `halcontrol` section:
-  * This section is where you put controls which are alsa control calls.
+  * In this section you put controls corresponding to alsa control calls.
   * If a control is not available, it will be registered in alsa using '4a-alsa-core'.
-  * These controls will be available as verb for your hal.
-  * The value passed to these verbs should be in percentage, the hal will do the conversion to the correct alsa value.
-    To be recognize by the hal, the value should ba associated to the key `val` and should be an integer.
-* In `halmixer` section (what it is passed to the mixer):
+  * These controls will be available as verbs for your hal.
+  * The value passed to these verbs should be a percentage, the hal will do the conversion to the correct alsa value.
+    To be recognized by the hal, the value should be associated to the key `val` and should be an integer.
+* In `halmixer` section (that it is passed to the mixer):
   * The `uid` field will be the name of the mixer corresponding to your hal.
   * The `mixerapi` field should contain the name of the api to call for reaching the mixer
     (not need to be changed if you use '4a-softmixer').
   * The `prefix` field  is not mandatory, it is where you precise the prefix that will be applied
-    at mixer attach call. All the streams that the mixer will create will be prefixed with this field.
+    when the mixer attach call happens. All the streams the mixer creates will be prefixed with this field.
   * In `ramps` section:
     * Define the ramp that you can use in your mixer (ramps in example files can be used).
     * The `uid` field is where you specify the name of the ramp.
