@@ -65,6 +65,7 @@
     "halmixer": {
         "uid": "csl-cm106-8ch-usb",
         "mixerapi": "smixer",
+        "prefix": "cm106-usb",
         "ramps": [
             {
                 "uid": "ramp-fast",

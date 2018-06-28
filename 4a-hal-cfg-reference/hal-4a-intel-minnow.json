@@ -35,6 +35,7 @@
     "halmixer": {
         "uid": "intel-minnow",
         "mixerapi": "smixer",
+        "prefix": "intel-minnow",
         "ramps": [
             {
                 "uid": "ramp-very-fast",

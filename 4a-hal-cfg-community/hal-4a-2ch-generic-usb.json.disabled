@@ -1,11 +1,11 @@
 {
     "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
     "metadata": {
-        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-03",
+        "uid": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
         "version": "0.9",
-        "api": "4a-hal-ensoniq",
+        "api": "4a-hal-2ch-generic-usb",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for Ensoniq",
+        "info": "4a hal for 2ch generic USB device",
         "author": "Jonathan Aillet",
         "date": "2018-06-13"
     },
@@ -20,57 +20,59 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Master Playback Volume",
-                "value": 100
-            }
-        },
-        {
-            "uid": "agl-pcm-playback-volume",
-            "alsa": {
-                "name": "PCM Playback Volume",
-                "value": 100
+                "name": "Speaker Playback Volume",
+                "value": 80
             }
         },
         {
             "uid": "agl-master-playback-switch",
             "alsa": {
-                "name": "Master Playback Switch",
+                "name": "Speaker Playback Switch",
                 "value": 1
             }
         },
         {
             "uid": "agl-mic-capture-volume",
             "alsa": {
-                "name": "Capture Volume"
+                "name": "Mic Capture Volume",
+                "value": 80
+            }
+        },
+        {
+            "uid": "agl-mic-capture-switch",
+            "alsa": {
+                "name": "Mic Capture Switch",
+                "value": 1
             }
         }
     ],
     "halmixer": {
-        "uid": "jabra-solemate",
+        "uid": "2ch-generic-usb",
         "mixerapi": "smixer",
+        "prefix": "2ch-usb",
         "ramps": [
             {
                 "uid": "ramp-very-fast",
                 "delay": 50,
                 "up": 6,
-                "down": 4
+                "down": 10
             },
             {
                 "uid": "ramp-fast",
                 "delay": 50,
                 "up": 2,
-                "down": 4
-            },
-            {
-                "uid": "ramp-normal",
-                "delay": 100,
-                "up": 6,
                 "down": 10
             },
             {
+                "uid": "ramp-normal",
+                "delay": 50,
+                "up": 2,
+                "down": 4
+            },
+            {
                 "uid": "ramp-slow",
-                "delay": 100,
-                "up": 4,
+                "delay": 50,
+                "up": 2,
                 "down": 2
             },
             {
@@ -81,8 +83,8 @@
             }
         ],
         "playbacks" : {
-            "uid": "JABRA-SOLEMATE",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-03",
+            "uid": "2CH-GENERIC-USB",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
             "params": {
                 "rate": 48000
             },
@@ -109,8 +111,8 @@
             }
         },
         "captures": {
-            "uid": "JABRA-SOLEMATE",
-            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-03",
+            "uid": "2CH-GENERIC-USB",
+            "path": "/dev/snd/by-id/usb-0d8c_USB_Sound_Device-00",
             "params": {
                 "rate": 48000
             },
