@@ -241,8 +241,8 @@ int HalCtlsAttachToMixer(AFB_ApiT apiHandle)
 		AFB_ApiError(apiHandle,
 			    "Error %i during call to verb %s of %s api with status '%s' and info '%s'",
 			    (int) returnedError,
-			    apiToCall,
 			    MIXER_ATTACH_VERB,
+			    apiToCall,
 			    returnedStatus ? returnedStatus : "not returned",
 			    returnedInfo ? returnedInfo : "not returned");
 		err = -7;
