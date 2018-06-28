@@ -20,14 +20,14 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "Digital Playback Volume1",
+                "name": "DVC Out Playback Volume",
                 "value": 80
             }
         },
         {
             "uid": "agl-pcm-playback-volume",
             "alsa": {
-                "name": "Digital Playback Volume1",
+                "name": "DVC Out Playback Volume",
                 "value": 80
             }
         },
@@ -48,6 +48,7 @@
     "halmixer": {
         "uid": "rcar-m3",
         "mixerapi": "smixer",
+        "prefix": "m3kf",
         "ramps": [
             {
                 "uid": "ramp-very-fast",
@@ -84,12 +85,13 @@
             "uid": "RCAR-M3",
             "path": "/dev/snd/by-path/platform-sound@1",
             "params": {
-                "rate": 48000
+                "rate": 48000,
+                "format": "S24_LE"
             },
             "sink": {
                 "controls": {
                     "volume": {
-                        "name": "Digital Playback Volume1",
+                        "name": "DVC Out Playback Volume",
                         "value": 80
                     },
                     "mute": {
@@ -171,7 +173,8 @@
                 "volume": 60,
                 "mute": false,
                 "params": {
-                    "rate": 48000
+                    "rate": 48000,
+                    "format": "S16_LE"
                 }
             },
             {
@@ -181,7 +184,8 @@
                 "volume": 70,
                 "mute": false,
                 "params": {
-                    "rate": 48000
+                    "rate": 48000,
+                    "format": "S16_LE"
                 }
             },
             {
@@ -191,7 +195,8 @@
                 "volume": 60,
                 "mute": false,
                 "params": {
-                    "rate": 48000
+                    "rate": 48000,
+                    "format": "S16_LE"
                 }
             }
         ]
