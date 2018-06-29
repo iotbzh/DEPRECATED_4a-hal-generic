@@ -48,11 +48,7 @@ void HalMgrPing(AFB_ReqT request)
 
 	count++;
 
-	if(request->dynapi)
-		AFB_ReqNotice(request, "%s (%s): ping count = %d", request->api, request->dynapi->apiname, count);
-	else
-		AFB_ReqNotice(request, "%s: ping count = %d", request->api, count);
-
+	AFB_ReqNotice(request, "%s: ping count = %d", request->api, count);
 	AFB_ReqSuccess(request, json_object_new_int(count), NULL);
 
 	return;
