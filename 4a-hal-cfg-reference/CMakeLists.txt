@@ -21,7 +21,7 @@
 ##################################################
 PROJECT_TARGET_ADD(4a-hal-cfg-reference)
 
-	file(GLOB CONF_FILES "*.json*")
+	file(GLOB CONF_FILES "*.json")
 
 	add_input_files("${CONF_FILES}")
 
