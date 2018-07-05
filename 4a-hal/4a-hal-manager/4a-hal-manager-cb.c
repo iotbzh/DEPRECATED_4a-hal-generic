@@ -58,7 +58,7 @@ void HalMgrLoaded(AFB_ReqT request)
 {
 	int requestJsonErr = 0, allHal = 0, verbose = 0;
 
-	char cardIdString[10];
+	char cardIdString[32];
 
 	AFB_ApiT apiHandle;
 	struct HalMgrData *HalMgrGlobalData;
@@ -102,9 +102,9 @@ void HalMgrLoaded(AFB_ReqT request)
 			// Case if request key is 'verbose' and value is bigger than 0
 			if(! requestJsonErr && verbose) {
 				if(currentHalData->sndCardId >= 0)
-					snprintf(cardIdString, 6, "hw:%i", currentHalData->sndCardId);
+					snprintf(cardIdString, sizeof(cardIdString), "hw:%i", currentHalData->sndCardId);
 				else
-					snprintf(cardIdString, 10, "not-found");
+					snprintf(cardIdString, sizeof(cardIdString), "not-found");
 
 				wrap_json_pack(&apiObject,
 					       "{s:s s:i s:s s:i s:s s:s s:s s:s s:s}",
