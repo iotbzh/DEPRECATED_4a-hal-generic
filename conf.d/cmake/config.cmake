@@ -130,9 +130,9 @@ set(CONTROL_SUPPORT_LUA 1 CACHE BOOL "Active or not LUA Support")
 # CACHE STRING "Compilation flags for RELEASE build type.")
 
 add_definitions(-DCTL_PLUGIN_MAGIC=7053042648)
-add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}:${CMAKE_BINARY_DIR}/package/etc")
-add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}:${CMAKE_BINARY_DIR}/package/lib/plugins")
-add_definitions(-DCONTROL_LUA_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}:${CMAKE_BINARY_DIR}/package/data")
+add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/etc:${CMAKE_BINARY_DIR}/package/etc")
+add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/plugins:${CMAKE_BINARY_DIR}/package/lib/plugins")
+add_definitions(-DCONTROL_LUA_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/data:${CMAKE_BINARY_DIR}/package/data")
 
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
