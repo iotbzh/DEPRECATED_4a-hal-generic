@@ -48,7 +48,7 @@ void HalMgrPing(AFB_ReqT request)
 
 	count++;
 
-	AFB_ReqNotice(request, "%s: ping count = %d", request->api, count);
+	AFB_ReqNotice(request, "ping count = %d", count);
 	AFB_ReqSuccess(request, json_object_new_int(count), NULL);
 
 	return;
