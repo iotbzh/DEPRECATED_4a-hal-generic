@@ -131,7 +131,7 @@ int HalMgrCreateApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
  *		TBD JAI : Use API-V3 instead of API-PRE-V3		       *
  ******************************************************************************/
 
-int afbBindingVdyn(AFB_ApiT apiHandle)
+int afbBindingEntry(AFB_ApiT apiHandle)
 {
 	int status = 0, rc;
 
