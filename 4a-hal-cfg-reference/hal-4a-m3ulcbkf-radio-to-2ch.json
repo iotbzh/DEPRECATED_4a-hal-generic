@@ -81,44 +81,43 @@
             }
         ],
         "playbacks" : [ 
-        {
-            "uid": "AK4613",
-            "path": "/dev/snd/by-path/platform-sound@1",
-            "params": {
-                "rate": 48000,
-                "format": "S24_LE"
-            },
-            "sink": {
-                "controls": {
-                    "volume": {
-                        "name": "DVC Out Playback Volume",
-                        "value": 81
-                    },
-                    "mute": {
-                        "name": "SRC Out Rate Switch"
-                    }
+            {
+                "uid": "AK4613",
+                "path": "/dev/snd/by-path/platform-sound@1",
+                "params": {
+                    "rate": 48000,
+                    "format": "S24_LE"
                 },
-                "channels": [
-                    {
-                        "uid": "front-right-m3",
-                        "port": 0
+                "sink": {
+                    "controls": {
+                        "volume": {
+                            "name": "DVC Out Playback Volume",
+                            "value": 81
+                        },
+                        "mute": {
+                            "name": "SRC Out Rate Switch"
+                        }
                     },
-                    {
-                        "uid": "front-left-m3",
-                        "port": 1
-                    }
-                ]
+                    "channels": [
+                        {
+                            "uid": "front-right-m3",
+                            "port": 0
+                        },
+                        {
+                            "uid": "front-left-m3",
+                            "port": 1
+                        }
+                    ]
+                }
             }
-         }
         ],
         "captures": [
             {
                 "uid": "radio",
                 "path": "/dev/snd/by-path/platform-sound@2",
                 "params": {
-
-                	"channels": 2
-            	},
+                    "channels": 2
+                },
                 "source": {
                     "channels": [
                         {
@@ -146,18 +145,18 @@
                         "channel": 1
                     }
                 ]
-            }            
+            }
         ],
         "streams": [
             {
                 "uid": "radio_stream",
                 "verb": "radio_stream",
                 "zone": "stereo-2",
-		"source" : "radio",
+                "source" : "radio",
                 "volume": 40,
                 "mute": true,
                 "params": {
-		    "rate" : 48000,
+                    "rate" : 48000,
                     "format": "S16_LE",
                     "channels": 2
                 }
