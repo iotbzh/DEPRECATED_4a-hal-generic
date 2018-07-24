@@ -20,7 +20,7 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "IEC958 Playback Switch",
+                "name": "IEC958 Playback Volume",
                 "value": 100
             }
         },
