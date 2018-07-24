@@ -6,7 +6,7 @@
         "version": "0.9",
         "api": "4a-hal-raspberry-pi-3",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for Raspberry Pi 3 device",
+        "info": "4a hal for Raspberry Pi 3 device\nWARNING: in AGL FF.rc2, RPI3 suffers from a bug in the native sound card driver that prevents DMix component to work correctly. As a consequence, no sound can be heard on the internal sound card of the PI3. See https://jira.automotivelinux.org/browse/SPEC-1610 . [Signed-Off: sdx@iot.bzh - 20180724]",
         "author": "Jonathan Aillet",
         "date": "2018-07-20"
     },
