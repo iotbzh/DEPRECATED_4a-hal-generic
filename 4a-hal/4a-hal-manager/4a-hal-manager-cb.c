@@ -141,7 +141,7 @@ void HalMgrLoad(AFB_ReqT request)
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *addedHal;
 
-	struct json_object *requestJson, *apiReceviedMetadata;
+	json_object *requestJson, *apiReceviedMetadata;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
@@ -215,7 +215,7 @@ void HalMgrUnload(AFB_ReqT request)
 	struct HalMgrData *HalMgrGlobalData;
 	struct SpecificHalData *HalToRemove;
 
-	struct json_object *requestJson;
+	json_object *requestJson;
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
