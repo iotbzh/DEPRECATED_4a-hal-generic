@@ -1,13 +1,13 @@
 ###########################################################################
-# Copyright 2015, 2016, 2017, 2018 IoT.bzh
+# Copyright 2015, 2016, 2017 IoT.bzh
 #
-# author: Jonathan Aillet <jonathan.aillet@iot.bzh>
+# author: Fulup Ar Foll <fulup@iot.bzh>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#	http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,24 +16,7 @@
 # limitations under the License.
 ###########################################################################
 
-#PROJECT_TARGET_ADD(example)
-#
-#		# Define targets
-#		ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.c)
-#
-#		# Alsa Plugin properties
-#		SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-#			LABELS "PLUGIN"
-#			PREFIX ""
-#			SUFFIX ".ctlso"
-#			OUTPUT_NAME ${TARGET_NAME}
-#		)
-#
-#		# Library dependencies (include updates automatically)
-#		TARGET_LINK_LIBRARIES(${TARGET_NAME}
-#			${link_libraries}
-#		)
-#
-#		target_include_directories(${TARGET_NAME}
-#		PRIVATE "../app-controller/ctl-lib"
-#		PRIVATE "../4a-hal-manager")
+
+# Include any directory not starting with _
+# -----------------------------------------------------
+PROJECT_SUBDIRS_ADD()

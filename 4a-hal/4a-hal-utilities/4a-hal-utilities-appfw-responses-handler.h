@@ -39,7 +39,7 @@ enum CallError {
 };
 
 // Handle application framework response function
-enum CallError HalUtlHandleAppFwCallError(AFB_ApiT apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo);
+extern enum CallError HalUtlHandleAppFwCallError(AFB_ApiT apiHandle, char *apiCalled, char *verbCalled, json_object *callReturnJ, char **returnedStatus, char **returnedInfo);
 void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char *verbCalled, json_object *callReturnJ, char *errorStatusToSend);
 
 #endif /* _HAL_UTILITIES_APPFW_RESP_HANDLER_INCLUDE_ */
