@@ -87,7 +87,7 @@ struct SpecificHalData *HalUtlAddHalApiToHalList(struct SpecificHalData **firstH
 	return currentApi;
 }
 
-uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *apiToRemove)
+int8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *apiToRemove)
 {
 	struct SpecificHalData *currentApi, *matchingApi;
 
@@ -134,15 +134,15 @@ uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, s
 	return 0;
 }
 
-uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData)
+int64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData)
 {
-	uint8_t ret;
-	uint64_t CtlHalApiRemoved = 0;
+	int8_t ret;
+	int64_t CtlHalApiRemoved = 0;
 
 	while(*firstHalData) {
 		ret = HalUtlRemoveSelectedHalFromList(firstHalData, *firstHalData);
 		if(ret)
-			return (uint64_t) ret;
+			return (int64_t) ret;
 
 		CtlHalApiRemoved++;
 	}
@@ -150,9 +150,9 @@ uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData)
 	return CtlHalApiRemoved;
 }
 
-uint64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData)
+int64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData)
 {
-	uint64_t numberOfCtlHal = 0;
+	int64_t numberOfCtlHal = 0;
 	struct SpecificHalData *currentApi;
 
 	if(! firstHalData)

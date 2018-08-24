@@ -94,9 +94,9 @@ struct HalMgrData {
 
 // Exported verbs for 'struct SpecificHalData' handling
 struct SpecificHalData *HalUtlAddHalApiToHalList(struct SpecificHalData **firstHalData);
-uint8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *ApiToRemove);
-uint64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData);
-uint64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData);
+int8_t HalUtlRemoveSelectedHalFromList(struct SpecificHalData **firstHalData, struct SpecificHalData *ApiToRemove);
+int64_t HalUtlRemoveAllHalFromList(struct SpecificHalData **firstHalData);
+int64_t HalUtlGetNumberOfHalInList(struct SpecificHalData **firstHalData);
 struct SpecificHalData *HalUtlSearchHalDataByApiName(struct SpecificHalData **firstHalData, char *apiName);
 struct SpecificHalData *HalUtlSearchReadyHalDataByCarId(struct SpecificHalData **firstHalData, int cardId);
 
