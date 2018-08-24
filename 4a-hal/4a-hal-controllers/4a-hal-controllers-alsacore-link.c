@@ -167,7 +167,7 @@ int HalCtlsSubscribeToAlsaCardEvent(AFB_ApiT apiHandle, char *cardId)
 			     returnedInfo ? returnedInfo : "not returned");
 		err = -1;
 	}
-	else if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "info", &returnedWarningJ)) {
+	else if(! wrap_json_unpack(returnedJ, "{s:{s:o}}", "request", "info", &returnedWarningJ)) {
 		AFB_ApiError(apiHandle,
 			     "Warning raised during call to verb %s of %s api : '%s'",
 			     ALSACORE_SUBSCRIBE_VERB,
