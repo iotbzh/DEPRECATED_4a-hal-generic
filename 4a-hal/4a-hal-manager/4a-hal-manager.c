@@ -69,6 +69,7 @@ struct SpecificHalData **HalMngGetFirstHalData(void)
 
 static int HalMgrInitApi(AFB_ApiT apiHandle)
 {
+	struct SpecificHalData *currentCtlHalData;
 	struct HalMgrData *HalMgrGlobalData;
 
 	if(! apiHandle)
@@ -84,6 +85,17 @@ static int HalMgrInitApi(AFB_ApiT apiHandle)
 
 	if(HalUtlInitializeHalMgrData(apiHandle, HalMgrGlobalData, HAL_MANAGER_API_NAME, HAL_MANAGER_API_INFO))
 		return -3;
+
+	currentCtlHalData = HalMgrGlobalData->first;
+
+	while(currentCtlHalData) {
+		if(! currentCtlHalData->apiName)
+			return -4;
+		else if(AFB_RequireApi(apiHandle, currentCtlHalData->apiName, 1))
+			return -5;
+
+		currentCtlHalData = currentCtlHalData->next;
+	}
 
 	return 0;
 }

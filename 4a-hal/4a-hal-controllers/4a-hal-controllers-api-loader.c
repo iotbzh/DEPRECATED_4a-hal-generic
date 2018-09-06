@@ -95,7 +95,6 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 	// Fill SpecificHalDatadata structure
 	currentCtlHalData->internal = 1;
 
-	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 	currentCtlHalData->sndCardPath = (char *) ctrlConfig->uid;
 	currentCtlHalData->info = (char *) ctrlConfig->info;
 
@@ -182,6 +181,8 @@ int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGl
 	currentCtlHalData = HalUtlAddHalApiToHalList(&HalMgrGlobalData->first);
 	if(! currentCtlHalData)
 		return -4;
+
+	currentCtlHalData->apiName = (char *) ctrlConfig->api;
 
 	// Stores current hal controller data in controller config
 	ctrlConfig->external = (void *) currentCtlHalData;
