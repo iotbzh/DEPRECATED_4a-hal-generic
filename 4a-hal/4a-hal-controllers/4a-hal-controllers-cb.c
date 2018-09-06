@@ -104,11 +104,11 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 		return;
 	}
 
-	AFB_ApiNotice(apiHandle,
-		      "%s: not an alsacore event '%s' [msg=%s]",
-		      __func__,
-		      evtLabel,
-		      json_object_get_string(eventJ));
+	AFB_ApiInfo(apiHandle,
+		    "%s: not an alsacore event '%s' [msg=%s]",
+		    __func__,
+		    evtLabel,
+		    json_object_get_string(eventJ));
 
 	CtrlDispatchApiEvent(apiHandle, evtLabel, eventJ);
 }
