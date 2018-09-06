@@ -121,7 +121,7 @@ void HalBtGetSelectedBluetoothDevice(AFB_ReqT request)
 	}
 
 	if(! localHalBtPluginData->selectedBtDevice) {
-		AFB_ReqSuccess(request, NULL, "No bluetooth device connected, cannot provide selected device");
+		AFB_ReqSuccess(request, NULL, "No bluetooth device selected");
 		return;
 	}
 

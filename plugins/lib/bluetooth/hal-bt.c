@@ -37,7 +37,7 @@ CTLP_CAPI_REGISTER(HAL_BT_PLUGIN_NAME)
 // Call at initialisation time
 CTLP_ONLOAD(plugin, callbacks)
 {
-	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Register: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered: uid='%s' 'info='%s'", plugin->uid, plugin->info);
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
 
@@ -51,7 +51,7 @@ CTLP_ONLOAD(plugin, callbacks)
 	return 0;
 }
 
-// Call at onload time
+// Call at contoller onload time
 CTLP_CAPI(init, source, argsJ, queryJ)
 {
 	unsigned int err;
@@ -120,9 +120,9 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	wrap_json_pack(&toSendJ, "{s:s}", "value", BT_MANAGER_DEVICE_UPDATE_EVENT);
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_SUBSCRIBE_VERB, toSendJ, &returnedJ)) {
 		AFB_ApiError(source->api,
-			     "Error during call to verb %s of %s api",
-			     BT_MANAGER_API,
-			     BT_MANAGER_SUBSCRIBE_VERB);
+			     "Error during call to verb '%s' of '%s' api",
+			     BT_MANAGER_SUBSCRIBE_VERB,
+			     BT_MANAGER_API);
 
 		return -6;
 	}
@@ -132,23 +132,23 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			     BT_MANAGER_DEVICE_UPDATE_EVENT,
 			     BT_MANAGER_SUBSCRIBE_VERB,
 			     BT_MANAGER_API);
-		return -7;
+		return -6;
 	}
 
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_GET_DEVICES_VERB, NULL, &returnedJ)) {
 		AFB_ApiError(source->api,
-			     "Error during call to verb %s of %s api",
-			     BT_MANAGER_API,
-			     BT_MANAGER_GET_DEVICES_VERB);
+			     "Error during call to verb '%s' of '%s' api",
+			     BT_MANAGER_GET_DEVICES_VERB,
+			     BT_MANAGER_API);
 
-		return -8;
+		return -7;
 	}
 	else if(wrap_json_unpack(returnedJ, "{s:{s:o}}", "response", "list", &returnedBtList)) {
 		AFB_ApiError(source->api,
 			     "Couldn't get bluetooth device list during call to verb '%s' of api '%s'",
 			     BT_MANAGER_GET_DEVICES_VERB,
 			     BT_MANAGER_API);
-		return -9;
+		return -7;
 	}
 
 	if((err = HalBtDataHandleReceivedMutlipleBtDeviceData(&localHalBtPluginData, returnedBtList)))
@@ -170,8 +170,6 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 CTLP_CAPI(events, source, argsJ, queryJ)
 {
 	struct HalBtDeviceData *previouslySelectedBtDevice = localHalBtPluginData.selectedBtDevice;
-
-	AFB_ApiNotice(source->api, "JAI: bt event received: %s", json_object_get_string(queryJ));
 
 	if(HalBtDataHandleReceivedSingleBtDeviceData(&localHalBtPluginData, queryJ)) {
 		AFB_ApiError(source->api, "Error while decoding bluetooth event received json (%s)", json_object_get_string(queryJ));
