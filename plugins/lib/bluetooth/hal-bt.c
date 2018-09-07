@@ -37,6 +37,8 @@ CTLP_CAPI_REGISTER(HAL_BT_PLUGIN_NAME)
 // Call at initialisation time
 CTLP_ONLOAD(plugin, callbacks)
 {
+	CtlConfigT *ctrlConfig;
+
 	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered: uid='%s' 'info='%s'", plugin->uid, plugin->info);
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
@@ -44,6 +46,16 @@ CTLP_ONLOAD(plugin, callbacks)
 	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
 		AFB_ApiError(plugin->api, "Didn't succeed to require %s api", BT_MANAGER_API);
 		return -1;
+	}
+
+	if(! (ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(plugin->api))) {
+		AFB_ApiError(plugin->api, "Can't get current hal controller config");
+		return -2;
+	}
+
+	if(! (localHalBtPluginData.currentHalData = (struct SpecificHalData *) ctrlConfig->external)) {
+		AFB_ApiError(plugin->api, "%s: Can't get current hal controller data", __func__);
+		return -3;
 	}
 
 	/* TDB JAI :

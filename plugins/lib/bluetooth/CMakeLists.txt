@@ -42,4 +42,5 @@ PROJECT_TARGET_ADD(hal-bt)
 
 		target_include_directories(${TARGET_NAME}
 			PRIVATE "${CMAKE_SOURCE_DIR}/app-controller/ctl-lib"
+			PRIVATE "${CMAKE_SOURCE_DIR}/4a-hal/4a-hal-utilities"
 		)

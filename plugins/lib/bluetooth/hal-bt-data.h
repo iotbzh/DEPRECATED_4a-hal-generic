@@ -24,6 +24,8 @@
 
 #include <json-c/json.h>
 
+#include <4a-hal-utilities-data.h>
+
 // Structure to store bluetooth device data
 struct HalBtDeviceData {
 	char *uid;
@@ -40,6 +42,8 @@ struct HalBtDeviceData {
 // Structure to store hal bluetooth plugin data
 struct HalBtPluginData {
 	unsigned int btStreamEnabled;
+
+	struct SpecificHalData *currentHalData;
 
 	struct HalBtDeviceData *selectedBtDevice;
 	struct HalBtDeviceData *first;
