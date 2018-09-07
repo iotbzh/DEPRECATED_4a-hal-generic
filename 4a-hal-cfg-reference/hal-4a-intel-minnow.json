@@ -20,7 +20,7 @@
         {
             "uid": "agl-master-playback-volume",
             "alsa": {
-                "name": "IEC958 Playback Volume",
+                "name": "IEC958 Playback Default",
                 "value": 100
             }
         },
@@ -70,7 +70,8 @@
         ],
         "playbacks" : {
             "uid": "INTEL-MINNOW",
-            "path": "/dev/snd/by-path/pci-0000:00:1b.0",
+            "cardid": "hw:PCH",
+            "device": 3,
             "params": {
                 "rate": 48000
             },
