@@ -27,16 +27,18 @@
 // Structure to store bluetooth device data
 struct HalBtDeviceData {
 	char *uid;
+
+	char *hci;
 	char *name;
 	char *address;
-	// TODO JAI : Get bluetooth device's profile and store it here
+
+	unsigned int a2dp;
 
 	struct HalBtDeviceData *next;
 };
 
 // Structure to store hal bluetooth plugin data
 struct HalBtPluginData {
-	// TODO JAI : Get hci device and store it here
 	unsigned int btStreamEnabled;
 
 	struct HalBtDeviceData *selectedBtDevice;

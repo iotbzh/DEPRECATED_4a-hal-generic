@@ -98,9 +98,11 @@ void HalBtGetConnectedBluetoothDevices(AFB_ReqT request)
 
 	while(currentBtDeviceData) {
 		wrap_json_pack(&currentBtDeviceObjectJ,
-			       "{s:s s:s}",
+			       "{s:s s:s s:s s:b}",
+			       "Hci", currentBtDeviceData->hci,
 			       "Name", currentBtDeviceData->name,
-			       "Address", currentBtDeviceData->address);
+			       "Address", currentBtDeviceData->address,
+			       "A2dp", currentBtDeviceData->a2dp);
 		json_object_array_add(requestAnswer, currentBtDeviceObjectJ);
 
 		currentBtDeviceData = currentBtDeviceData->next;
@@ -126,9 +128,11 @@ void HalBtGetSelectedBluetoothDevice(AFB_ReqT request)
 	}
 
 	wrap_json_pack(&selectedBtDeviceObject,
-		       "{s:s s:s}",
+		       "{s:s s:s s:s s:b}",
+		       "Hci", localHalBtPluginData->selectedBtDevice->hci,
 		       "Name", localHalBtPluginData->selectedBtDevice->name,
-		       "Address", localHalBtPluginData->selectedBtDevice->address);
+		       "Address", localHalBtPluginData->selectedBtDevice->address,
+		       "A2dp", localHalBtPluginData->selectedBtDevice->a2dp);
 	
 	AFB_ReqSuccess(request, selectedBtDeviceObject, "Selected Bluetooth device");
 }
@@ -159,6 +163,11 @@ void HalBtSetSelectedBluetoothDevice(AFB_ReqT request)
 
 	if(! (selectedBtDeviceData = HalBtDataSearchBtDeviceByAddress(&localHalBtPluginData->first, requestedBtDeviceToSelect))) {
 		AFB_ReqFail(request, "requested_device_to_select", "Requested bluetooth device to select is not currently connected");
+		return;
+	}
+
+	if(! selectedBtDeviceData->a2dp) {
+		AFB_ReqFail(request, "requested_device_to_select", "Requested bluetooth device to select is not able to use A2DP profile");
 		return;
 	}
 

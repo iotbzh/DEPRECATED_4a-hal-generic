@@ -55,6 +55,7 @@ int HalBtDataRemoveSelectedBtDeviceFromList(struct HalBtDeviceData **firstBtDevi
 		}
 	}
 
+	free(matchingBtDevice->hci);
 	free(matchingBtDevice->uid);
 	free(matchingBtDevice->name);
 	free(matchingBtDevice->address);
@@ -76,7 +77,6 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 	currentBtDeviceData = *firstBtDeviceData;
 
 	if(! currentBtDeviceData) {
-
 		currentBtDeviceData = (struct HalBtDeviceData *) calloc(1, sizeof(struct HalBtDeviceData));
 		if(! currentBtDeviceData)
 			return NULL;
@@ -84,7 +84,6 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		*firstBtDeviceData = currentBtDeviceData;
 	}
 	else {
-
 		while(currentBtDeviceData->next)
 			currentBtDeviceData = currentBtDeviceData->next;
 
@@ -95,6 +94,8 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		currentBtDeviceData = currentBtDeviceData->next;
 	}
 
+	// TODO JAI : get hci device of bt device here
+	// TODO JAI : check if a2dp profile is supported here
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
 			 "{s:s s:s}",
 			 "Name", &currentBtDeviceName,
@@ -104,6 +105,12 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 	}
 
 	if(asprintf(&currentBtDeviceData->uid, "BT#%s", currentBtDeviceAddress) == -1) {
+		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
+		return NULL;
+	}
+
+	// JAI : WARNING : hci bt device is currently harcoded
+	if(! (currentBtDeviceData->hci = strdup("hci0"))) {
 		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
 		return NULL;
 	}
@@ -118,7 +125,29 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		return NULL;
 	}
 
+	// JAI : WARNING : a2dp profile is currently harcoded
+	currentBtDeviceData->a2dp = 1;
+
 	return currentBtDeviceData;
+}
+
+struct HalBtDeviceData *HalBtDataGetFirstA2dpBtDeviceAvailable(struct HalBtDeviceData **firstBtDeviceData)
+{
+	struct HalBtDeviceData *currentBtDeviceData;
+
+	if(! firstBtDeviceData)
+		return NULL;
+
+	currentBtDeviceData = *firstBtDeviceData;
+
+	while(currentBtDeviceData) {
+		if(currentBtDeviceData->a2dp)
+			return currentBtDeviceData;
+
+		currentBtDeviceData = currentBtDeviceData->next;
+	}
+
+	return NULL;
 }
 
 int HalBtDataGetNumberOfBtDeviceInList(struct HalBtDeviceData **firstBtDeviceData)
@@ -184,15 +213,14 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 			return -3;
 
 		if(halBtPluginData->selectedBtDevice == currentBtDevice)
-			halBtPluginData->selectedBtDevice = halBtPluginData->first;
+			halBtPluginData->selectedBtDevice = HalBtDataGetFirstA2dpBtDeviceAvailable(&halBtPluginData->first);
 	}
 	else if(! currentBtDevice && currentBtDeviceIsConnected) {
-
 		if(! HalBtDataAddBtDeviceToBtDeviceList(&halBtPluginData->first, currentSingleBtDeviceDataJ))
 			return -4;
 
 		if(! halBtPluginData->selectedBtDevice)
-			halBtPluginData->selectedBtDevice = halBtPluginData->first;
+			halBtPluginData->selectedBtDevice = HalBtDataGetFirstA2dpBtDeviceAvailable(&halBtPluginData->first);
 	}
 
 	return 0;
