@@ -23,6 +23,7 @@ PROJECT_TARGET_ADD(hal-bt)
 			    hal-bt.c
 			    hal-bt-cb.c
 			    hal-bt-data.c
+			    hal-bt-mixer-link.c
 			    )
 
 		# Alsa Plugin properties

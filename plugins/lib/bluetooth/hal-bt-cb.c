@@ -26,6 +26,7 @@
 #include <ctl-plugin.h>
 
 #include "hal-bt-data.h"
+#include "hal-bt-mixer-link.h"
 
 /*******************************************************************************
  *		HAL Bluetooth plugin verbs functions			       *
@@ -51,6 +52,8 @@ void HalBtSetStreamingStatus(AFB_ReqT request)
 
 	json_object *requestJson;
 
+	AFB_ApiT apiHandle;
+
 	if(! (localHalBtPluginData = (struct HalBtPluginData *) afb_request_get_vcbdata(request))) {
 		AFB_ReqFail(request, "bt_plugin_data", "Can't get bluetooth plugin data");
 		return;
@@ -61,6 +64,11 @@ void HalBtSetStreamingStatus(AFB_ReqT request)
 		return;
 	}
 
+	if(! (apiHandle = (AFB_ApiT ) afb_request_get_dynapi(request))) {
+		AFB_ReqFail(request, "api_handle", "Can't get current hal controller api handle");
+		return;
+	}
+
 	if(wrap_json_unpack(requestJson, "{s:b}", "status", &requestedBtStreamingStatus)) {
 		AFB_ReqFail(request, "requested_status", "Can't get requested bluetooth streaming status");
 		return;
@@ -68,7 +76,18 @@ void HalBtSetStreamingStatus(AFB_ReqT request)
 
 	localHalBtPluginData->btStreamEnabled = requestedBtStreamingStatus;
 	
-	// TODO JAI : Enable capture stream to playback using 'uid' used at 'set-capture' call
+	if(HalBtMixerLinkSetBtStreamingSettings(apiHandle,
+						localHalBtPluginData->currentHalData->ctlHalSpecificData->mixerApiName,
+						localHalBtPluginData->btStreamEnabled,
+						localHalBtPluginData->selectedBtDevice ? localHalBtPluginData->selectedBtDevice->hci : NULL,
+					 	localHalBtPluginData->selectedBtDevice ? localHalBtPluginData->selectedBtDevice->address : NULL)) {
+		AFB_ApiError(apiHandle,
+			     "Couldn't set bluetooth streaming settings during call to verb '%s' of api '%s'",
+			     MIXER_SET_STREAMED_BT_DEVICE_VERB,
+			     localHalBtPluginData->currentHalData->ctlHalSpecificData->mixerApiName);
+		AFB_ReqFail(request, "requested_device_to_select", "Error happened during set of streamed bt device");
+		return;
+	}
 
 	AFB_ReqSuccess(request, NULL, "Bluetooth streaming status successfully set");
 }
@@ -146,6 +165,8 @@ void HalBtSetSelectedBluetoothDevice(AFB_ReqT request)
 
 	json_object *requestJson;
 
+	AFB_ApiT apiHandle;
+
 	if(! (localHalBtPluginData = (struct HalBtPluginData *) afb_request_get_vcbdata(request))) {
 		AFB_ReqFail(request, "bt_plugin_data", "Can't get bluetooth plugin data");
 		return;
@@ -153,6 +174,11 @@ void HalBtSetSelectedBluetoothDevice(AFB_ReqT request)
 
 	if(! (requestJson = AFB_ReqJson(request))) {
 		AFB_ReqFail(request, "request_json", "Can't get request json");
+		return;
+	}
+
+	if(! (apiHandle = (AFB_ApiT ) afb_request_get_dynapi(request))) {
+		AFB_ReqFail(request, "api_handle", "Can't get current hal controller api handle");
 		return;
 	}
 
@@ -173,8 +199,18 @@ void HalBtSetSelectedBluetoothDevice(AFB_ReqT request)
 
 	localHalBtPluginData->selectedBtDevice = selectedBtDeviceData;
 
-	// TODO JAI : Tell the softmixer that we want it as an input using 'bluealsa:HCI=hci0,DEV=F6:32:15:2A:80:70,PROFILE=a2dp' 
-	//	      string as capture associated with an 'uid' using smixer verb 'set-capture'
+	if(HalBtMixerLinkSetBtStreamingSettings(apiHandle,
+						localHalBtPluginData->currentHalData->ctlHalSpecificData->mixerApiName,
+						localHalBtPluginData->btStreamEnabled,
+						localHalBtPluginData->selectedBtDevice->hci,
+						localHalBtPluginData->selectedBtDevice->address)) {
+		AFB_ApiError(apiHandle,
+			     "Couldn't set bluetooth streaming settings during call to verb '%s' of api '%s'",
+			     MIXER_SET_STREAMED_BT_DEVICE_VERB,
+			     localHalBtPluginData->currentHalData->ctlHalSpecificData->mixerApiName);
+		AFB_ReqFail(request, "requested_device_to_select", "Error happened during set of streamed bt device");
+		return;
+	}
 
 	AFB_ReqSuccess(request, NULL, "Selected bluetooth device successfully set");
 }

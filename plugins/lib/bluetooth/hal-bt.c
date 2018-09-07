@@ -28,6 +28,7 @@
 #include "hal-bt.h"
 #include "hal-bt-cb.h"
 #include "hal-bt-data.h"
+#include "hal-bt-mixer-link.h"
 
 // Local (static) Hal manager data structure
 static struct HalBtPluginData localHalBtPluginData;
@@ -171,11 +172,18 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 
 	if(localHalBtPluginData.selectedBtDevice) {
 		localHalBtPluginData.btStreamEnabled = 1;
-		/* TODO JAI : send selected device to softmixer (and enable stream here for now)
-					* Tell the softmixer that we want it as an input using 'bluealsa:HCI=hci0,DEV=F6:32:15:2A:80:70,PROFILE=a2dp'
-					  string as capture associated with an 'uid' using smixer verb 'set-capture'
-					* Enable capture stream to playback using 'uid' used at 'set-capture' call
-		*/
+
+		if(HalBtMixerLinkSetBtStreamingSettings(source->api,
+							localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName,
+							localHalBtPluginData.btStreamEnabled,
+							localHalBtPluginData.selectedBtDevice->hci,
+							localHalBtPluginData.selectedBtDevice->address)) {
+			AFB_ApiError(source->api,
+				     "Couldn't set bluetooth streaming settings during call to verb '%s' of api '%s'",
+				     MIXER_SET_STREAMED_BT_DEVICE_VERB,
+				     localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName);
+			return -8;
+		}
 	}
 
 	return 0;
@@ -191,18 +199,24 @@ CTLP_CAPI(events, source, argsJ, queryJ)
 		return -1;
 	}
 
-	if(localHalBtPluginData.selectedBtDevice && localHalBtPluginData.selectedBtDevice != previouslySelectedBtDevice) {
+	if(localHalBtPluginData.selectedBtDevice && localHalBtPluginData.selectedBtDevice != previouslySelectedBtDevice)
 		localHalBtPluginData.btStreamEnabled = 1;
-		/* TODO JAI : send selected device to softmixer (and enable stream here for now)
-					* Tell the softmixer that we want it as an input using 'bluealsa:HCI=hci0,DEV=F6:32:15:2A:80:70,PROFILE=a2dp'
-					  string as capture associated with an 'uid' using smixer verb 'set-capture'
-					* Enable capture stream to playback using 'uid' used at 'set-capture' call
-		*/
-	}
-	else if (! localHalBtPluginData.selectedBtDevice) {
+	else if (! localHalBtPluginData.selectedBtDevice)
 		localHalBtPluginData.btStreamEnabled = 0;
-		// TODO JAI: Disable capture stream to playback using 'uid' used at 'set-capture' call
+	else
+		return 0;
+
+	if(HalBtMixerLinkSetBtStreamingSettings(source->api,
+						localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName,
+						localHalBtPluginData.btStreamEnabled,
+						localHalBtPluginData.selectedBtDevice ? localHalBtPluginData.selectedBtDevice->hci : NULL,
+						localHalBtPluginData.selectedBtDevice ? localHalBtPluginData.selectedBtDevice->address : NULL)) {
+		AFB_ApiError(source->api,
+			     "Couldn't set bluetooth streaming settings during call to verb '%s' of api '%s'",
+			     MIXER_SET_STREAMED_BT_DEVICE_VERB,
+			     localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName);
+		return -2;
 	}
 
-	return 0;
+	return 1;
 }

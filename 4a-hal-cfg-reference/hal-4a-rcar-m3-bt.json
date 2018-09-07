@@ -131,6 +131,27 @@
                 ]
             }
         },
+        "captures": [
+            {
+                "uid": "bluetooth",
+                "pcmplug_params": "bluealsa_proxy",
+                "params": {
+                    "channels": 2
+                },
+                "source": {
+                    "channels": [
+                        {
+                            "uid": "bluetooth-right",
+                            "port": 0
+                        },
+                        {
+                            "uid": "bluetooth-left",
+                            "port": 1
+                        }
+                    ]
+                }
+            }
+        ],
         "zones": [
             {
                 "uid": "full-stereo",
@@ -191,6 +212,19 @@
                 "params": {
                     "rate": 48000,
                     "format": "S16_LE"
+                }
+            },
+            {
+                "uid": "bluetooth_stream",
+                "verb": "bluetooth_stream",
+                "zone": "front-seats",
+                "source" : "bluetooth",
+                "volume": 85,
+                "mute": false,
+                "params": {
+                    "rate" : 48000,
+                    "format": "S16_LE",
+                    "channels": 2
                 }
             }
         ]
