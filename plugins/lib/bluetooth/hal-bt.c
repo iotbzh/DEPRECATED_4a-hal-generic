@@ -41,7 +41,10 @@ CTLP_ONLOAD(plugin, callbacks)
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
 
-	AFB_RequireApi(plugin->api, BT_MANAGER_API, 1);
+	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
+		AFB_ApiError(plugin->api, "Didn't succeed to require %s api", BT_MANAGER_API);
+		return -1;
+	}
 
 	/* TDB JAI :
 		- Register 'init' plugin function (HAL_BT_PLUGIN_NAME#init) as onload action here (to avoid adding it in json)
