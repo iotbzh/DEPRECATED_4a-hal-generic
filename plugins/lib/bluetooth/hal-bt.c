@@ -136,9 +136,10 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	wrap_json_pack(&toSendJ, "{s:s}", "value", BT_MANAGER_DEVICE_UPDATE_EVENT);
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_SUBSCRIBE_VERB, toSendJ, &returnedJ)) {
 		AFB_ApiError(source->api,
-			     "Error during call to verb '%s' of '%s' api",
+			     "Error during call to verb '%s' of '%s' api (%s)",
 			     BT_MANAGER_SUBSCRIBE_VERB,
-			     BT_MANAGER_API);
+			     BT_MANAGER_API,
+				 json_object_get_string(returnedJ));
 
 		return -6;
 	}
@@ -153,9 +154,10 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_GET_DEVICES_VERB, NULL, &returnedJ)) {
 		AFB_ApiError(source->api,
-			     "Error during call to verb '%s' of '%s' api",
+			     "Error during call to verb '%s' of '%s' api (%s)",
 			     BT_MANAGER_GET_DEVICES_VERB,
-			     BT_MANAGER_API);
+			     BT_MANAGER_API,
+				 json_object_get_string(returnedJ));
 
 		return -7;
 	}
