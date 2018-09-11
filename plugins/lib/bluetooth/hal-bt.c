@@ -45,19 +45,21 @@ CTLP_ONLOAD(plugin, callbacks)
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
 
 	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
-		AFB_ApiError(plugin->api, "Didn't succeed to require %s api", BT_MANAGER_API);
-		return -1;
+		AFB_ApiWarning(plugin->api, "Didn't succeed to require %s api, bluetooth is disable because not reachable", BT_MANAGER_API);
+		return 0;
 	}
 
 	if(! (ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(plugin->api))) {
 		AFB_ApiError(plugin->api, "Can't get current hal controller config");
-		return -2;
+		return -1;
 	}
 
 	if(! (localHalBtPluginData.currentHalData = (struct SpecificHalData *) ctrlConfig->external)) {
 		AFB_ApiError(plugin->api, "%s: Can't get current hal controller data", __func__);
-		return -3;
+		return -2;
 	}
+
+	localHalBtPluginData.halBtPluginEnabled = 1;
 
 	/* TDB JAI :
 		- Register 'init' plugin function (HAL_BT_PLUGIN_NAME#init) as onload action here (to avoid adding it in json)
@@ -73,6 +75,11 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	unsigned int err;
 
 	struct json_object *toSendJ, *returnedJ, *returnedBtList = NULL;
+
+	if(! localHalBtPluginData.halBtPluginEnabled) {
+		AFB_ApiWarning(source->api, "Controller onload initialization of HAL-BT plugin cannot be done because bluetooth is not reachable");
+		return 0;
+	}
 
 	AFB_ApiNotice(source->api, "Initializing HAL-BT plugin");
 
@@ -195,6 +202,11 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 CTLP_CAPI(events, source, argsJ, queryJ)
 {
 	struct HalBtDeviceData *previouslySelectedBtDevice = localHalBtPluginData.selectedBtDevice;
+
+	if(! localHalBtPluginData.halBtPluginEnabled) {
+		AFB_ApiWarning(source->api, "Bluetooth event received but cannot be handled because bluetooth is not reachable");
+		return 0;
+	}
 
 	if(HalBtDataHandleReceivedSingleBtDeviceData(&localHalBtPluginData, queryJ)) {
 		AFB_ApiError(source->api, "Error while decoding bluetooth event received json (%s)", json_object_get_string(queryJ));

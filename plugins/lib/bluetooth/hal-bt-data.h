@@ -41,9 +41,11 @@ struct HalBtDeviceData {
 
 // Structure to store hal bluetooth plugin data
 struct HalBtPluginData {
-	unsigned int btStreamEnabled;
+	unsigned int halBtPluginEnabled;
 
 	struct SpecificHalData *currentHalData;
+
+	unsigned int btStreamEnabled;
 
 	struct HalBtDeviceData *selectedBtDevice;
 	struct HalBtDeviceData *first;
