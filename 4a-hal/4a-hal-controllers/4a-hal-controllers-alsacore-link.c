@@ -24,7 +24,7 @@
 
 #include <alsa/asoundlib.h>
 
-#include <ctl-plugin.h>
+#include <ctl-config.h>
 
 #include "../4a-hal-utilities/4a-hal-utilities-data.h"
 #include "../4a-hal-utilities/4a-hal-utilities-appfw-responses-handler.h"

@@ -23,7 +23,7 @@
 
 #include <wrap-json.h>
 
-#include <ctl-plugin.h>
+#include <ctl-config.h>
 
 #include "hal-bt.h"
 #include "hal-bt-cb.h"

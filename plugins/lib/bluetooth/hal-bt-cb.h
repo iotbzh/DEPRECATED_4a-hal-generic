@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include <ctl-plugin.h>
+#include <ctl-config.h>
 
 #define HAL_BT_GET_STREAMING_STATUS_VERB	"get_bt_streaming_status"
 #define HAL_BT_SET_STREAMING_STATUS_VERB	"set_bt_streaming_status"

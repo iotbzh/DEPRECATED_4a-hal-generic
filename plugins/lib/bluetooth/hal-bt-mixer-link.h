@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include <ctl-plugin.h>
+#include <ctl-config.h>
 
 #define MIXER_SET_STREAMED_BT_DEVICE_VERB	"bluezalsa_dev"
 

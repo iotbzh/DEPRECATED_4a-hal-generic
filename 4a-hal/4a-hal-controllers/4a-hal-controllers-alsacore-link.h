@@ -24,7 +24,7 @@
 
 #include <alsa/asoundlib.h>
 
-#include <ctl-plugin.h>
+#include <ctl-config.h>
 
 #define ALSACORE_API			"alsacore"
 #define ALSACORE_SUBSCRIBE_VERB		"subscribe"
