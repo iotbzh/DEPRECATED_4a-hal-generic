@@ -54,7 +54,7 @@ int HalBtMixerLinkSetBtStreamingSettings(AFB_ApiT apiHandle, char *mixerApiName,
 			     mixerApiName);
 		return -3;
 	}
-	else if(wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedError)) {
+	else if(! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedError)) {
 		AFB_ApiError(apiHandle,
 			     "Error '%s' happened during set bluetooth streaming settings during call to verb '%s' of api '%s'",
 			     returnedError ? returnedError : "no_error_string",
