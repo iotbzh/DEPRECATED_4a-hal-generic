@@ -13,7 +13,6 @@
         {
             "uid": "hal-bt",
             "info": "Bluetooth hal plugin to get selected bluetooth device as an input by tweaking softmixer configuration",
-            "spath": "./package/lib/plugins:./package/var:./lib/plugins:./var:/usr/libexec/agl/4a-hal/lib/plugins",
             "libs": ["hal-bt.ctlso"]
         }
     ],
