@@ -45,6 +45,8 @@ struct HalBtDeviceData {
 struct HalBtPluginData {
 	unsigned int halBtPluginEnabled;
 
+	AFB_ApiT currentHalApiHandle;
+
 	struct SpecificHalData *currentHalData;
 
 	unsigned int btStreamEnabled;

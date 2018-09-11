@@ -118,7 +118,7 @@ void HalBtGetA2DPBluetoothDevices(AFB_ReqT request)
 	while(currentBtDeviceData) {
 		wrap_json_pack(&currentBtDeviceObjectJ,
 			       "{s:s s:s s:s s:b}",
-			       "Hci", currentBtDeviceData->hci,
+			       "Interface", currentBtDeviceData->hci,
 			       "Name", currentBtDeviceData->name,
 			       "Address", currentBtDeviceData->address);
 		json_object_array_add(requestAnswer, currentBtDeviceObjectJ);
@@ -147,7 +147,7 @@ void HalBtGetSelectedA2DPBluetoothDevice(AFB_ReqT request)
 
 	wrap_json_pack(&selectedBtDeviceObject,
 		       "{s:s s:s s:s s:b}",
-		       "Hci", localHalBtPluginData->selectedBtDevice->hci,
+		       "Interface", localHalBtPluginData->selectedBtDevice->hci,
 		       "Name", localHalBtPluginData->selectedBtDevice->name,
 		       "Address", localHalBtPluginData->selectedBtDevice->address);
 	

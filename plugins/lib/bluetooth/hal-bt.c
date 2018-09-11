@@ -40,9 +40,11 @@ CTLP_ONLOAD(plugin, callbacks)
 {
 	CtlConfigT *ctrlConfig;
 
-	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+	AFB_ApiInfo(plugin->api, "Hal-Bt Plugin Registering: uid='%s' 'info='%s'", plugin->uid, plugin->info);
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
+
+	localHalBtPluginData.currentHalApiHandle = plugin->api;
 
 	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
 		AFB_ApiWarning(plugin->api, "Didn't succeed to require %s api, bluetooth is disable because not reachable", BT_MANAGER_API);
@@ -61,6 +63,8 @@ CTLP_ONLOAD(plugin, callbacks)
 
 	localHalBtPluginData.halBtPluginEnabled = 1;
 
+	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered correctly: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+
 	/* TDB JAI :
 		- Register 'init' plugin function (HAL_BT_PLUGIN_NAME#init) as onload action here (to avoid adding it in json)
 		- Register 'event' plugin function (HAL_BT_PLUGIN_NAME#event) as action for BT_MANAGER_API#BT_MANAGER_DEVICE_UPDATE_EVENT event here (to avoid adding it in json)
@@ -74,6 +78,8 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 {
 	unsigned int err;
 
+	char *returnedInfo;
+
 	struct json_object *toSendJ, *returnedJ, *returnedBtList = NULL;
 
 	if(! localHalBtPluginData.halBtPluginEnabled) {
@@ -81,7 +87,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 		return 0;
 	}
 
-	AFB_ApiNotice(source->api, "Initializing HAL-BT plugin");
+	AFB_ApiInfo(source->api, "Controller onload initialization of HAL-BT plugin");
 
 	// Loading hal BT plugin specific verbs
 	if(afb_dynapi_add_verb(source->api,
@@ -146,16 +152,17 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			     "Error during call to verb '%s' of '%s' api (%s)",
 			     BT_MANAGER_SUBSCRIBE_VERB,
 			     BT_MANAGER_API,
-				 json_object_get_string(returnedJ));
+			     json_object_get_string(returnedJ));
 
 		return -6;
 	}
-	else if(! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", NULL)) {
+	else if(! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedInfo)) {
 		AFB_ApiError(source->api,
-			     "Couldn't subscribe to event '%s' during call to verb '%s' of api '%s'",
+			     "Couldn't subscribe to event '%s' during call to verb '%s' of api '%s' (error '%s')",
 			     BT_MANAGER_DEVICE_UPDATE_EVENT,
 			     BT_MANAGER_SUBSCRIBE_VERB,
-			     BT_MANAGER_API);
+			     BT_MANAGER_API,
+			     returnedInfo);
 		return -6;
 	}
 
@@ -164,7 +171,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			     "Error during call to verb '%s' of '%s' api (%s)",
 			     BT_MANAGER_GET_DEVICES_VERB,
 			     BT_MANAGER_API,
-				 json_object_get_string(returnedJ));
+			     json_object_get_string(returnedJ));
 
 		return -7;
 	}
@@ -182,6 +189,8 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	if(localHalBtPluginData.selectedBtDevice) {
 		localHalBtPluginData.btStreamEnabled = 1;
 
+		AFB_ApiInfo(source->api, "Useable bluetooth device detected at initialization, will try to use it");
+
 		if(HalBtMixerLinkSetBtStreamingSettings(source->api,
 							localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName,
 							localHalBtPluginData.btStreamEnabled,
@@ -194,6 +203,8 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			return -8;
 		}
 	}
+
+	AFB_ApiNotice(source->api, "Controller onload initialization of HAL-BT plugin correctly done");
 
 	return 0;
 }

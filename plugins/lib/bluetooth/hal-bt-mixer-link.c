@@ -40,12 +40,17 @@ int HalBtMixerLinkSetBtStreamingSettings(AFB_ApiT apiHandle, char *mixerApiName,
 	if(! apiHandle || ! mixerApiName)
 		return -1;
 
-	if(! btStreamStatus)
+	if(! btStreamStatus) {
+		AFB_ApiDebug(apiHandle, "Will try to disable bluetooth streamed device");
 		toSendJ = NULL;
-	else if(btStreamStatus == 1 && hci && btAddress)
+	}
+	else if(btStreamStatus == 1 && hci && btAddress) {
+		AFB_ApiDebug(apiHandle, "Will try to change bluetooth streamed device to hci='%s' address='%s'", hci, btAddress);
 		wrap_json_pack(&toSendJ, "{s:s s:s s:s}", "interface", hci, "device", btAddress, "profile", "a2dp");
-	else
-		return -3;
+	}
+	else {
+		return -2;
+	}
 
 	if(AFB_ServiceSync(apiHandle, mixerApiName, MIXER_SET_STREAMED_BT_DEVICE_VERB, toSendJ, &returnedJ)) {
 		AFB_ApiError(apiHandle,
@@ -62,6 +67,11 @@ int HalBtMixerLinkSetBtStreamingSettings(AFB_ApiT apiHandle, char *mixerApiName,
 			     mixerApiName);
 		return -4;
 	}
+
+	if(btStreamStatus)
+		AFB_ApiInfo(apiHandle, "Bluetooth streamed device changed to hci='%s' address='%s'", hci, btAddress);
+	else
+		AFB_ApiInfo(apiHandle, "Bluetooth streamed device disbaled");
 
 	return 0;
 }

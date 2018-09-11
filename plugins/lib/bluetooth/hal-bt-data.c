@@ -220,15 +220,27 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 		if(HalBtDataRemoveSelectedBtDeviceFromList(&halBtPluginData->first, currentBtDevice))
 			return -3;
 
-		if(halBtPluginData->selectedBtDevice == currentBtDevice)
+		AFB_ApiInfo(halBtPluginData->currentHalApiHandle, "Bluetooth device (address = %s) successfully removed from list", currentBtDeviceAddress);
+
+		if(halBtPluginData->selectedBtDevice == currentBtDevice) {
 			halBtPluginData->selectedBtDevice = halBtPluginData->first;
+			AFB_ApiDebug(halBtPluginData->currentHalApiHandle,
+				     "Bluetooth selected device changed to '%s'",
+				     halBtPluginData->selectedBtDevice ? halBtPluginData->selectedBtDevice->address : "none");
+		}
 	}
 	else if(! currentBtDevice && currentBtDeviceIsConnected) {
 		if(! HalBtDataAddBtDeviceToBtDeviceList(&halBtPluginData->first, currentSingleBtDeviceDataJ))
 			return -4;
 
-		if(! halBtPluginData->selectedBtDevice)
+		AFB_ApiInfo(halBtPluginData->currentHalApiHandle, "Bluetooth device (address = %s) successfully added from list", currentBtDeviceAddress);
+
+		if(! halBtPluginData->selectedBtDevice) {
 			halBtPluginData->selectedBtDevice = halBtPluginData->first;
+			AFB_ApiDebug(halBtPluginData->currentHalApiHandle,
+				     "Bluetooth selected device changed to '%s'",
+				     halBtPluginData->selectedBtDevice ? halBtPluginData->selectedBtDevice->address : "none");
+		}
 	}
 
 	return 0;
