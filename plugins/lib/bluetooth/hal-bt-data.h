@@ -26,6 +26,10 @@
 
 #include <4a-hal-utilities-data.h>
 
+#define A2DP_AUDIOSOURCE_UUID	"0000110a-0000-1000-8000-00805f9b34fb"
+#define HSP_GATEAWAY_UUID	"00001112-0000-1000-8000-00805f9b34fb"
+#define HFP_GATEAWAY_UUID	"0000111f-0000-1000-8000-00805f9b34fb"
+
 // Structure to store bluetooth device data
 struct HalBtDeviceData {
 	char *uid;
@@ -33,8 +37,6 @@ struct HalBtDeviceData {
 	char *hci;
 	char *name;
 	char *address;
-
-	unsigned int a2dp;
 
 	struct HalBtDeviceData *next;
 };

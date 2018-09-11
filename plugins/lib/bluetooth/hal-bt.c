@@ -107,35 +107,35 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	}
 
 	if(afb_dynapi_add_verb(source->api, 
-			       HAL_BT_GET_CONNECTED_DEVICES_VERB,
-			       "Get connected Bluetooth devices list",
-			       HalBtGetConnectedBluetoothDevices,
+			       HAL_BT_GET_CONNECTED_A2DP_DEVICES_VERB,
+			       "Get connected Bluetooth A2DP devices list",
+			       HalBtGetA2DPBluetoothDevices,
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_CONNECTED_DEVICES_VERB);
+		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_CONNECTED_A2DP_DEVICES_VERB);
 		return -3;
 	}
 
 	if(afb_dynapi_add_verb(source->api,
-			       HAL_BT_GET_SELECTED_DEVICE_VERB,
-			       "Get selected Bluetooth device",
-			       HalBtGetSelectedBluetoothDevice,
+			       HAL_BT_GET_SELECTED_A2DP_DEVICE_VERB,
+			       "Get selected Bluetooth A2DP device",
+			       HalBtGetSelectedA2DPBluetoothDevice,
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_SELECTED_DEVICE_VERB);
+		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_SELECTED_A2DP_DEVICE_VERB);
 		return -4;
 	}
 
 	if(afb_dynapi_add_verb(source->api,
-			       HAL_BT_SET_SELECTED_DEVICE_VERB,
-			       "Set selected Bluetooth device",
-			       HalBtSetSelectedBluetoothDevice,
+			       HAL_BT_SET_SELECTED_A2DP_DEVICE_VERB,
+			       "Set selected Bluetooth A2DP device",
+			       HalBtSetSelectedA2DPBluetoothDevice,
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_SET_SELECTED_DEVICE_VERB);
+		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_SET_SELECTED_A2DP_DEVICE_VERB);
 		return -5;
 	}
 

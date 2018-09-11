@@ -95,11 +95,10 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 	}
 
 	// TODO JAI : get hci device of bt device here
-	// TODO JAI : check if a2dp profile is supported here
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			 "{s:s s:s}",
-			 "Name", &currentBtDeviceName,
-			 "Address", &currentBtDeviceAddress)) {
+			    "{s:s s:s s:o}",
+			    "Name", &currentBtDeviceName,
+			    "Address", &currentBtDeviceAddress)) {
 		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
 		return NULL;
 	}
@@ -125,29 +124,7 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		return NULL;
 	}
 
-	// JAI : WARNING : a2dp profile is currently harcoded
-	currentBtDeviceData->a2dp = 1;
-
 	return currentBtDeviceData;
-}
-
-struct HalBtDeviceData *HalBtDataGetFirstA2dpBtDeviceAvailable(struct HalBtDeviceData **firstBtDeviceData)
-{
-	struct HalBtDeviceData *currentBtDeviceData;
-
-	if(! firstBtDeviceData)
-		return NULL;
-
-	currentBtDeviceData = *firstBtDeviceData;
-
-	while(currentBtDeviceData) {
-		if(currentBtDeviceData->a2dp)
-			return currentBtDeviceData;
-
-		currentBtDeviceData = currentBtDeviceData->next;
-	}
-
-	return NULL;
 }
 
 int HalBtDataGetNumberOfBtDeviceInList(struct HalBtDeviceData **firstBtDeviceData)
@@ -190,22 +167,51 @@ struct HalBtDeviceData *HalBtDataSearchBtDeviceByAddress(struct HalBtDeviceData 
 
 int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPluginData, json_object *currentSingleBtDeviceDataJ)
 {
-	unsigned int currentBtDeviceIsConnected;
+	int btProfilesCount;
+
+	unsigned int idx = 0, currentBtDeviceIsConnected, currentBtDeviceIsA2DP;
 
 	char *currentBtDeviceAddress, *currentBtDeviceIsConnectedString;
+
+	json_object *currentBtAllProfilesJ, *currentBtCurrentProfileJ;
 
 	struct HalBtDeviceData *currentBtDevice;
 	if(! halBtPluginData || ! currentSingleBtDeviceDataJ)
 		return -1;
 
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			    "{s:s s:s}",
+			    "{s:s s:s s:s}",
 			    "Address", &currentBtDeviceAddress,
-			    "Connected", &currentBtDeviceIsConnectedString)) {
+			    "Connected", &currentBtDeviceIsConnectedString,
+			    "UUIDs", &currentBtAllProfilesJ)) {
 		return -2;
 	}
 
+	if(json_object_is_type(currentBtAllProfilesJ, json_type_array)) {
+		btProfilesCount = json_object_array_length(currentBtAllProfilesJ);
+
+		while(idx < btProfilesCount) {
+			currentBtCurrentProfileJ = json_object_array_get_idx(currentBtAllProfilesJ, idx);
+
+			if(json_object_is_type(currentBtCurrentProfileJ, json_type_string) &&
+			   ! strncasecmp(json_object_get_string(currentBtCurrentProfileJ), A2DP_AUDIOSOURCE_UUID, sizeof(A2DP_AUDIOSOURCE_UUID))) {
+				currentBtDeviceIsA2DP = 1;
+				break;
+			}
+
+			idx++;
+		}
+	}
+	else if(json_object_is_type(currentBtAllProfilesJ, json_type_string) &&
+		! strncasecmp(json_object_get_string(currentBtAllProfilesJ), A2DP_AUDIOSOURCE_UUID, sizeof(A2DP_AUDIOSOURCE_UUID))) {
+		currentBtDeviceIsA2DP = 1;
+	}
+
+	if(! currentBtDeviceIsA2DP)
+		return 0;
+
 	currentBtDeviceIsConnected = ! strncmp(currentBtDeviceIsConnectedString, "True", strlen(currentBtDeviceIsConnectedString));
+
 	currentBtDevice = HalBtDataSearchBtDeviceByAddress(&halBtPluginData->first, currentBtDeviceAddress);
 
 	if(currentBtDevice && ! currentBtDeviceIsConnected) {
@@ -213,14 +219,14 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 			return -3;
 
 		if(halBtPluginData->selectedBtDevice == currentBtDevice)
-			halBtPluginData->selectedBtDevice = HalBtDataGetFirstA2dpBtDeviceAvailable(&halBtPluginData->first);
+			halBtPluginData->selectedBtDevice = halBtPluginData->first;
 	}
 	else if(! currentBtDevice && currentBtDeviceIsConnected) {
 		if(! HalBtDataAddBtDeviceToBtDeviceList(&halBtPluginData->first, currentSingleBtDeviceDataJ))
 			return -4;
 
 		if(! halBtPluginData->selectedBtDevice)
-			halBtPluginData->selectedBtDevice = HalBtDataGetFirstA2dpBtDeviceAvailable(&halBtPluginData->first);
+			halBtPluginData->selectedBtDevice = halBtPluginData->first;
 	}
 
 	return 0;
