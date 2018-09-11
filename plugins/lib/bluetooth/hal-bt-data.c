@@ -96,7 +96,7 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 
 	// TODO JAI : get hci device of bt device here
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			    "{s:s s:s s:o}",
+			    "{s:s s:s}",
 			    "Name", &currentBtDeviceName,
 			    "Address", &currentBtDeviceAddress)) {
 		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
@@ -171,7 +171,7 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 
 	unsigned int idx = 0, currentBtDeviceIsConnected, currentBtDeviceIsA2DP;
 
-	char *currentBtDeviceAddress, *currentBtDeviceIsConnectedString;
+	char *currentBtDeviceAddress, *currentBtDeviceIsConnectedString, *currentBtDeviceIsAVPConnectedString;
 
 	json_object *currentBtAllProfilesJ, *currentBtCurrentProfileJ;
 
@@ -180,9 +180,10 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 		return -1;
 
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			    "{s:s s:s s:s}",
+			    "{s:s s:s s:s s:o}",
 			    "Address", &currentBtDeviceAddress,
 			    "Connected", &currentBtDeviceIsConnectedString,
+			    "AVPConnected", &currentBtDeviceIsAVPConnectedString,
 			    "UUIDs", &currentBtAllProfilesJ)) {
 		return -2;
 	}
@@ -210,7 +211,8 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 	if(! currentBtDeviceIsA2DP)
 		return 0;
 
-	currentBtDeviceIsConnected = ! strncmp(currentBtDeviceIsConnectedString, "True", strlen(currentBtDeviceIsConnectedString));
+	currentBtDeviceIsConnected = ((! strncmp(currentBtDeviceIsConnectedString, "True", strlen(currentBtDeviceIsConnectedString))) &&
+				      (! strncmp(currentBtDeviceIsAVPConnectedString, "True", strlen(currentBtDeviceIsAVPConnectedString))));
 
 	currentBtDevice = HalBtDataSearchBtDeviceByAddress(&halBtPluginData->first, currentBtDeviceAddress);
 
