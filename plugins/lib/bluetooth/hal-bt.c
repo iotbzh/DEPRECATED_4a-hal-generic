@@ -213,12 +213,15 @@ CTLP_CAPI(events, source, argsJ, queryJ)
 		return -1;
 	}
 
-	if(localHalBtPluginData.selectedBtDevice && localHalBtPluginData.selectedBtDevice != previouslySelectedBtDevice)
-		localHalBtPluginData.btStreamEnabled = 1;
-	else if (! localHalBtPluginData.selectedBtDevice)
-		localHalBtPluginData.btStreamEnabled = 0;
-	else
+	if(localHalBtPluginData.selectedBtDevice == previouslySelectedBtDevice) {
+		AFB_ApiDebug(source->api, "Bluetooth event received but device didn't change");
 		return 0;
+	}
+
+	if(localHalBtPluginData.selectedBtDevice)
+		localHalBtPluginData.btStreamEnabled = 1;
+	else
+		localHalBtPluginData.btStreamEnabled = 0;
 
 	if(HalBtMixerLinkSetBtStreamingSettings(source->api,
 						localHalBtPluginData.currentHalData->ctlHalSpecificData->mixerApiName,
@@ -232,5 +235,5 @@ CTLP_CAPI(events, source, argsJ, queryJ)
 		return -2;
 	}
 
-	return 1;
+	return 0;
 }
