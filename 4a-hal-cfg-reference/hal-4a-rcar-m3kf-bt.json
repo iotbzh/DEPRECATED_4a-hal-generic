@@ -16,24 +16,11 @@
             "libs": ["hal-bt.ctlso"]
         }
     ],
-    "onload": [
-        {
-            "uid": "init-bt-plugin",
-            "info": "Init Bluetooth hal plugin",
-            "action": "plugin://hal-bt#init"
-        }
-    ],
     "controls": [
         {
             "uid": "ping",
             "info": "Ping hal",
             "action": "api://4a-hal-manager#ping"
-        }
-    ],
-    "events": [
-        {
-            "uid": "Bluetooth-Manager/device_updated",
-            "action": "plugin://hal-bt#events"
         }
     ],
     "halmap": [
