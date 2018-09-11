@@ -80,7 +80,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 
 	char *returnedInfo;
 
-	struct json_object *toSendJ, *returnedJ, *returnedBtList = NULL;
+	json_object *toSendJ, *returnedJ, *returnedBtList;
 
 	if(! localHalBtPluginData.halBtPluginEnabled) {
 		AFB_ApiWarning(source->api, "Controller onload initialization of HAL-BT plugin cannot be done because bluetooth is not reachable");
@@ -163,8 +163,10 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			     BT_MANAGER_SUBSCRIBE_VERB,
 			     BT_MANAGER_API,
 			     returnedInfo);
+		json_object_put(returnedJ);
 		return -6;
 	}
+	json_object_put(returnedJ);
 
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_GET_DEVICES_VERB, NULL, &returnedJ)) {
 		AFB_ApiError(source->api,
@@ -180,11 +182,14 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			     "Couldn't get bluetooth device list during call to verb '%s' of api '%s'",
 			     BT_MANAGER_GET_DEVICES_VERB,
 			     BT_MANAGER_API);
+		json_object_put(returnedJ);
 		return -7;
 	}
 
 	if((err = HalBtDataHandleReceivedMutlipleBtDeviceData(&localHalBtPluginData, returnedBtList)))
 		return (10 * err);
+
+	json_object_put(returnedJ);
 
 	if(localHalBtPluginData.selectedBtDevice) {
 		localHalBtPluginData.btStreamEnabled = 1;

@@ -65,8 +65,11 @@ int HalBtMixerLinkSetBtStreamingSettings(AFB_ApiT apiHandle, char *mixerApiName,
 			     returnedError ? returnedError : "no_error_string",
 			     MIXER_SET_STREAMED_BT_DEVICE_VERB,
 			     mixerApiName);
+		json_object_put(returnedJ);
 		return -4;
 	}
+
+	json_object_put(returnedJ);
 
 	if(btStreamStatus)
 		AFB_ApiInfo(apiHandle, "Bluetooth streamed device changed to hci='%s' address='%s'", hci, btAddress);
