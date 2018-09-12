@@ -173,19 +173,24 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 
 	char *currentBtDeviceAddress, *currentBtDeviceIsConnectedString, *currentBtDeviceIsAVPConnectedString;
 
-	json_object *currentBtAllProfilesJ, *currentBtCurrentProfileJ;
+	json_object *currentBtAllProfilesJ = NULL, *currentBtCurrentProfileJ;
 
 	struct HalBtDeviceData *currentBtDevice;
 	if(! halBtPluginData || ! currentSingleBtDeviceDataJ)
 		return -1;
 
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			    "{s:s s:s s:s s:o}",
+			    "{s:s s:s s:s s?:o}",
 			    "Address", &currentBtDeviceAddress,
 			    "Connected", &currentBtDeviceIsConnectedString,
 			    "AVPConnected", &currentBtDeviceIsAVPConnectedString,
 			    "UUIDs", &currentBtAllProfilesJ)) {
 		return -2;
+	}
+
+	if(! currentBtAllProfilesJ) {
+		AFB_ApiInfo(halBtPluginData->currentHalApiHandle, "Bluetooth device (address = %s) has no specified profiles, ignore it", currentBtDeviceAddress);
+		return 0;
 	}
 
 	if(json_object_is_type(currentBtAllProfilesJ, json_type_array)) {
@@ -260,8 +265,9 @@ int HalBtDataHandleReceivedMutlipleBtDeviceData(struct HalBtPluginData *halBtPlu
 	btDeviceNumber = json_object_array_length(currentMultipleBtDeviceDataJ);
 
 	for(idx = 0; idx < btDeviceNumber; idx++) {
-		if((err = HalBtDataHandleReceivedSingleBtDeviceData(halBtPluginData, json_object_array_get_idx(currentMultipleBtDeviceDataJ, (unsigned int) idx))))
+		if((err = HalBtDataHandleReceivedSingleBtDeviceData(halBtPluginData, json_object_array_get_idx(currentMultipleBtDeviceDataJ, (unsigned int) idx)))) {
 			return ((int) idx * err * 10);
+		}
 	}
 
 	return 0;
