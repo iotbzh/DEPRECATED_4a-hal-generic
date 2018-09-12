@@ -67,7 +67,7 @@ int HalBtDataRemoveSelectedBtDeviceFromList(struct HalBtDeviceData **firstBtDevi
 
 struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceData **firstBtDeviceData, json_object *currentSingleBtDeviceDataJ)
 {
-	char *currentBtDeviceName, *currentBtDeviceAddress;
+	char *currentBtDeviceName, *currentBtDeviceAddress, *currentBtDevicePath, *currentBtDeviceHci;
 
 	struct HalBtDeviceData *currentBtDeviceData;
 
@@ -94,11 +94,11 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		currentBtDeviceData = currentBtDeviceData->next;
 	}
 
-	// TODO JAI : get hci device of bt device here
 	if(wrap_json_unpack(currentSingleBtDeviceDataJ,
-			    "{s:s s:s}",
+			    "{s:s s:s s:s}",
 			    "Name", &currentBtDeviceName,
-			    "Address", &currentBtDeviceAddress)) {
+			    "Address", &currentBtDeviceAddress,
+			    "Path", &currentBtDevicePath)) {
 		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
 		return NULL;
 	}
@@ -108,8 +108,11 @@ struct HalBtDeviceData *HalBtDataAddBtDeviceToBtDeviceList(struct HalBtDeviceDat
 		return NULL;
 	}
 
-	// JAI : WARNING : hci bt device is currently harcoded
-	if(! (currentBtDeviceData->hci = strdup("hci0"))) {
+	currentBtDeviceHci = strtok(currentBtDevicePath, "/");
+	while(currentBtDeviceHci && strncmp(currentBtDeviceHci, "hci", 3))
+		currentBtDeviceHci = strtok(NULL, "/");
+
+	if((! currentBtDeviceHci) || (! (currentBtDeviceData->hci = strdup(currentBtDeviceHci)))) {
 		HalBtDataRemoveSelectedBtDeviceFromList(firstBtDeviceData, currentBtDeviceData);
 		return NULL;
 	}
