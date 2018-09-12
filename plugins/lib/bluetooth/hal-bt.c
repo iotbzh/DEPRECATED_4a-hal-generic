@@ -76,11 +76,11 @@ CTLP_ONLOAD(plugin, callbacks)
 // Call at contoller onload time
 CTLP_CAPI(init, source, argsJ, queryJ)
 {
-	unsigned int err;
+	int err;
 
 	char *returnedInfo;
 
-	json_object *toSendJ, *returnedJ, *returnedBtList;
+	json_object *toSendJ, *returnedJ, *returnedBtList = NULL;
 
 	if(! localHalBtPluginData.halBtPluginEnabled) {
 		AFB_ApiWarning(source->api, "Controller onload initialization of HAL-BT plugin cannot be done because bluetooth is not reachable");
@@ -169,13 +169,22 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	json_object_put(returnedJ);
 
 	if(AFB_ServiceSync(source->api, BT_MANAGER_API, BT_MANAGER_GET_DEVICES_VERB, NULL, &returnedJ)) {
-		AFB_ApiError(source->api,
-			     "Error during call to verb '%s' of '%s' api (%s)",
-			     BT_MANAGER_GET_DEVICES_VERB,
-			     BT_MANAGER_API,
-			     json_object_get_string(returnedJ));
+		if((! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedInfo)) &&
+		   (! strncmp(returnedInfo, "No find devices", strlen(returnedInfo)))) {
+			AFB_ApiInfo(source->api,
+				    "No bluetooth devices returned by call to verb '%s' of '%s' api",
+				    BT_MANAGER_GET_DEVICES_VERB,
+				    BT_MANAGER_API);
+		}
+		else {
+			AFB_ApiError(source->api,
+				     "Error during call to verb '%s' of '%s' api (%s)",
+				     BT_MANAGER_GET_DEVICES_VERB,
+				     BT_MANAGER_API,
+				     json_object_get_string(returnedJ));
 
-		return -7;
+			return -7;
+		}
 	}
 	else if(wrap_json_unpack(returnedJ, "{s:{s:o}}", "response", "list", &returnedBtList)) {
 		AFB_ApiError(source->api,
@@ -186,7 +195,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 		return -7;
 	}
 
-	if((err = HalBtDataHandleReceivedMutlipleBtDeviceData(&localHalBtPluginData, returnedBtList)))
+	if((returnedBtList) && (err = HalBtDataHandleReceivedMutlipleBtDeviceData(&localHalBtPluginData, returnedBtList)))
 		return (10 * err);
 
 	json_object_put(returnedJ);
