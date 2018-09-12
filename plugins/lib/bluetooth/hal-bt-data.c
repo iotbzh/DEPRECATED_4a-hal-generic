@@ -238,7 +238,7 @@ int HalBtDataHandleReceivedSingleBtDeviceData(struct HalBtPluginData *halBtPlugi
 		if(! HalBtDataAddBtDeviceToBtDeviceList(&halBtPluginData->first, currentSingleBtDeviceDataJ))
 			return -4;
 
-		AFB_ApiInfo(halBtPluginData->currentHalApiHandle, "Bluetooth device (address = %s) successfully added from list", currentBtDeviceAddress);
+		AFB_ApiInfo(halBtPluginData->currentHalApiHandle, "Bluetooth device (address = %s) successfully added to list", currentBtDeviceAddress);
 
 		if(! halBtPluginData->selectedBtDevice) {
 			halBtPluginData->selectedBtDevice = halBtPluginData->first;
