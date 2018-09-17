@@ -116,21 +116,23 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 
 int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *MixerJ)
 {
+	int err = 0;
+
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentHalData;
 
 	if(! apiHandle || ! section)
 		return -1;
 
+	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
+	if(! ctrlConfig)
+		return -2;
+
+	currentHalData = (struct SpecificHalData *) ctrlConfig->external;
+	if(! currentHalData)
+		return -3;
+
 	if(MixerJ) {
-		ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
-		if(! ctrlConfig)
-			return -2;
-
-		currentHalData = (struct SpecificHalData *) ctrlConfig->external;
-		if(! currentHalData)
-			return -3;
-
 		if(json_object_is_type(MixerJ, json_type_object))
 			currentHalData->ctlHalSpecificData->halMixerJ = MixerJ;
 		else
@@ -140,6 +142,11 @@ int HalCtlsHalMixerConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object 
 			return -5;
 
 		wrap_json_unpack(MixerJ, "{s?:s}", "prefix", &currentHalData->ctlHalSpecificData->prefix);
+	}
+	else if(currentHalData->status == HAL_STATUS_AVAILABLE &&
+		(err = HalCtlsAttachToMixer(apiHandle))) {
+		AFB_ApiError(apiHandle, "%s: Error %i while attaching to mixer", __func__, err);
+		return -6;
 	}
 
 	return 0;

@@ -72,8 +72,6 @@ static AFB_ApiVerbs CtlHalDynApiStaticVerbs[] =
 
 static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 {
-	int err;
-
 	CtlConfigT *ctrlConfig;
 	struct SpecificHalData *currentCtlHalData;
 
@@ -109,16 +107,10 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 
 	currentCtlHalData->sndCardId = HalCtlsGetCardIdByCardPath(apiHandle, currentCtlHalData->sndCardPath);
 
-	if(currentCtlHalData->sndCardId < 0) {
+	if(currentCtlHalData->sndCardId < 0)
 		currentCtlHalData->status = HAL_STATUS_UNAVAILABLE;
-	}
-	else {
+	else
 		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
-		if((err = HalCtlsAttachToMixer(apiHandle))) {
-			AFB_ApiError(apiHandle, "Error %i while attaching to mixer", err);
-			return -4;
-		}
-	}
 
 	// TBD JAI: handle refresh of hal status for dynamic card (/dev/by-id)
 
