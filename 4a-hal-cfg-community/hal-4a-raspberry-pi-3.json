@@ -172,6 +172,16 @@
                     "rate": 48000,
                     "format": "S16_LE"
                 }
+            },
+            {
+                "uid": "radio_stream",
+                "verb": "radio_stream",
+                "zone": "full-stereo",
+                "volume": 70,
+                "mute": true,
+                "params": {
+                    "rate" : 48000
+                }
             }
         ]
     }

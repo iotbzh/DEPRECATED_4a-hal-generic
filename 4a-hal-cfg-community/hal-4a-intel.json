@@ -194,6 +194,16 @@
                 "params": {
                     "rate": 48000
                 }
+            },
+            {
+                "uid": "radio_stream",
+                "verb": "radio_stream",
+                "zone": "full-stereo",
+                "volume": 70,
+                "mute": true,
+                "params": {
+                    "rate" : 48000
+                }
             }
         ]
     }

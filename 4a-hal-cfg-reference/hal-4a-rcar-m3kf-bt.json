@@ -136,6 +136,25 @@
                         }
                     ]
                 }
+            },
+            {
+            	"uid": "radio",
+            	"path": "/dev/snd/by-path/platform-sound@2",
+            	"params": {
+               		"channels": 2
+            	},
+            	"source": {
+                    "channels": [
+                        {
+                    	    "uid": "radio-right",
+                            "port": 0
+                    	},
+                    	{
+                            "uid": "radio-left",
+                            "port": 1
+                    	}
+                    ]
+            	}
             }
         ],
         "zones": [
@@ -211,6 +230,17 @@
                     "rate" : 48000,
                     "format": "S16_LE",
                     "channels": 2
+                }
+            },
+            {
+                "uid": "radio_stream",
+                "verb": "radio_stream",
+                "zone": "full-stereo",
+                "source" : "radio",
+                "volume": 70,
+                "mute": true,
+                "params": {
+                    "rate" : 48000
                 }
             }
         ]
