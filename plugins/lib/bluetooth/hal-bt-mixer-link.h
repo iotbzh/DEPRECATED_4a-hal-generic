@@ -26,6 +26,39 @@
 
 #define MIXER_SET_STREAMED_BT_DEVICE_VERB	"bluezalsa_dev"
 
+#define MIXER_BT_CAPTURE_JSON_SECTION		"\
+{\
+	\"uid\": \"bluetooth\",\
+	\"pcmplug_params\": \"bluealsa_proxy\",\
+	\"source\": {\
+		\"channels\": [\
+			{\
+				\"uid\": \"bluetooth-right\",\
+				\"port\": 0\
+			},\
+			{\
+				\"uid\": \"bluetooth-left\",\
+				\"port\": 1\
+			}\
+		]\
+	}\
+}\
+"
+#define MIXER_BT_STREAM_JSON_SECTION		"\
+{\
+	\"uid\": \"bluetooth_stream\",\
+	\"verb\": \"bluetooth_stream\",\
+	\"source\" : \"bluetooth\",\
+	\"volume\": 80,\
+	\"mute\": false,\
+	\"params\": {\
+		\"rate\" : 48000,\
+		\"format\": \"S16_LE\",\
+		\"channels\": 2\
+	}\
+}\
+"
+
 // HAL controllers handle mixer bt calls functions	
 int HalBtMixerLinkSetBtStreamingSettings(AFB_ApiT apiHandle, char *mixerApiName, unsigned int btStreamStatus, char *hci, char *btAddress);
 

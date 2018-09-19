@@ -51,13 +51,15 @@ CTLP_ONLOAD(plugin, callbacks)
 
 CTLP_INIT(plugin, callbacks)
 {
+	int btChannelsNumber;
+
 	unsigned int idx;
 
-	char *returnedInfo;
+	char *btStreamZone, *returnedInfo;
 
 	CtlConfigT *ctrlConfig;
 
-	json_object *actionsToAdd, *returnedJ;
+	json_object *actionsToAdd, *returnedJ, *halMixerJ, *halOrigCaptureJ, *halNewCaptureJ, *halOrigStreamJ, *halNewStreamJ, *btCaptureJ, *btCaptureParamsJ, *btStreamJ;
 
 	AFB_ApiInfo(plugin->api, "Plugin initialization of HAL-BT plugin");
 
@@ -76,6 +78,12 @@ CTLP_INIT(plugin, callbacks)
 		return -2;
 	}
 
+	if((! localHalBtPluginData.currentHalData->ctlHalSpecificData) ||
+	   (! (halMixerJ = localHalBtPluginData.currentHalData->ctlHalSpecificData->halMixerJ))) {
+		AFB_ApiError(plugin->api, "Can't get current hal mixer json section");
+		return -3;
+	}
+
 	if(AFB_ServiceSync(plugin->api, BT_MANAGER_API, BT_MANAGER_GET_POWER_INFO, NULL, &returnedJ)) {
 		if((! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedInfo)) &&
 		   (! strncmp(returnedInfo, "Unable to get power status", strlen(returnedInfo)))) {
@@ -91,8 +99,14 @@ CTLP_INIT(plugin, callbacks)
 				     BT_MANAGER_GET_POWER_INFO,
 				     BT_MANAGER_API,
 				     json_object_get_string(returnedJ));
-			return -3;
+			return -4;
 		}
+	}
+
+	if((! json_object_is_type(plugin->paramsJ, json_type_object)) ||
+	   (wrap_json_unpack(plugin->paramsJ, "{s:i, s:s}", "channels", &btChannelsNumber, "zone", &btStreamZone))) {
+		AFB_ApiError(plugin->api, "Can't get HAL-BT plugin parameters from json ('%s')", json_object_get_string(plugin->paramsJ));
+		return -5;
 	}
 
 	wrap_json_pack(&actionsToAdd, "{s:s s:s}",
@@ -106,13 +120,13 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event, 'events' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -4;
+		return -6;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].key);
 		json_object_put(actionsToAdd);
-		return -5;
+		return -7;
 	}
 
 	wrap_json_pack(&actionsToAdd, "{s:s s:s s:s}",
@@ -127,13 +141,64 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload, 'onload' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -6;
+		return -8;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].uid);
 		json_object_put(actionsToAdd);
-		return -7;
+		return -9;
+	}
+
+	btCaptureJ = json_tokener_parse(MIXER_BT_CAPTURE_JSON_SECTION);
+	wrap_json_pack(&btCaptureParamsJ, "{s:i}", "channels", btChannelsNumber);
+	json_object_object_add(btCaptureJ, "params", btCaptureParamsJ);
+
+	if(! json_object_object_get_ex(halMixerJ, "captures", &halOrigCaptureJ)) {
+		halNewCaptureJ = json_object_new_array();
+		json_object_array_add(halNewCaptureJ, btCaptureJ);
+		json_object_object_add(halMixerJ, "captures", halNewCaptureJ);
+	}
+	else if(json_object_is_type(halOrigCaptureJ, json_type_array)) {
+		halNewCaptureJ = halOrigCaptureJ;
+		json_object_array_add(halNewCaptureJ, btCaptureJ);
+	}
+	else if(json_object_is_type(halOrigCaptureJ, json_type_object)) {
+		json_object_get(halOrigCaptureJ);
+		json_object_object_del(halMixerJ, "captures");
+		halNewCaptureJ = json_object_new_array();
+		json_object_array_add(halNewCaptureJ, halOrigCaptureJ);
+		json_object_array_add(halNewCaptureJ, btCaptureJ);
+		json_object_object_add(halMixerJ, "captures", halNewCaptureJ);
+	}
+	else {
+		AFB_ApiError(plugin->api, "Unrecognized 'halmixer' captures format");
+		return -10;
+	}
+
+	btStreamJ = json_tokener_parse(MIXER_BT_STREAM_JSON_SECTION);
+	json_object_object_add(btStreamJ, "zone", json_object_new_string(btStreamZone));
+
+	if(! json_object_object_get_ex(halMixerJ, "streams", &halOrigStreamJ)) {
+		halNewStreamJ = json_object_new_array();
+		json_object_array_add(halNewStreamJ, btStreamJ);
+		json_object_object_add(halMixerJ, "streams", halNewStreamJ);
+	}
+	else if(json_object_is_type(halOrigStreamJ, json_type_array)) {
+		halNewStreamJ = halOrigStreamJ;
+		json_object_array_add(halNewStreamJ, btStreamJ);
+	}
+	else if(json_object_is_type(halOrigStreamJ, json_type_object)) {
+		json_object_get(halOrigStreamJ);
+		json_object_object_del(halMixerJ, "streams");
+		halNewStreamJ = json_object_new_array();
+		json_object_array_add(halNewStreamJ, halOrigStreamJ);
+		json_object_array_add(halNewStreamJ, btStreamJ);
+		json_object_object_add(halMixerJ, "streams", halNewStreamJ);
+	}
+	else {
+		AFB_ApiError(plugin->api, "Unrecognized 'halmixer' streams format");
+		return -11;
 	}
 
 	localHalBtPluginData.halBtPluginEnabled = 1;

@@ -9,6 +9,17 @@
         "author": "Jonathan Aillet",
         "date": "2018-06-09"
     },
+    "resources": [
+        {
+            "uid": "hal-bt",
+            "info": "Bluetooth hal plugin to get A2DP bluetooth device as an input by tweaking softmixer configuration",
+            "params": {
+                "channels": 2,
+                "zone": "front-seats"
+            },
+            "libs": ["hal-bt.ctlso"]
+        }
+    ],
     "controls": [
         {
             "uid": "ping",
