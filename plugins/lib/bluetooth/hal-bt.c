@@ -38,13 +38,13 @@ CTLP_CAPI_REGISTER(HAL_BT_PLUGIN_NAME)
 // Call at initialisation time
 CTLP_ONLOAD(plugin, callbacks)
 {
-	AFB_ApiInfo(plugin->api, "Hal-Bt Plugin Registering: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+	AFB_ApiInfo(plugin->api, "%s Plugin Registering: uid='%s' 'info='%s'", HAL_BT_PLUGIN_NAME, plugin->uid, plugin->info);
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
 
 	localHalBtPluginData.currentHalApiHandle = plugin->api;
 
-	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered correctly: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+	AFB_ApiNotice(plugin->api, "%s Plugin Registered correctly: uid='%s' 'info='%s'", HAL_BT_PLUGIN_NAME, plugin->uid, plugin->info);
 
 	return 0;
 }
@@ -153,11 +153,11 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 	json_object *toSendJ, *returnedJ, *returnedBtList = NULL;
 
 	if(! localHalBtPluginData.halBtPluginEnabled) {
-		AFB_ApiWarning(source->api, "Controller onload initialization of HAL-BT plugin cannot be done because bluetooth is not reachable");
+		AFB_ApiWarning(source->api, "Controller onload initialization of %s plugin cannot be done because bluetooth is not reachable", HAL_BT_PLUGIN_NAME);
 		return 0;
 	}
 
-	AFB_ApiInfo(source->api, "Controller onload initialization of HAL-BT plugin");
+	AFB_ApiInfo(source->api, "Controller onload initialization of %s plugin", HAL_BT_PLUGIN_NAME);
 
 	// Loading hal BT plugin specific verbs
 	if(afb_dynapi_add_verb(source->api,
@@ -288,7 +288,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 		}
 	}
 
-	AFB_ApiNotice(source->api, "Controller onload initialization of HAL-BT plugin correctly done");
+	AFB_ApiNotice(source->api, "Controller onload initialization of %s plugin correctly done", HAL_BT_PLUGIN_NAME);
 
 	return 0;
 }
