@@ -34,7 +34,7 @@
 // TBD JAI : to implement
 void HalMgrDispatchApiEvent(AFB_ApiT apiHandle, const char *evtLabel, json_object *eventJ)
 {
-	AFB_ApiWarning(apiHandle, "%s not implemented yet", __func__);
+	AFB_ApiWarning(apiHandle, "Not implemented yet");
 	// Use "4a-hal-manager-events.h" to handle events
 }
 
@@ -93,7 +93,7 @@ void HalMgrLoaded(AFB_ReqT request)
 
 	requestJson = AFB_ReqJson(request);
 	if(! requestJson)
-		AFB_ReqNotice(request, "%s: Can't get request json", __func__);
+		AFB_ReqNotice(request, "Can't get request json");
 	else
 		requestJsonErr = wrap_json_unpack(requestJson, "{s?:b s?:b}", "all", &allHal, "verbose", &verbose);
 
@@ -264,7 +264,7 @@ void HalMgrUnload(AFB_ReqT request)
 // TBD JAI : to implement
 void HalMgrSubscribeEvent(AFB_ReqT request)
 {
-	AFB_ReqWarning(request, "%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "Not implemented yet");
 
 	AFB_ReqSuccess(request, json_object_new_boolean(0), NULL);
 }
@@ -272,7 +272,7 @@ void HalMgrSubscribeEvent(AFB_ReqT request)
 // TBD JAI : to implement
 void HalMgrUnsubscribeEvent(AFB_ReqT request)
 {
-	AFB_ReqWarning(request, "%s not implemented yet", __func__);
+	AFB_ReqWarning(request, "Not implemented yet");
 
 	AFB_ReqSuccess(request, json_object_new_boolean(0), NULL);
 }

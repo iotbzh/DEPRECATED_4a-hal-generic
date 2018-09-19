@@ -115,7 +115,7 @@ static int HalCtlsInitOneApi(AFB_ApiT apiHandle)
 	else {
 		currentCtlHalData->status = HAL_STATUS_AVAILABLE;
 		if((err = HalCtlsAttachToMixer(apiHandle))) {
-			AFB_ApiError(apiHandle, "%s: Error %i while attaching to mixer", __func__, err);
+			AFB_ApiError(apiHandle, "Error %i while attaching to mixer", err);
 			return -4;
 		}
 	}
@@ -140,7 +140,7 @@ static int HalCtlsLoadOneApi(void *cbdata, AFB_ApiT apiHandle)
 
 	// Add static controls verbs
 	if(HalUtlLoadVerbs(apiHandle, CtlHalDynApiStaticVerbs)) {
-		AFB_ApiError(apiHandle, "%s : load Section : fail to register static V2 verbs", __func__);
+		AFB_ApiError(apiHandle, "Load Section : fail to register static V2 verbs");
 		return 1;
 	}
 
@@ -168,12 +168,12 @@ int HalCtlsCreateApi(AFB_ApiT apiHandle, char *path, struct HalMgrData *HalMgrGl
 	// Create one Api per file
 	ctrlConfig = CtlLoadMetaData(apiHandle, path);
 	if(! ctrlConfig) {
-		AFB_ApiError(apiHandle, "%s: No valid control config file in:\n-- %s", __func__, path);
+		AFB_ApiError(apiHandle, "No valid control config file in:\n-- %s", path);
 		return -2;
 	}
 
 	if(! ctrlConfig->api) {
-		AFB_ApiError(apiHandle, "%s: API Missing from metadata in:\n-- %s", __func__, path);
+		AFB_ApiError(apiHandle, "API Missing from metadata in:\n-- %s", path);
 		return -3;
 	}
 
@@ -213,7 +213,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 	// Hugely hack to make all V2 AFB_DEBUG to work in fileutils
 	AFB_default = apiHandle;
 
-	AFB_ApiNotice(apiHandle, "In %s", __func__);
+	AFB_ApiNotice(apiHandle, "Begining to create all APIs");
 
 	dirList = getenv("CONTROL_CONFIG_PATH");
 	if(! dirList)
@@ -221,7 +221,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 
 	configJ = CtlConfigScan(dirList, "hal");
 	if(! configJ) {
-		AFB_ApiWarning(apiHandle, "%s: No hal-(binder-middle-name)*.json config file(s) found in %s, 4a-hal-manager will only works with external hal", __func__, dirList);
+		AFB_ApiWarning(apiHandle, "No hal-(binder-middle-name)*.json config file(s) found in %s, 4a-hal-manager will only works with external hal", dirList);
 		return 0;
 	}
 
@@ -230,7 +230,7 @@ int HalCtlsCreateAllApi(AFB_ApiT apiHandle, struct HalMgrData *HalMgrGlobalData)
 		entryJ = json_object_array_get_idx(configJ, index);
 
 		if(wrap_json_unpack(entryJ, "{s:s, s:s !}", "fullpath", &fullPath, "filename", &fileName)) {
-			AFB_ApiError(apiHandle, "%s: HOOPs invalid JSON entry = %s", __func__, json_object_get_string(entryJ));
+			AFB_ApiError(apiHandle, "HOOPs invalid JSON entry = %s", json_object_get_string(entryJ));
 			return -2;
 		}
 

@@ -76,7 +76,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 		case json_type_null:
 		case json_type_object:
 			count = 0;
-			AFB_ApiWarning(apiHandle, "%s: can't normalize json values :\n-- %s", __func__, json_object_get_string(toConvertJ));
+			AFB_ApiWarning(apiHandle, "Can't normalize json values :\n-- %s", json_object_get_string(toConvertJ));
 			*ConvertedJ = json_object_get(toConvertJ);
 			return -1;
 
@@ -99,8 +99,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 				if(! json_object_is_type(toConvertObjectJ, json_type_int)) {
 					err += -10*idx;
 					AFB_ApiWarning(apiHandle,
-						"%s: Try normalize an integer control but value sent in json is not an integer : '%s'",
-						__func__,
+						"Try normalize an integer control but value sent in json is not an integer : '%s'",
 						json_object_get_string(toConvertObjectJ));
 					convertedValueJ = toConvertObjectJ;
 					break;
@@ -110,8 +109,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 				convertedValue = HalCtlsConvertPercentageToValue(initialValue, alsaCtlProperties->minval, alsaCtlProperties->maxval);
 				if(convertedValue == -INT_MAX) {
 					AFB_ApiWarning(apiHandle,
-						"%s: Can't normalize %i (using min %i et max %i), value set to 0",
-						__func__,
+						"Can't normalize %i (using min %i et max %i), value set to 0",
 						initialValue,
 						alsaCtlProperties->minval,
 						alsaCtlProperties->maxval);
@@ -132,8 +130,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 				      json_object_is_type(toConvertObjectJ, json_type_boolean))) {
 					err += -1000*idx;
 					AFB_ApiWarning(apiHandle,
-						"%s: Try normalize a boolean control but value sent in json is not a boolean/integer : '%s'",
-						__func__,
+						"Try normalize a boolean control but value sent in json is not a boolean/integer : '%s'",
 						json_object_get_string(toConvertObjectJ));
 					convertedValueJ = toConvertObjectJ;
 					break;
@@ -145,8 +142,7 @@ int HalCtlsNormalizeJsonValues(AFB_ApiT apiHandle, struct CtlHalAlsaCtlPropertie
 
 			default:
 				AFB_ApiWarning(apiHandle,
-					       "%s: Normalization not handle for the alsa control type %i, sending back the object as it was '%s'",
-					       __func__,
+					       "Normalization not handle for the alsa control type %i, sending back the object as it was '%s'",
 					       (int) alsaCtlProperties->type,
 					       json_object_get_string(toConvertJ));
 				convertedValueJ = toConvertObjectJ;

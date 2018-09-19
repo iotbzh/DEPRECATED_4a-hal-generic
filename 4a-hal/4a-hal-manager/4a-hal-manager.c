@@ -114,7 +114,7 @@ static int HalMgrLoadApi(void *cbdata, AFB_ApiT apiHandle)
 
 	// Add static controls verbs
 	if(HalUtlLoadVerbs(apiHandle, HalManagerApiStaticVerbs)) {
-		AFB_ApiError(apiHandle, "%s : load section : fail to register static V2 verbs", __func__);
+		AFB_ApiError(apiHandle, "Load section : fail to register static verbs");
 		return 1;
 	}
 
@@ -153,7 +153,7 @@ int afbBindingEntry(AFB_ApiT apiHandle)
 	// Hugely hack to make all V2 AFB_DEBUG to work in fileutils
 	AFB_default = apiHandle;
 
-	AFB_ApiNotice(apiHandle, "In %s", __func__);
+	AFB_ApiNotice(apiHandle, "Binding start");
 
 	// Load Hal-Manager using DynApi
 	rc = HalMgrCreateApi(apiHandle, &localHalMgrGlobalData);

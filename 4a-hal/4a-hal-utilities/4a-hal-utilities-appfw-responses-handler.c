@@ -94,13 +94,13 @@ void HalUtlHandleAppFwCallErrorInRequest(AFB_ReqT request, char *apiCalled, char
 	AFB_ApiT apiHandle;
 
 	if(! request || ! apiCalled || ! verbCalled || ! callReturnJ) {
-		AFB_ReqFailF(request, "invalid_args", "%s: invalid arguments", __func__);
+		AFB_ReqFailF(request, "invalid_args", "Invalid arguments");
 		return;
 	}
 
 	apiHandle = (AFB_ApiT) afb_request_get_dynapi(request);
 	if(! apiHandle) {
-		AFB_ReqFailF(request, "api_handle", "%s: Can't get hal manager api handle", __func__);
+		AFB_ReqFailF(request, "api_handle", "Can't get hal manager api handle");
 		return;
 	}
 

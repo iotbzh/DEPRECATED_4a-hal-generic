@@ -57,7 +57,7 @@ CTLP_ONLOAD(plugin, callbacks)
 	}
 
 	if(! (localHalBtPluginData.currentHalData = (struct SpecificHalData *) ctrlConfig->external)) {
-		AFB_ApiError(plugin->api, "%s: Can't get current hal controller data", __func__);
+		AFB_ApiError(plugin->api, "Can't get current hal controller data");
 		return -2;
 	}
 
@@ -158,7 +158,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_STREAMING_STATUS_VERB);
+		AFB_ApiError(source->api, "Error while creating verb for bluetooth plugin : '%s'", HAL_BT_GET_STREAMING_STATUS_VERB);
 		return -1;
 	}
 
@@ -169,7 +169,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_SET_STREAMING_STATUS_VERB);
+		AFB_ApiError(source->api, "Error while creating verb for bluetooth plugin : '%s'", HAL_BT_SET_STREAMING_STATUS_VERB);
 		return -2;
 	}
 
@@ -180,7 +180,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_CONNECTED_A2DP_DEVICES_VERB);
+		AFB_ApiError(source->api, "Error while creating verb for bluetooth plugin : '%s'", HAL_BT_GET_CONNECTED_A2DP_DEVICES_VERB);
 		return -3;
 	}
 
@@ -191,7 +191,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_GET_SELECTED_A2DP_DEVICE_VERB);
+		AFB_ApiError(source->api, "Error while creating verb for bluetooth plugin : '%s'", HAL_BT_GET_SELECTED_A2DP_DEVICE_VERB);
 		return -4;
 	}
 
@@ -202,7 +202,7 @@ CTLP_CAPI(init, source, argsJ, queryJ)
 			       (void *) &localHalBtPluginData,
 			       NULL,
 			       0)) {
-		AFB_ApiError(source->api, "%s: error while creating verb for bluetooth plugin : '%s'", __func__, HAL_BT_SET_SELECTED_A2DP_DEVICE_VERB);
+		AFB_ApiError(source->api, "Error while creating verb for bluetooth plugin : '%s'", HAL_BT_SET_SELECTED_A2DP_DEVICE_VERB);
 		return -5;
 	}
 

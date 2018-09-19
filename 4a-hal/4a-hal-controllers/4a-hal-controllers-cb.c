@@ -46,17 +46,17 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 
 	json_object *valuesJ;
 
-	AFB_ApiDebug(apiHandle, "%s: evtname=%s [msg=%s]", __func__, evtLabel, json_object_get_string(eventJ));
+	AFB_ApiDebug(apiHandle, "Evtname=%s [msg=%s]", evtLabel, json_object_get_string(eventJ));
 
 	ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(apiHandle);
 	if(! ctrlConfig) {
-		AFB_ApiError(apiHandle, "%s: Can't get current hal controller config", __func__);
+		AFB_ApiError(apiHandle, "Can't get current hal controller config");
 		return;
 	}
 
 	currentHalData = (struct SpecificHalData *) ctrlConfig->external;
 	if(! currentHalData) {
-		AFB_ApiWarning(apiHandle, "%s: Can't get current hal controller data", __func__);
+		AFB_ApiWarning(apiHandle, "Can't get current hal controller data");
 		return;
 	}
 
@@ -68,7 +68,7 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 	   sscanf(&evtLabel[idx + 1], "%d", &cardidx) == 1 &&
 	   currentHalData->sndCardId == cardidx) {
 		if(wrap_json_unpack(eventJ, "{s:i s:o !}", "id", &numid, "val", &valuesJ)) {
-			AFB_ApiError(apiHandle, "%s: Invalid Alsa Event label=%s value=%s", __func__, evtLabel, json_object_get_string(eventJ));
+			AFB_ApiError(apiHandle, "Invalid Alsa Event label=%s value=%s", evtLabel, json_object_get_string(eventJ));
 			return;
 		}
 
@@ -86,8 +86,7 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 				}
 				else {
 					AFB_ApiNotice(apiHandle,
-						      "%s: The alsa control id '%i' is corresponding to a known control but without any action registered",
-						      __func__,
+						      "The alsa control id '%i' is corresponding to a known control but without any action registered",
 						      numid);
 				}
 
@@ -95,8 +94,7 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 			}
 		}
 
-		AFB_ApiWarning(apiHandle, "%s: alsacore event with an unrecognized numid: %i, evtname=%s [msg=%s]",
-					  __func__,
+		AFB_ApiWarning(apiHandle, "Alsacore event with an unrecognized numid: %i, evtname=%s [msg=%s]",
 					  numid,
 					  evtLabel,
 					  json_object_get_string(eventJ));
@@ -105,8 +103,7 @@ void HalCtlsDispatchApiEvent(afb_dynapi *apiHandle, const char *evtLabel, json_o
 	}
 
 	AFB_ApiInfo(apiHandle,
-		    "%s: not an alsacore event '%s' [msg=%s]",
-		    __func__,
+		    "Not an alsacore event '%s' [msg=%s]",
 		    evtLabel,
 		    json_object_get_string(eventJ));
 
@@ -154,14 +151,14 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 
 	json_object *alsaJ = NULL, *createAlsaCtlJ = NULL;
 
-	AFB_ApiDebug(apiHandle, "%s: AlsaMapJ=%s", __func__, json_object_get_string(AlsaMapJ));
+	AFB_ApiDebug(apiHandle, "AlsaMapJ=%s", json_object_get_string(AlsaMapJ));
 
 	if(wrap_json_unpack(AlsaMapJ, "{s:s s?:s s:o s?:s !}",
 				      "uid", &alsaMap->uid,
 				      "info", &alsaMap->info,
 				      "alsa", &alsaJ,
 				      "action", &action)) {
-		AFB_ApiError(apiHandle, "%s: parsing error, map should only contains [label]|[uid]|[tag]|[info]|[alsa]|[action] in:\n-- %s", __func__, json_object_get_string(AlsaMapJ));
+		AFB_ApiError(apiHandle, "Parsing error, map should only contains [label]|[uid]|[tag]|[info]|[alsa]|[action] in:\n-- %s", json_object_get_string(AlsaMapJ));
 		return -1;
 	}
 
@@ -170,7 +167,7 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 				   "numid", &alsaMap->ctl.numid,
 				   "value", &alsaMap->ctl.value,
 				   "create", &createAlsaCtlJ)) {
-		AFB_ApiError(apiHandle, "%s: parsing error, alsa json should only contains [name]|[numid]||[value]|[create] in:\n-- %s", __func__, json_object_get_string(alsaJ));
+		AFB_ApiError(apiHandle, "Parsing error, alsa json should only contains [name]|[numid]||[value]|[create] in:\n-- %s", json_object_get_string(alsaJ));
 		return -2;
 	}
 
@@ -184,12 +181,12 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 				    "minval", &alsaMap->ctl.alsaCtlCreation->minval,
 				    "maxval", &alsaMap->ctl.alsaCtlCreation->maxval,
 				    "step", &alsaMap->ctl.alsaCtlCreation->step)) {
-			AFB_ApiError(apiHandle, "%s: parsing error, alsa creation json should only contains [type]|[count]|[minval]|[maxval]|[step] in:\n-- %s", __func__, json_object_get_string(alsaJ));
+			AFB_ApiError(apiHandle, "Parsing error, alsa creation json should only contains [type]|[count]|[minval]|[maxval]|[step] in:\n-- %s", json_object_get_string(alsaJ));
 			return -3;
 		}
 
 		if(typename && (alsaMap->ctl.alsaCtlCreation->type = HalCtlsMapsAlsaTypeToEnum(typename)) == SND_CTL_ELEM_TYPE_NONE) {
-			AFB_ApiError(apiHandle, "%s: Couldn't get alsa type from string %s in:\n-- %s", __func__, typename, json_object_get_string(alsaJ));
+			AFB_ApiError(apiHandle, "Couldn't get alsa type from string %s in:\n-- %s", typename, json_object_get_string(alsaJ));
 			return -4;
 		}
 
@@ -198,8 +195,7 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 	}
 	else if(alsaMap->ctl.name && alsaMap->ctl.numid > 0) {
 		AFB_ApiError(apiHandle,
-			     "%s: Can't have both a control name (%s) and a control uid (%i) in alsa object:\n-- %s",
-			     __func__,
+			     "Can't have both a control name (%s) and a control uid (%i) in alsa object:\n-- %s",
 			     alsaMap->ctl.name,
 			     alsaMap->ctl.numid,
 			     json_object_get_string(alsaJ));
@@ -207,8 +203,7 @@ int HalCtlsProcessOneHalMapObject(AFB_ApiT apiHandle, struct CtlHalAlsaMap *alsa
 	}
 	else if(! alsaMap->ctl.name && alsaMap->ctl.numid <= 0) {
 		AFB_ApiError(apiHandle,
-			     "%s: Need at least a control name or a control uid in alsa object:\n-- %s",
-			     __func__,
+			     "Need at least a control name or a control uid in alsa object:\n-- %s",
 			     json_object_get_string(alsaJ));
 		return -6;
 	}
@@ -227,16 +222,12 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 
 	if(alsaMap->ctl.alsaCtlCreation) {
 		if(HalCtlsCreateAlsaCtl(apiHandle, cardId, &alsaMap->ctl)) {
-			AFB_ApiError(apiHandle,
-				     "%s: An error happened when trying to create a new alsa control",
-				     __func__);
+			AFB_ApiError(apiHandle, "An error happened when trying to create a new alsa control");
 			return -1;
 		}
 	}
 	else if(HalCtlsGetAlsaCtlInfo(apiHandle, cardId, &alsaMap->ctl)) {
-		AFB_ApiError(apiHandle,
-			     "%s: An error happened when trying to get existing alsa control info",
-			     __func__);
+		AFB_ApiError(apiHandle, "An error happened when trying to get existing alsa control info");
 		return -2;
 	}
 
@@ -271,8 +262,7 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 		alsaMap->action = calloc(1, sizeof(CtlActionT));
 		if(ActionLoadOne(apiHandle, alsaMap->action, alsaMap->actionJ, 0)) {
 			AFB_ApiError(apiHandle,
-				     "%s: Didn't succeed to load action using alsa object:\n-- %s",
-				     __func__,
+				     "Didn't succeed to load action using alsa object:\n-- %s",
 				     json_object_get_string(alsaMap->actionJ));
 			return -5;
 		}
@@ -280,8 +270,7 @@ int HalCtlsHandleOneHalMapObject(AFB_ApiT apiHandle, char *cardId, struct CtlHal
 
 	if(afb_dynapi_add_verb(apiHandle, alsaMap->uid, alsaMap->info, HalCtlsActionOnAlsaCtl, (void *) alsaMap, NULL, 0)) {
 		AFB_ApiError(apiHandle,
-			     "%s: Didn't to create verb for current alsa control to load action using alsa object:\n-- %s",
-			     __func__,
+			     "Didn't to create verb for current alsa control to load action using alsa object:\n-- %s",
 			     json_object_get_string(alsaMap->actionJ));
 		return -6;
 	}
@@ -310,7 +299,7 @@ int HalCtlsProcessAllHalMap(AFB_ApiT apiHandle, json_object *AlsaMapJ, struct Ct
 		default:
 			currentCtlHalAlsaMapT->ctlsCount = 0;
 			currentCtlHalAlsaMapT->ctls = NULL;
-			AFB_ApiWarning(apiHandle, "%s: couldn't get content of 'halmap' section in:\n-- %s", __func__, json_object_get_string(AlsaMapJ));
+			AFB_ApiWarning(apiHandle, "Couldn't get content of 'halmap' section in:\n-- %s", json_object_get_string(AlsaMapJ));
 			return -1;
 	}
 
@@ -357,28 +346,28 @@ int HalCtlsHalMapConfig(AFB_ApiT apiHandle, CtlSectionT *section, json_object *A
 		currentHalData->ctlHalSpecificData->ctlHalAlsaMapT = calloc(1, sizeof(struct CtlHalAlsaMapT));
 
 		if(HalCtlsProcessAllHalMap(apiHandle, AlsaMapJ, currentHalData->ctlHalSpecificData->ctlHalAlsaMapT)) {
-			AFB_ApiError(apiHandle, "%s: failed to process 'halmap' section", __func__);
+			AFB_ApiError(apiHandle, "Failed to process 'halmap' section");
 			return -3;
 		}
 	}
 	else if(currentHalData->status == HAL_STATUS_UNAVAILABLE) {
-		AFB_ApiWarning(apiHandle, "%s: hal is unavailable, 'halmap' section data can't be handle", __func__);
+		AFB_ApiWarning(apiHandle, "Hal is unavailable, 'halmap' section data can't be handle");
 		return 1;
 	}
 	else if(currentHalData->sndCardId < 0) {
-		AFB_ApiError(apiHandle, "%s: hal alsa card id is not valid, 'halmap' section data can't be handle", __func__);
+		AFB_ApiError(apiHandle, "Hal alsa card id is not valid, 'halmap' section data can't be handle");
 		return -6;
 	}
 	else if(! currentHalData->ctlHalSpecificData->ctlHalAlsaMapT) {
-		AFB_ApiWarning(apiHandle, "%s: 'halmap' section data is empty", __func__);
+		AFB_ApiWarning(apiHandle, "'halmap' section data is empty");
 		return 2;
 	}
 	else if(! (currentHalData->ctlHalSpecificData->ctlHalAlsaMapT->ctlsCount > 0)) {
-		AFB_ApiWarning(apiHandle, "%s: no alsa controls defined in 'halmap' section", __func__);
+		AFB_ApiWarning(apiHandle, "No alsa controls defined in 'halmap' section");
 		return 3;
 	}
 	else if(HalCtlsHandleAllHalMap(apiHandle, currentHalData->sndCardId, currentHalData->ctlHalSpecificData->ctlHalAlsaMapT)) {
-		AFB_ApiError(apiHandle, "%s: failed to handle 'halmap' section", __func__);
+		AFB_ApiError(apiHandle, "Failed to handle 'halmap' section");
 		return -9;
 	}
 
@@ -453,8 +442,7 @@ void HalCtlsActionOnCall(AFB_ReqT request)
 	else if(wrap_json_unpack(returnJ, "{s:o}", "response", &toReturnJ)) {
 		AFB_ReqSuccessF(request,
 				json_object_get(returnJ),
-				"%s: Seems that %s call to api %s succeed, but no response was found : '%s'",
-				__func__,
+				"Seems that %s call to api %s succeed, but no response was found : '%s'",
 				currentMixerData->verbToCall,
 				apiToCall,
 				json_object_get_string(returnJ));
@@ -544,7 +532,7 @@ void HalCtlsInfo(AFB_ReqT request)
 
 	requestJson = AFB_ReqJson(request);
 	if(! requestJson) {
-		AFB_ReqNotice(request, "%s: Can't get request json", __func__);
+		AFB_ReqNotice(request, "Can't get request json");
 	}
 	else if(json_object_is_type(requestJson, json_type_object) && json_object_get_object(requestJson)->count > 0) {
 		apiToCall = currentCtlHalData->ctlHalSpecificData->mixerApiName;

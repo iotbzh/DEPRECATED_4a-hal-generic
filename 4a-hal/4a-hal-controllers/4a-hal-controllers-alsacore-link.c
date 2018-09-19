@@ -105,12 +105,12 @@ int HalCtlsGetCardIdByCardPath(AFB_ApiT apiHandle, char *devPath)
 	json_object *toSendJ, *returnJ = NULL, *responsJ, *devidJ;
 
 	if(! apiHandle) {
-		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
+		AFB_ApiError(apiHandle, "Api handle not available");
 		return -1;
 	}
 
 	if(! devPath) {
-		AFB_ApiError(apiHandle, "%s: dev path is not available", __func__);
+		AFB_ApiError(apiHandle, "Dev path is not available");
 		return -2;
 	}
 
@@ -193,24 +193,23 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 	json_object *queryJ, *returnedJ = NULL;
 
 	if(! apiHandle) {
-		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
+		AFB_ApiError(apiHandle, "Api handle not available");
 		return -1;
 	}
 
 	if(! cardId) {
-		AFB_ApiError(apiHandle, "%s: card id is not available", __func__);
+		AFB_ApiError(apiHandle, "Card id is not available");
 		return -2;
 	}
 
 	if(! currentAlsaCtl) {
-		AFB_ApiError(apiHandle, "%s: alsa control data structure is not available", __func__);
+		AFB_ApiError(apiHandle, "Alsa control data structure is not available");
 		return -3;
 	}
 
 	if(currentAlsaCtl->name && currentAlsaCtl->numid > 0) {
 		AFB_ApiError(apiHandle,
-			     "%s: Can't have both a control name (%s) and a control uid (%i)",
-			     __func__,
+			     "Can't have both a control name (%s) and a control uid (%i)",
 			     currentAlsaCtl->name,
 			     currentAlsaCtl->numid);
 		return -4;
@@ -222,7 +221,7 @@ int HalCtlsGetAlsaCtlInfo(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl
 		wrap_json_pack(&queryJ, "{s:s s:i s:i}", "devid", cardId, "ctl", currentAlsaCtl->numid, "mode", 3);
 	}
 	else {
-		AFB_ApiError(apiHandle, "%s: Need at least a control name or a control uid", __func__);
+		AFB_ApiError(apiHandle, "Need at least a control name or a control uid");
 		return -5;
 	}
 
@@ -279,22 +278,22 @@ int HalCtlsSetAlsaCtlValue(AFB_ApiT apiHandle, char *cardId, int ctlId, json_obj
 	json_object *queryJ, *returnedJ = NULL, *returnedWarningJ;
 
 	if(! apiHandle) {
-		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
+		AFB_ApiError(apiHandle, "Api handle not available");
 		return -1;
 	}
 
 	if(! cardId) {
-		AFB_ApiError(apiHandle, "%s: card id is not available", __func__);
+		AFB_ApiError(apiHandle, "Card id is not available");
 		return -2;
 	}
 
 	if(ctlId <= 0) {
-		AFB_ApiError(apiHandle, "%s: Alsa control id is not valid", __func__);
+		AFB_ApiError(apiHandle, "Alsa control id is not valid");
 		return -3;
 	}
 
 	if(! valuesJ) {
-		AFB_ApiError(apiHandle, "%s: values to set json is not available", __func__);
+		AFB_ApiError(apiHandle, "Values to set json is not available");
 		return -4;
 	}
 
@@ -337,22 +336,22 @@ int HalCtlsCreateAlsaCtl(AFB_ApiT apiHandle, char *cardId, struct CtlHalAlsaCtl 
 	json_object *queryJ, *returnedJ = NULL, *returnedWarningJ, *responseJ;
 
 	if(! apiHandle) {
-		AFB_ApiError(apiHandle, "%s: api handle not available", __func__);
+		AFB_ApiError(apiHandle, "Api handle not available");
 		return -1;
 	}
 
 	if(! cardId) {
-		AFB_ApiError(apiHandle, "%s: card id is not available", __func__);
+		AFB_ApiError(apiHandle, "Card id is not available");
 		return -2;
 	}
 
 	if(! alsaCtlToCreate) {
-		AFB_ApiError(apiHandle, "%s: alsa control data structure is not available", __func__);
+		AFB_ApiError(apiHandle, "Alsa control data structure is not available");
 		return -3;
 	}
 
 	if(! alsaCtlToCreate->alsaCtlCreation) {
-		AFB_ApiError(apiHandle, "%s: alsa control data for creation structure is not available", __func__);
+		AFB_ApiError(apiHandle, "Alsa control data for creation structure is not available");
 		return -4;
 	}
 
