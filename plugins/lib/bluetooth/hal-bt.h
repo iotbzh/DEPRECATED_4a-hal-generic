@@ -25,6 +25,7 @@
 #define HAL_BT_PLUGIN_NAME		"hal-bt"
 
 #define BT_MANAGER_API			"Bluetooth-Manager"
+#define BT_MANAGER_GET_POWER_INFO	"power"
 #define BT_MANAGER_SUBSCRIBE_VERB	"subscribe"
 #define BT_MANAGER_GET_DEVICES_VERB	"discovery_result"
 

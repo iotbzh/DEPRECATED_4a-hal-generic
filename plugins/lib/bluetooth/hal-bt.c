@@ -53,9 +53,11 @@ CTLP_INIT(plugin, callbacks)
 {
 	unsigned int idx;
 
+	char *returnedInfo;
+
 	CtlConfigT *ctrlConfig;
 
-	json_object *actionsToAdd;
+	json_object *actionsToAdd, *returnedJ;
 
 	AFB_ApiInfo(plugin->api, "Plugin initialization of HAL-BT plugin");
 
@@ -74,6 +76,25 @@ CTLP_INIT(plugin, callbacks)
 		return -2;
 	}
 
+	if(AFB_ServiceSync(plugin->api, BT_MANAGER_API, BT_MANAGER_GET_POWER_INFO, NULL, &returnedJ)) {
+		if((! wrap_json_unpack(returnedJ, "{s:{s:s}}", "request", "info", &returnedInfo)) &&
+		   (! strncmp(returnedInfo, "Unable to get power status", strlen(returnedInfo)))) {
+			AFB_ApiWarning(plugin->api,
+				       "No bluetooth receiver detected when calling verb '%s' of '%s' api, bluetooth is disable because not reachable",
+				       BT_MANAGER_GET_POWER_INFO,
+				       BT_MANAGER_API);
+			return 0;
+		}
+		else {
+			AFB_ApiError(plugin->api,
+				     "Error during call to verb '%s' of '%s' api (%s)",
+				     BT_MANAGER_GET_POWER_INFO,
+				     BT_MANAGER_API,
+				     json_object_get_string(returnedJ));
+			return -3;
+		}
+	}
+
 	wrap_json_pack(&actionsToAdd, "{s:s s:s}",
 				      "uid", "Bluetooth-Manager/device_updated",
 				      "action", "plugin://hal-bt#events");
@@ -85,13 +106,13 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event, 'events' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -3;
+		return -4;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].key);
 		json_object_put(actionsToAdd);
-		return -4;
+		return -5;
 	}
 
 	wrap_json_pack(&actionsToAdd, "{s:s s:s s:s}",
@@ -106,13 +127,13 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload, 'onload' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -5;
+		return -6;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].uid);
 		json_object_put(actionsToAdd);
-		return -6;
+		return -7;
 	}
 
 	localHalBtPluginData.halBtPluginEnabled = 1;
