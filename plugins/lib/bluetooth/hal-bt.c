@@ -38,13 +38,26 @@ CTLP_CAPI_REGISTER(HAL_BT_PLUGIN_NAME)
 // Call at initialisation time
 CTLP_ONLOAD(plugin, callbacks)
 {
-	CtlConfigT *ctrlConfig;
-
 	AFB_ApiInfo(plugin->api, "Hal-Bt Plugin Registering: uid='%s' 'info='%s'", plugin->uid, plugin->info);
 
 	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
 
 	localHalBtPluginData.currentHalApiHandle = plugin->api;
+
+	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered correctly: uid='%s' 'info='%s'", plugin->uid, plugin->info);
+
+	return 0;
+}
+
+CTLP_INIT(plugin, callbacks)
+{
+	unsigned int idx;
+
+	CtlConfigT *ctrlConfig;
+
+	json_object *actionsToAdd;
+
+	AFB_ApiInfo(plugin->api, "Plugin initialization of HAL-BT plugin");
 
 	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
 		AFB_ApiWarning(plugin->api, "Didn't succeed to require %s api, bluetooth is disable because not reachable", BT_MANAGER_API);
@@ -61,33 +74,6 @@ CTLP_ONLOAD(plugin, callbacks)
 		return -2;
 	}
 
-	localHalBtPluginData.halBtPluginEnabled = 1;
-
-	AFB_ApiNotice(plugin->api, "Hal-Bt Plugin Registered correctly: uid='%s' 'info='%s'", plugin->uid, plugin->info);
-
-	return 0;
-}
-
-CTLP_INIT(plugin, callbacks)
-{
-	unsigned int idx;
-
-	CtlConfigT *ctrlConfig;
-
-	json_object *actionsToAdd;
-
-	if(! localHalBtPluginData.halBtPluginEnabled) {
-		AFB_ApiWarning(plugin->api, "Plugin initialization of HAL-BT plugin cannot be done because bluetooth is not reachable");
-		return 0;
-	}
-
-	AFB_ApiInfo(plugin->api, "Plugin initialization of HAL-BT plugin");
-
-	if(! (ctrlConfig = (CtlConfigT *) afb_dynapi_get_userdata(plugin->api))) {
-		AFB_ApiError(plugin->api, "Can't get current hal controller config");
-		return -1;
-	}
-
 	wrap_json_pack(&actionsToAdd, "{s:s s:s}",
 				      "uid", "Bluetooth-Manager/device_updated",
 				      "action", "plugin://hal-bt#events");
@@ -99,13 +85,13 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event, 'events' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -2;
+		return -3;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new event to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].key);
 		json_object_put(actionsToAdd);
-		return -3;
+		return -4;
 	}
 
 	wrap_json_pack(&actionsToAdd, "{s:s s:s s:s}",
@@ -120,14 +106,16 @@ CTLP_INIT(plugin, callbacks)
 	if(! ctrlConfig->sections[idx].key) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload, 'onload' section not found", json_object_get_string(actionsToAdd));
 		json_object_put(actionsToAdd);
-		return -4;
+		return -5;
 	}
 
 	if(AddActionsToSectionFromPlugin(plugin->api, *ctrlConfig->ctlPlugins, &ctrlConfig->sections[idx], actionsToAdd, 0)) {
 		AFB_ApiError(plugin->api, "Wasn't able to add '%s' as a new onload to %s", json_object_get_string(actionsToAdd), ctrlConfig->sections[idx].uid);
 		json_object_put(actionsToAdd);
-		return -5;
+		return -6;
 	}
+
+	localHalBtPluginData.halBtPluginEnabled = 1;
 
 	AFB_ApiNotice(plugin->api, "Plugin initialization of HAL-BT plugin correctly done");
 
