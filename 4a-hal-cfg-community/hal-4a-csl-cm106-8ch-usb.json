@@ -9,23 +9,10 @@
         "author": "Jonathan Aillet",
         "date": "2018-06-09"
     },
-    "onload": [
-        {
-            "uid": "init-audio-hal",
-            "info": "Init current HAL",
-            "action": "api://4a-hal-manager#ping"
-        }
-    ],
     "controls": [
         {
             "uid": "ping",
             "info": "Ping hal",
-            "action": "api://4a-hal-manager#ping"
-        }
-    ],
-    "events": [
-        {
-            "uid": "api/status_changed",
             "action": "api://4a-hal-manager#ping"
         }
     ],
