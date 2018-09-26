@@ -61,7 +61,7 @@ CTLP_INIT(plugin, callbacks)
 
 	json_object *actionsToAdd, *returnedJ, *halMixerJ, *halOrigCaptureJ, *halNewCaptureJ, *halOrigStreamJ, *halNewStreamJ, *btCaptureJ, *btCaptureParamsJ, *btStreamJ;
 
-	AFB_ApiInfo(plugin->api, "Plugin initialization of HAL-BT plugin");
+	AFB_ApiInfo(plugin->api, "Plugin initialization of %s plugin", HAL_BT_PLUGIN_NAME);
 
 	if(AFB_RequireApi(plugin->api, BT_MANAGER_API, 1)) {
 		AFB_ApiWarning(plugin->api, "Didn't succeed to require %s api, bluetooth is disable because not reachable", BT_MANAGER_API);
@@ -105,7 +105,7 @@ CTLP_INIT(plugin, callbacks)
 
 	if((! json_object_is_type(plugin->paramsJ, json_type_object)) ||
 	   (wrap_json_unpack(plugin->paramsJ, "{s:i, s:s}", "channels", &btChannelsNumber, "zone", &btStreamZone))) {
-		AFB_ApiError(plugin->api, "Can't get HAL-BT plugin parameters from json ('%s')", json_object_get_string(plugin->paramsJ));
+		AFB_ApiError(plugin->api, "Can't get %s plugin parameters from json ('%s')", HAL_BT_PLUGIN_NAME, json_object_get_string(plugin->paramsJ));
 		return -5;
 	}
 
@@ -203,7 +203,7 @@ CTLP_INIT(plugin, callbacks)
 
 	localHalBtPluginData.halBtPluginEnabled = 1;
 
-	AFB_ApiNotice(plugin->api, "Plugin initialization of HAL-BT plugin correctly done");
+	AFB_ApiNotice(plugin->api, "Plugin initialization of %s plugin correctly done", HAL_BT_PLUGIN_NAME);
 
 	return 0;
 }
