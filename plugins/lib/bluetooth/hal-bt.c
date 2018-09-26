@@ -38,12 +38,6 @@ CTLP_CAPI_REGISTER(HAL_BT_PLUGIN_NAME)
 // Call at initialisation time
 CTLP_ONLOAD(plugin, callbacks)
 {
-	AFB_ApiInfo(plugin->api, "%s Plugin Registering: uid='%s' 'info='%s'", HAL_BT_PLUGIN_NAME, plugin->uid, plugin->info);
-
-	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
-
-	localHalBtPluginData.currentHalApiHandle = plugin->api;
-
 	AFB_ApiNotice(plugin->api, "%s Plugin Registered correctly: uid='%s' 'info='%s'", HAL_BT_PLUGIN_NAME, plugin->uid, plugin->info);
 
 	return 0;
@@ -59,6 +53,8 @@ CTLP_INIT(plugin, callbacks)
 
 	CtlConfigT *ctrlConfig;
 
+	struct SpecificHalData *currentHalData;
+
 	json_object *actionsToAdd, *returnedJ, *halMixerJ, *halOrigCaptureJ, *halNewCaptureJ, *halOrigStreamJ, *halNewStreamJ, *btCaptureJ, *btCaptureParamsJ, *btStreamJ;
 
 	AFB_ApiInfo(plugin->api, "Plugin initialization of %s plugin", HAL_BT_PLUGIN_NAME);
@@ -73,13 +69,13 @@ CTLP_INIT(plugin, callbacks)
 		return -1;
 	}
 
-	if(! (localHalBtPluginData.currentHalData = (struct SpecificHalData *) ctrlConfig->external)) {
+	if(! (currentHalData = (struct SpecificHalData *) ctrlConfig->external)) {
 		AFB_ApiError(plugin->api, "Can't get current hal controller data");
 		return -2;
 	}
 
-	if((! localHalBtPluginData.currentHalData->ctlHalSpecificData) ||
-	   (! (halMixerJ = localHalBtPluginData.currentHalData->ctlHalSpecificData->halMixerJ))) {
+	if((! currentHalData->ctlHalSpecificData) ||
+	   (! (halMixerJ = currentHalData->ctlHalSpecificData->halMixerJ))) {
 		AFB_ApiError(plugin->api, "Can't get current hal mixer json section");
 		return -3;
 	}
@@ -112,6 +108,17 @@ CTLP_INIT(plugin, callbacks)
 	wrap_json_pack(&actionsToAdd, "{s:s s:s}",
 				      "uid", "Bluetooth-Manager/device_updated",
 				      "action", "plugin://hal-bt#events");
+
+	if(currentHalData->status != HAL_STATUS_AVAILABLE) {
+		AFB_ApiWarning(plugin->api, "Controller initialization of %s plugin cannot be done because hal is not ready to be used", HAL_BT_PLUGIN_NAME);
+		return 0;
+	}
+
+	memset(&localHalBtPluginData, '\0', sizeof(localHalBtPluginData));
+
+	localHalBtPluginData.currentHalApiHandle = plugin->api;
+
+	localHalBtPluginData.currentHalData = currentHalData;
 
 	idx = 0;
 	while(ctrlConfig->sections[idx].key && strcasecmp(ctrlConfig->sections[idx].key, "events"))
