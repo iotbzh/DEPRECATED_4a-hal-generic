@@ -52,7 +52,7 @@
 	\"volume\": 80,\
 	\"mute\": false,\
 	\"params\": {\
-		\"rate\" : 48000,\
+		\"rate\" : 44100,\
 		\"format\": \"S16_LE\",\
 		\"channels\": 2\
 	}\
