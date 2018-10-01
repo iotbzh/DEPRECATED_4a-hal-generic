@@ -29,16 +29,9 @@
     ],
     "halmap": [
         {
-            "uid": "agl-master-playback-volume",
-            "alsa": {
-                "name": "IEC958 Playback Default",
-                "value": 100
-            }
-        },
-        {
             "uid": "agl-pcm-playback-switch",
             "alsa": {
-                "name": "IEC958 Playback Switch",
+                "numid": 11,
                 "value": 1
             }
         }
