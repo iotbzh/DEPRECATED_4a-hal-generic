@@ -11,11 +11,11 @@
 
 ### Cloning 4a-hal-generic with its submodules
 
-git clone --recurse-submodules -b rc2 https://github.com/iotbzh/4a-hal-generic.git
+git clone --recurse-submodules https://github.com/iotbzh/4a-hal-generic.git
 
 ### Cloning 4a-softmixer hal-rc1 version (needed to make work '4a-hal-generic') with its submodules
 
-git clone --recurse-submodules -b hal-rc2-sandbox https://github.com/iotbzh/4a-softmixer.git
+git clone --recurse-submodules https://github.com/iotbzh/4a-softmixer.git
 
 ### Cloning 4a-alsacore with its submodules
 
