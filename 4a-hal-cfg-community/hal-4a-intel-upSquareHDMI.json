@@ -1,0 +1,192 @@
+{
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json",
+    "metadata": {
+        "uid": "/dev/snd/by-path/pci-0000:00:0e.0",
+        "version": "0.9",
+        "api": "4a-hal-intel-UpSquareHDMI",
+        "require": [ "alsacore", "smixer" ],
+        "info": "4a hal for Intel UpSquare device via HDMI socket",
+        "author": "Dominig ar Foll (Intel OTC)",
+        "date": "2018-10-01"
+    },
+    "resources": [
+        {
+            "uid": "hal-bt",
+            "info": "Bluetooth hal plugin to get A2DP bluetooth device as an input by tweaking softmixer configuration",
+            "params": {
+                "channels": 2,
+                "zone": "front-seats"
+            },
+            "libs": ["hal-bt.ctlso"]
+        }
+    ],
+    "controls": [
+        {
+            "uid": "ping",
+            "info": "Ping hal",
+            "action": "api://4a-hal-manager#ping"
+        }
+    ],
+    "halmap": [
+        {
+            "uid": "agl-master-playback-volume",
+            "alsa": {
+                "name": "IEC958 Playback Default",
+                "value": 100
+            }
+        },
+        {
+            "uid": "agl-pcm-playback-switch",
+            "alsa": {
+                "name": "IEC958 Playback Switch",
+                "value": 1
+            }
+        }
+    ],
+    "halmixer": {
+        "uid": "intel-upsquare-hdmi",
+        "mixerapi": "smixer",
+        "prefix": "intel-upquare-hdmi",
+        "ramps": [
+            {
+                "uid": "ramp-very-fast",
+                "delay": 50,
+                "up": 6,
+                "down": 10
+            },
+            {
+                "uid": "ramp-fast",
+                "delay": 50,
+                "up": 2,
+                "down": 10
+            },
+            {
+                "uid": "ramp-normal",
+                "delay": 50,
+                "up": 2,
+                "down": 4
+            },
+            {
+                "uid": "ramp-slow",
+                "delay": 50,
+                "up": 2,
+                "down": 2
+            },
+            {
+                "uid": "ramp-very-slow",
+                "delay": 100,
+                "up": 1,
+                "down": 1
+            }
+        ],
+        "playbacks" : {
+            "uid": "INTEL-UPSQUARE-HDMI",
+            "cardid": "hw:PCH",
+            "device": 7,
+            "params": {
+                "rate": 48000
+            },
+            "sink": {
+                "channels": [
+                    {
+                        "uid": "front-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "front-left",
+                        "port": 1
+                    }
+                ]
+            }
+        },
+        "captures": {
+            "uid": "INTEL-UPSQUARE-HDMI",
+            "path": "/dev/snd/by-path/pci-0000:00:0e.0",
+            "params": {
+                "rate": 48000
+            },
+            "source": {
+                "channels": [
+                    {
+                        "uid": "mic-right",
+                        "port": 0
+                    },
+                    {
+                        "uid": "mic-left",
+                        "port": 1
+                    }
+                ]
+            }
+        },
+        "zones": [
+            {
+                "uid": "full-stereo",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            },
+            {
+                "uid": "front-seats",
+                "sink": [
+                    {
+                        "target": "front-right",
+                        "channel": 0
+                    },
+                    {
+                        "target": "front-left",
+                        "channel": 1
+                    }
+                ]
+            }
+        ],
+        "streams": [
+            {
+                "uid": "multimedia",
+                "verb": "multimedia",
+                "zone": "full-stereo",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "navigation",
+                "verb": "navigation",
+                "zone": "front-seats",
+                "volume": 70,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "emergency",
+                "verb": "emergency",
+                "zone": "front-seats",
+                "volume": 60,
+                "mute": false,
+                "params": {
+                    "rate": 48000
+                }
+            },
+            {
+                "uid": "radio_stream",
+                "verb": "radio_stream",
+                "zone": "full-stereo",
+                "volume": 70,
+                "mute": true,
+                "params": {
+                    "rate" : 48000
+                }
+            }
+        ]
+    }
+}
