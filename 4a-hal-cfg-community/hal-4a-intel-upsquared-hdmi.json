@@ -3,9 +3,9 @@
     "metadata": {
         "uid": "/dev/snd/by-path/pci-0000:00:0e.0",
         "version": "0.9",
-        "api": "4a-hal-intel-UpSquareHDMI",
+        "api": "4a-hal-intel-upsquared-hdmi",
         "require": [ "alsacore", "smixer" ],
-        "info": "4a hal for Intel UpSquare device via HDMI socket",
+        "info": "4a hal for Intel UpSquared device via HDMI socket",
         "author": "Dominig ar Foll (Intel OTC)",
         "date": "2018-10-01"
     },
@@ -37,9 +37,9 @@
         }
     ],
     "halmixer": {
-        "uid": "intel-upsquare-hdmi",
+        "uid": "intel-upsquared-hdmi",
         "mixerapi": "smixer",
-        "prefix": "intel-upquare-hdmi",
+        "prefix": "intel-upsquared-hdmi",
         "ramps": [
             {
                 "uid": "ramp-very-fast",
@@ -73,7 +73,7 @@
             }
         ],
         "playbacks" : {
-            "uid": "INTEL-UPSQUARE-HDMI",
+            "uid": "INTEL-UPSQUARED-HDMI",
             "cardid": "hw:PCH",
             "device": 7,
             "params": {
@@ -93,7 +93,7 @@
             }
         },
         "captures": {
-            "uid": "INTEL-UPSQUARE-HDMI",
+            "uid": "INTEL-UPSQUARED-HDMI",
             "path": "/dev/snd/by-path/pci-0000:00:0e.0",
             "params": {
                 "rate": 48000
