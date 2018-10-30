@@ -2,6 +2,8 @@
 
 ------------------------------------------------------------
 
+DEPRECATED: this repo has been moved to AGL Gerrit server https://gerrit.automotivelinux.org/gerrit/#/admin/projects/src/4a-hal-generic,branches
+
 * Object: Use a new api to centralize call to hals, automatically create hal api from configuration files
 * Status: In Progress (master)
 * Author: Jonathan Aillet jonathan.aillet@iot.bzh
